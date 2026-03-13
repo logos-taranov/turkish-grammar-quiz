@@ -1,20 +1,20 @@
 <!doctype html>
-<html lang="tr">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Türkçe Dilbilgisi Testi — Ekler</title>
+  <title>Турецкая грамматика — аффиксы</title>
   <style>
     :root{
-      --bg: #fbf7f1;
+      --bg: #f8f9fa;
       --card: #ffffff;
       --ink: #1f2328;
       --muted: #5b6572;
-      --brand: #a8743a;
-      --brand-2:#d9a46a;
+      --brand: #3478E0;
+      --brand-2:#7AB4F5;
       --ok: #1f7a3a;
       --bad:#b42318;
-      --line:#e8dccb;
+      --line:#e5e7eb;
       --shadow: 0 10px 30px rgba(31,35,40,.08);
       --radius: 18px;
     }
@@ -25,8 +25,8 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
       color: var(--ink);
-      background: radial-gradient(1200px 600px at 15% 0%, rgba(217,164,106,.25), transparent 55%),
-                  radial-gradient(900px 500px at 95% 20%, rgba(168,116,58,.16), transparent 52%),
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(52,120,224,.10), transparent 55%),
+                  radial-gradient(900px 500px at 95% 20%, rgba(122,180,245,.12), transparent 52%),
                   var(--bg);
     }
 
@@ -36,18 +36,73 @@
       padding: 22px 14px 40px;
     }
 
-    header{
+    header.topHeader{
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content: space-between;
       gap: 14px;
       margin: 8px 0 16px;
     }
 
+    .brandRow{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .logo{
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 80% 20%, #7AB4F5 0%, #3478E0 55%, #2C67C7 100%);
+      display:flex;
+      flex-direction: column;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      line-height: 1;
+      box-shadow: 0 10px 22px rgba(52,120,224,.25);
+      border: 1px solid rgba(255,255,255,.35);
+      flex: 0 0 auto;
+      user-select: none;
+    }
+
+    .logoTop{
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 850;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .logoBottom{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      font-size: 12px;
+      font-weight: 850;
+      opacity: .95;
+      margin-top: 2px;
+      letter-spacing: .02em;
+    }
+
     .title{
       display:flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .welcomeBanner{
+      display:inline-flex;
+      align-items:center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--brand-2), var(--brand));
+      color: #fff;
+      font-weight: 850;
+      width: fit-content;
+      box-shadow: 0 10px 22px rgba(52,120,224,.20);
+      letter-spacing: -0.01em;
     }
 
     h1{
@@ -55,6 +110,7 @@
       line-height: 1.15;
       margin:0;
       letter-spacing: -0.02em;
+      color: var(--brand);
     }
 
     .subtitle{
@@ -62,7 +118,7 @@
       margin: 0;
       line-height: 1.35;
       font-size: 14px;
-      max-width: 62ch;
+      max-width: 72ch;
     }
 
     .chip{
@@ -70,8 +126,8 @@
       align-items:center;
       gap:8px;
       padding:10px 12px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(52,120,224,.22);
+      background: rgba(255,255,255,.75);
       border-radius: 999px;
       box-shadow: 0 4px 16px rgba(31,35,40,.06);
       white-space: nowrap;
@@ -84,12 +140,12 @@
       border: 0;
       background: transparent;
       color: var(--brand);
-      font-weight: 650;
+      font-weight: 750;
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 999px;
     }
-    .chip button:hover{ background: rgba(168,116,58,.10); }
+    .chip button:hover{ background: rgba(52,120,224,.10); }
 
     .grid{
       display:grid;
@@ -100,7 +156,7 @@
 
     @media (max-width: 860px){
       .grid{ grid-template-columns: 1fr; }
-      header{ flex-direction: column; }
+      header.topHeader{ flex-direction: column; align-items: flex-start; }
       .chip{ width: fit-content; }
     }
 
@@ -116,6 +172,7 @@
       margin: 0 0 10px;
       font-size: 16px;
       letter-spacing: -0.01em;
+      color: var(--brand);
     }
 
     .help{
@@ -126,8 +183,8 @@
     }
 
     .story{
-      border: 1px dashed rgba(168,116,58,.35);
-      background: rgba(251,247,241,.55);
+      border: 1px dashed rgba(52,120,224,.40);
+      background: rgba(248,249,250,.75);
       border-radius: 14px;
       padding: 14px;
       line-height: 1.9;
@@ -157,8 +214,8 @@
     }
 
     input.ans:focus{
-      border-color: rgba(168,116,58,.75);
-      box-shadow: 0 0 0 4px rgba(217,164,106,.25);
+      border-color: rgba(52,120,224,.95);
+      box-shadow: 0 0 0 4px rgba(52,120,224,.18);
     }
 
     input.ans.ok{
@@ -196,10 +253,10 @@
       cursor: pointer;
       background: linear-gradient(180deg, var(--brand-2), var(--brand));
       color: #fff;
-      font-weight: 750;
+      font-weight: 850;
       padding: 10px 14px;
       border-radius: 12px;
-      box-shadow: 0 10px 22px rgba(168,116,58,.22);
+      box-shadow: 0 10px 22px rgba(52,120,224,.22);
     }
 
     button.primary:disabled{
@@ -215,16 +272,16 @@
       color: var(--ink);
       padding: 10px 14px;
       border-radius: 12px;
-      font-weight: 700;
+      font-weight: 750;
     }
-    button.secondary:hover{ background: rgba(251,247,241,.75); }
+    button.secondary:hover{ background: rgba(248,249,250,.85); }
 
     .score{
       margin-top: 12px;
       padding: 12px 12px;
       border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(52,120,224,.22);
+      background: rgba(255,255,255,.75);
       display:flex;
       gap:10px;
       align-items:center;
@@ -233,7 +290,7 @@
 
     .score .big{
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: -0.01em;
     }
     .score .small{
@@ -263,7 +320,7 @@
       padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.8);
       font-size: 13px;
       color: var(--muted);
     }
@@ -293,7 +350,7 @@
       width: min(520px, 100%);
       background: #fff;
       border-radius: 18px;
-      border: 1px solid rgba(232,220,203,.8);
+      border: 1px solid rgba(229,231,235,.95);
       box-shadow: 0 30px 80px rgba(0,0,0,.25);
       padding: 16px;
     }
@@ -301,6 +358,7 @@
       margin: 0 0 6px;
       font-size: 18px;
       letter-spacing: -0.01em;
+      color: var(--brand);
     }
     .modal p{ margin:0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
 
@@ -318,8 +376,8 @@
       font-size: 15px;
     }
     .modal input:focus{
-      border-color: rgba(168,116,58,.75);
-      box-shadow: 0 0 0 4px rgba(217,164,106,.25);
+      border-color: rgba(52,120,224,.95);
+      box-shadow: 0 0 0 4px rgba(52,120,224,.18);
     }
 
     /* Admin */
@@ -329,7 +387,7 @@
       overflow:hidden;
       border-radius: 14px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.85);
     }
     th, td{
       padding: 10px 10px;
@@ -337,17 +395,18 @@
       text-align:left;
       font-size: 13px;
     }
-    th{ background: rgba(251,247,241,.75); color: var(--muted); font-weight: 800; }
+    th{ background: rgba(52,120,224,.06); color: var(--muted); font-weight: 900; }
     tr:last-child td{ border-bottom: 0; }
 
     .pill{
       display:inline-flex;
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid var(--line);
+      border: 1px solid rgba(52,120,224,.22);
       background: #fff;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 12px;
+      color: var(--ink);
     }
 
     footer{
@@ -362,69 +421,78 @@
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>Türkçe Dilbilgisi Testi (Ekler)</h1>
-        <p class="subtitle">
-          Boşluklara <b>sadece ekleri</b> yazın. Örnek: <i>Fırat</i> + <i>'ın</i> → <i>Fırat'ın</i>, <i>ev</i> + <i>i</i> → <i>evi</i>.
-        </p>
+    <header class="topHeader">
+      <div class="brandRow">
+        <div class="logo" aria-hidden="true">
+          <span class="logoTop">Türkçem</span>
+          <span class="logoBottom">NİN hali</span>
+        </div>
+
+        <div class="title">
+          <div class="welcomeBanner">Hoş geldiniz!</div>
+          <h1>Турецкая грамматика (аффиксы)</h1>
+          <p class="subtitle">
+            Впишите в пропуски <b>только аффиксы</b>. Пример: <i>Fırat</i> + <i>'ın</i> → <i>Fırat'ın</i>, <i>ev</i> + <i>i</i> → <i>evi</i>.
+          </p>
+        </div>
       </div>
+
       <div class="chip" id="userChip">
         <span>👤 <b id="userName">—</b></span>
-        <button id="changeNameBtn" type="button" title="Adı değiştir">Değiştir</button>
+        <button id="changeNameBtn" type="button" title="Изменить имя">Изменить</button>
       </div>
     </header>
 
     <div class="grid" id="mainGrid">
       <section class="card">
-        <h2>Metin</h2>
-        <p class="help">Her <b>___</b> bir boşluktur. Doğru ekleri yazdıktan sonra <b>Kontrol Et</b>’e basın.</p>
+        <h2>Текст</h2>
+        <p class="help">Каждый <b>___</b> — это один пропуск. Прочитайте текст и вставьте правильные аффиксы. Затем нажмите <b>«Проверить»</b> для проверки ответов.</p>
 
         <div class="story" id="story"></div>
 
         <div class="actions">
-          <button class="primary" id="checkBtn" type="button">Kontrol Et</button>
-          <button class="secondary" id="retryBtn" type="button">Tekrar Dene</button>
+          <button class="primary" id="checkBtn" type="button">Проверить</button>
+          <button class="secondary" id="retryBtn" type="button">Попробовать снова</button>
         </div>
 
         <div class="score" id="scoreBox" style="display:none;">
           <div>
-            <div class="big" id="scoreText">0 / 0 doğru</div>
-            <div class="small" id="scoreSub">Sonuç kaydedildi.</div>
+            <div class="big" id="scoreText">0 / 0 верно</div>
+            <div class="small" id="scoreSub">Результат сохранён.</div>
           </div>
           <div class="pill" id="percentPill">%0</div>
         </div>
       </section>
 
       <aside class="card aside" id="sideCard">
-        <h2>İpuçları</h2>
+        <h2>Подсказки</h2>
         <div class="kv">
-          <div class="row"><span>Toplam boşluk</span><b id="totalCount">—</b></div>
-          <div class="row"><span>Kayıtlı deneme</span><b id="attemptCount">—</b></div>
-          <div class="row"><span>Admin modu</span><b id="adminFlag">Kapalı</b></div>
+          <div class="row"><span>Всего пропусков</span><b id="totalCount">—</b></div>
+          <div class="row"><span>Сохранённых попыток</span><b id="attemptCount">—</b></div>
+          <div class="row"><span>Режим админа</span><b id="adminFlag">Выкл</b></div>
         </div>
         <p class="note">
-          Not: Cevaplarınızı kontrol ettikten sonra sonuçlar tarayıcınızda (localStorage) saklanır.
-          Admin modu: <code>?admin=1</code>
+          Примечание: после проверки результаты сохраняются в вашем браузере (localStorage).
+          Режим админа: <code>?admin=1</code>
         </p>
       </aside>
     </div>
 
     <section class="card" id="adminPanel" style="display:none; margin-top: 14px;">
-      <h2>Admin — Sonuçlar</h2>
-      <p class="help">Bu cihazda kayıtlı sonuçlar listelenir.</p>
+      <h2>Админ — результаты</h2>
+      <p class="help">На этом устройстве показаны сохранённые результаты.</p>
       <div class="actions" style="margin-top:0;">
-        <button class="secondary" id="exportBtn" type="button">JSON Olarak Kopyala</button>
-        <button class="secondary" id="clearBtn" type="button">Sonuçları Temizle</button>
+        <button class="secondary" id="exportBtn" type="button">Скопировать JSON</button>
+        <button class="secondary" id="clearBtn" type="button">Очистить результаты</button>
       </div>
       <div style="margin-top: 12px; overflow:auto;">
         <table>
           <thead>
             <tr>
-              <th>Tarih</th>
-              <th>Ad</th>
-              <th>Skor</th>
-              <th>Yüzde</th>
+              <th>Дата</th>
+              <th>Имя</th>
+              <th>Счёт</th>
+              <th>Процент</th>
             </tr>
           </thead>
           <tbody id="adminTbody"></tbody>
@@ -440,13 +508,13 @@
   <!-- Modal: Name -->
   <div class="modalBack" id="nameModalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal">
-      <h3 id="modalTitle">Adınızı girin</h3>
-      <p>Sonuçlar bu isimle kaydedilecek.</p>
+      <h3 id="modalTitle">Введите ваше имя</h3>
+      <p>Результаты будут сохранены под этим именем.</p>
       <div class="row">
-        <input id="nameInput" type="text" inputmode="text" autocomplete="name" placeholder="Örn. Ayşe" />
-        <button class="primary" id="saveNameBtn" type="button">Kaydet</button>
+        <input id="nameInput" type="text" inputmode="text" autocomplete="name" placeholder="Напр. Айше" />
+        <button class="primary" id="saveNameBtn" type="button">Сохранить</button>
       </div>
-      <p class="note" style="margin-top:10px;">İpucu: İsterseniz sonra değiştirebilirsiniz.</p>
+      <p class="note" style="margin-top:10px;">Подсказка: имя можно изменить позже.</p>
     </div>
   </div>
 
@@ -538,7 +606,7 @@
           inp.autocomplete = "off";
           inp.spellcheck = false;
           inp.inputMode = "text";
-          inp.setAttribute("aria-label", `Boşluk ${idx+1}`);
+          inp.setAttribute("aria-label", `Пропуск ${idx+1}`);
 
           const ideal = answers[idx] ?? "";
           const size = Math.max(2, Math.min(10, String(ideal).length || 2));
@@ -546,7 +614,7 @@
 
           const corr = document.createElement("span");
           corr.className = "corr";
-          corr.textContent = ideal === "" ? "Doğru: (boş)" : `Doğru: ${ideal}`;
+          corr.textContent = ideal === "" ? "Правильно: (пусто)" : `Правильно: ${ideal}`;
 
           wrap.appendChild(inp);
           wrap.appendChild(corr);
@@ -670,7 +738,7 @@
     }
 
     function persistResult(ok, total){
-      const name = getName() || "(isimsiz)";
+      const name = getName() || "(без имени)";
       const results = loadResults();
       results.push({
         ts: nowISO(),
@@ -693,7 +761,7 @@
       setCheckedState();
 
       const pct = total ? Math.round((ok/total)*100) : 0;
-      scoreText.textContent = `${ok} / ${total} doğru`;
+      scoreText.textContent = `${ok} / ${total} верно`;
       percentPill.textContent = `%${pct}`;
       scoreBox.style.display = "flex";
 
@@ -737,7 +805,7 @@
     function fmt(ts){
       try{
         const d = new Date(ts);
-        return d.toLocaleString("tr-TR", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+        return d.toLocaleString("ru-RU", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
       }catch{ return ts; }
     }
 
@@ -750,7 +818,7 @@
         const tr = document.createElement("tr");
         const td = document.createElement("td");
         td.colSpan = 4;
-        td.textContent = "Henüz sonuç yok.";
+        td.textContent = "Пока нет результатов.";
         td.style.color = "#5b6572";
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -785,18 +853,18 @@
       const data = JSON.stringify(loadResults(), null, 2);
       try{
         await navigator.clipboard.writeText(data);
-        alert("JSON panoya kopyalandı.");
+        alert("JSON скопирован в буфер обмена.");
       }catch{
-        prompt("Kopyalamak için Ctrl/Cmd+C", data);
+        prompt("Чтобы скопировать: Ctrl/Cmd+C", data);
       }
     });
 
     $("#clearBtn").addEventListener("click", () => {
-      if (!confirm("Tüm sonuçları silmek istiyor musunuz?")) return;
+      if (!confirm("Удалить все результаты?")) return;
       localStorage.removeItem(LS_RESULTS);
       updateAttemptCount();
       renderAdmin();
-      alert("Sonuçlar temizlendi.");
+      alert("Результаты очищены.");
     });
 
     // ====== Init ======
@@ -805,7 +873,7 @@
       updateAttemptCount();
 
       const admin = isAdmin();
-      $("#adminFlag").textContent = admin ? "Açık" : "Kapalı";
+      $("#adminFlag").textContent = admin ? "Вкл" : "Выкл";
       if (admin){
         $("#adminPanel").style.display = "block";
         renderAdmin();
