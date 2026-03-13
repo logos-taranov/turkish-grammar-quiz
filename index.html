@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Türkçe Dilbilgisi Testi — Ekler</title>
+  <style>
+    :root{
+      --bg: #fbf7f1;
+      --card: #ffffff;
+      --ink: #1f2328;
+      --muted: #5b6572;
+      --brand: #a8743a;
+      --brand-2:#d9a46a;
+      --ok: #1f7a3a;
+      --bad:#b42318;
+      --line:#e8dccb;
+      --shadow: 0 10px 30px rgba(31,35,40,.08);
+      --radius: 18px;
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(217,164,106,.25), transparent 55%),
+                  radial-gradient(900px 500px at 95% 20%, rgba(168,116,58,.16), transparent 52%),
+                  var(--bg);
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 22px 14px 40px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 8px 0 16px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    h1{
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.15;
+      margin:0;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle{
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.35;
+      font-size: 14px;
+      max-width: 62ch;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.7);
+      border-radius: 999px;
+      box-shadow: 0 4px 16px rgba(31,35,40,.06);
+      white-space: nowrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .chip b{ color: var(--ink); }
+    .chip button{
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-weight: 650;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+    .chip button:hover{ background: rgba(168,116,58,.10); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ flex-direction: column; }
+      .chip{ width: fit-content; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .card h2{
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .help{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .story{
+      border: 1px dashed rgba(168,116,58,.35);
+      background: rgba(251,247,241,.55);
+      border-radius: 14px;
+      padding: 14px;
+      line-height: 1.9;
+      font-size: 16px;
+    }
+
+    .story .linebreak{ display:block; height: 10px; }
+
+    .blank{
+      display:inline-flex;
+      align-items:baseline;
+      gap: 8px;
+      vertical-align: baseline;
+    }
+
+    input.ans{
+      width: 72px;
+      max-width: 38vw;
+      padding: 6px 8px;
+      border: 1px solid rgba(91,101,114,.35);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 15px;
+      line-height: 1.2;
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    input.ans:focus{
+      border-color: rgba(168,116,58,.75);
+      box-shadow: 0 0 0 4px rgba(217,164,106,.25);
+    }
+
+    input.ans.ok{
+      border-color: rgba(31,122,58,.65);
+      background: rgba(31,122,58,.06);
+    }
+
+    input.ans.bad{
+      border-color: rgba(180,35,24,.70);
+      background: rgba(180,35,24,.06);
+    }
+
+    .corr{
+      display:none;
+      font-size: 12px;
+      color: var(--bad);
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(180,35,24,.35);
+      background: rgba(180,35,24,.05);
+      transform: translateY(-1px);
+    }
+
+    .corr.show{ display:inline-flex; }
+
+    .actions{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button.primary{
+      border: 0;
+      cursor: pointer;
+      background: linear-gradient(180deg, var(--brand-2), var(--brand));
+      color: #fff;
+      font-weight: 750;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: 0 10px 22px rgba(168,116,58,.22);
+    }
+
+    button.primary:disabled{
+      opacity: .6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button.secondary{
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    button.secondary:hover{ background: rgba(251,247,241,.75); }
+
+    .score{
+      margin-top: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.6);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content: space-between;
+    }
+
+    .score .big{
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .score .small{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .aside{
+      position: sticky;
+      top: 14px;
+    }
+    @media (max-width: 860px){
+      .aside{ position: static; }
+    }
+
+    .kv{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .kv .row{
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.7);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .kv .row b{ color: var(--ink); }
+
+    .note{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Modal */
+    .modalBack{
+      position: fixed;
+      inset: 0;
+      background: rgba(31,35,40,.55);
+      display:none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+    .modalBack.show{ display:flex; }
+
+    .modal{
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(232,220,203,.8);
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      padding: 16px;
+    }
+    .modal h3{
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .modal p{ margin:0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .modal .row{
+      display:flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .modal input{
+      flex:1;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(91,101,114,.35);
+      outline:none;
+      font-size: 15px;
+    }
+    .modal input:focus{
+      border-color: rgba(168,116,58,.75);
+      box-shadow: 0 0 0 4px rgba(217,164,106,.25);
+    }
+
+    /* Admin */
+    table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.75);
+    }
+    th, td{
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align:left;
+      font-size: 13px;
+    }
+    th{ background: rgba(251,247,241,.75); color: var(--muted); font-weight: 800; }
+    tr:last-child td{ border-bottom: 0; }
+
+    .pill{
+      display:inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    footer{
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+    footer a{ color: var(--brand); text-decoration: none; }
+    footer a:hover{ text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Türkçe Dilbilgisi Testi (Ekler)</h1>
+        <p class="subtitle">
+          Boşluklara <b>sadece ekleri</b> yazın. Örnek: <i>Fırat</i> + <i>'ın</i> → <i>Fırat'ın</i>, <i>ev</i> + <i>i</i> → <i>evi</i>.
+        </p>
+      </div>
+      <div class="chip" id="userChip">
+        <span>👤 <b id="userName">—</b></span>
+        <button id="changeNameBtn" type="button" title="Adı değiştir">Değiştir</button>
+      </div>
+    </header>
+
+    <div class="grid" id="mainGrid">
+      <section class="card">
+        <h2>Metin</h2>
+        <p class="help">Her <b>___</b> bir boşluktur. Doğru ekleri yazdıktan sonra <b>Kontrol Et</b>’e basın.</p>
+
+        <div class="story" id="story"></div>
+
+        <div class="actions">
+          <button class="primary" id="checkBtn" type="button">Kontrol Et</button>
+          <button class="secondary" id="retryBtn" type="button">Tekrar Dene</button>
+        </div>
+
+        <div class="score" id="scoreBox" style="display:none;">
+          <div>
+            <div class="big" id="scoreText">0 / 0 doğru</div>
+            <div class="small" id="scoreSub">Sonuç kaydedildi.</div>
+          </div>
+          <div class="pill" id="percentPill">%0</div>
+        </div>
+      </section>
+
+      <aside class="card aside" id="sideCard">
+        <h2>İpuçları</h2>
+        <div class="kv">
+          <div class="row"><span>Toplam boşluk</span><b id="totalCount">—</b></div>
+          <div class="row"><span>Kayıtlı deneme</span><b id="attemptCount">—</b></div>
+          <div class="row"><span>Admin modu</span><b id="adminFlag">Kapalı</b></div>
+        </div>
+        <p class="note">
+          Not: Cevaplarınızı kontrol ettikten sonra sonuçlar tarayıcınızda (localStorage) saklanır.
+          Admin modu: <code>?admin=1</code>
+        </p>
+      </aside>
+    </div>
+
+    <section class="card" id="adminPanel" style="display:none; margin-top: 14px;">
+      <h2>Admin — Sonuçlar</h2>
+      <p class="help">Bu cihazda kayıtlı sonuçlar listelenir.</p>
+      <div class="actions" style="margin-top:0;">
+        <button class="secondary" id="exportBtn" type="button">JSON Olarak Kopyala</button>
+        <button class="secondary" id="clearBtn" type="button">Sonuçları Temizle</button>
+      </div>
+      <div style="margin-top: 12px; overflow:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Ad</th>
+              <th>Skor</th>
+              <th>Yüzde</th>
+            </tr>
+          </thead>
+          <tbody id="adminTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <span>GitHub Pages: <a href="https://github.com/logos-taranov/turkish-grammar-quiz" target="_blank" rel="noreferrer">logos-taranov/turkish-grammar-quiz</a></span>
+    </footer>
+  </div>
+
+  <!-- Modal: Name -->
+  <div class="modalBack" id="nameModalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <h3 id="modalTitle">Adınızı girin</h3>
+      <p>Sonuçlar bu isimle kaydedilecek.</p>
+      <div class="row">
+        <input id="nameInput" type="text" inputmode="text" autocomplete="name" placeholder="Örn. Ayşe" />
+        <button class="primary" id="saveNameBtn" type="button">Kaydet</button>
+      </div>
+      <p class="note" style="margin-top:10px;">İpucu: İsterseniz sonra değiştirebilirsiniz.</p>
+    </div>
+  </div>
+
+  <script>
+    // ====== Content ======
+    // NOTE: Each ___ is ONE input.
+    // Small whitespace fixes applied for readability ("Masa___ üzerinde" etc.).
+    const template = `Fırat___ yeni bir ev___ var. Bu ev şehir merkez___ biraz dışında ama mahalle___ en güzel sokaklar___dan bir___de bulunuyor. Ev___ bahçe___ küçük ama çok sevimli. Bahçe___ orta___da yaşlı bir elma ağac___ var.\n\nFırat___ ev___ kapı___ yeşil renkte. Kapı___ yanında küçük bir posta kutu___ duruyor. Posta kutu___ üzerinde Fırat'ın soyad___ yazıyor.\n\nFırat___ ev___ içinde üç oda var. Oturma oda___ evin en büyük oda___. Oda___ orta___da büyük bir masa var. Masa___ üzerinde Fırat___ dün al___ kitap duruyor.\n\nFırat kitap okumayı çok seviyor. Bu yüzden ev___ duvarlar___da birçok kitap raf___ var. Raflar___ üzerinde Fırat___ yıllar boyunca topla___ kitaplar duruyor.\n\nFırat___ komşular___dan bir___ yaşlı bir adam. Adam___ en sev___ şey bahçe___de çiçek yetiştirmek. Sabahları Fırat çoğu zaman komşu___ bahçe___de çalış___ görüyor.\n\nFırat, komşu___ yetiştir___ çiçekler___ koku___ çok seviyor. Özellikle bahar___ ilk günler___de bahçe___ hava___ çok güzel oluyor.\n\nFırat___ arkadaş___ da bu evi çok seviyor. Onlar Fırat___ yeni ev___ ortam___ çok sıcak ol___ söylüyorlar.`;
+
+    // Hardcoded answers in order of blanks (manual extraction).
+    const answers = [
+      "'ın", "i", "inin", "nin", "ından", "inde", "in", "si", "nin", "sın", "ı",
+      "'ın", "inin", "sı", "nın", "su", "sunun", "ı", "'ın", "inin", "sı", "sı",
+      "nın", "sın", "nın", "'ın", "dığı", "in", "ın", "ı", "ın", "'ın", "dığı",
+      "'ın", "ın", "i", "ın", "diği", "sin", "sunun", "sin", "tığını", "sunun",
+      "diği", "in", "sunu", "ın", "in", "nin", "sı", "'ın", "ları", "'ın", "inin",
+      "ının", "duğunu"
+    ];
+
+    // ====== Storage ======
+    const LS_NAME = "tgq_name";
+    const LS_RESULTS = "tgq_results";
+
+    const $ = (sel) => document.querySelector(sel);
+
+    function nowISO(){
+      return new Date().toISOString();
+    }
+
+    function loadResults(){
+      try{
+        const raw = localStorage.getItem(LS_RESULTS);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch{ return []; }
+    }
+
+    function saveResults(arr){
+      localStorage.setItem(LS_RESULTS, JSON.stringify(arr));
+    }
+
+    function normalizeApostrophe(s){
+      return String(s ?? "").replace(/[’`´]/g, "'");
+    }
+
+    function norm(s){
+      return normalizeApostrophe(String(s ?? "").trim());
+    }
+
+    // ====== Render quiz ======
+    const storyEl = $("#story");
+    const parts = template.split("___");
+    const total = parts.length - 1;
+    $("#totalCount").textContent = String(total);
+
+    if (total !== answers.length){
+      console.warn("Blank count != answers length", { total, answers: answers.length });
+    }
+
+    const inputs = [];
+
+    function appendTextWithBreaks(parent, text){
+      const segs = String(text).split("\n");
+      segs.forEach((t, i) => {
+        if (t) parent.appendChild(document.createTextNode(t));
+        if (i < segs.length - 1){
+          const br = document.createElement("span");
+          br.className = "linebreak";
+          parent.appendChild(br);
+        }
+      });
+    }
+
+    function build(){
+      storyEl.innerHTML = "";
+      inputs.length = 0;
+
+      for (let i = 0; i < parts.length; i++){
+        appendTextWithBreaks(storyEl, parts[i]);
+
+        if (i < parts.length - 1){
+          const idx = i; // blank index
+          const wrap = document.createElement("span");
+          wrap.className = "blank";
+
+          const inp = document.createElement("input");
+          inp.className = "ans";
+          inp.type = "text";
+          inp.autocomplete = "off";
+          inp.spellcheck = false;
+          inp.inputMode = "text";
+          inp.setAttribute("aria-label", `Boşluk ${idx+1}`);
+
+          const ideal = answers[idx] ?? "";
+          const size = Math.max(2, Math.min(10, String(ideal).length || 2));
+          inp.size = size;
+
+          const corr = document.createElement("span");
+          corr.className = "corr";
+          corr.textContent = ideal === "" ? "Doğru: (boş)" : `Doğru: ${ideal}`;
+
+          wrap.appendChild(inp);
+          wrap.appendChild(corr);
+          storyEl.appendChild(wrap);
+
+          inputs.push({ inp, corr });
+        }
+      }
+    }
+
+    build();
+
+    // ====== Name modal ======
+    const modalBack = $("#nameModalBack");
+    const nameInput = $("#nameInput");
+    const saveNameBtn = $("#saveNameBtn");
+    const userNameEl = $("#userName");
+
+    function getName(){
+      return (localStorage.getItem(LS_NAME) || "").trim();
+    }
+
+    function setName(n){
+      localStorage.setItem(LS_NAME, String(n).trim());
+      userNameEl.textContent = getName() || "—";
+    }
+
+    function openNameModal(prefill=""){
+      modalBack.classList.add("show");
+      nameInput.value = prefill;
+      setTimeout(() => nameInput.focus(), 50);
+    }
+
+    function closeNameModal(){
+      modalBack.classList.remove("show");
+    }
+
+    function ensureName(){
+      const n = getName();
+      userNameEl.textContent = n || "—";
+      if (!n) openNameModal("");
+    }
+
+    saveNameBtn.addEventListener("click", () => {
+      const v = nameInput.value.trim();
+      if (!v){
+        nameInput.focus();
+        nameInput.setAttribute("aria-invalid", "true");
+        return;
+      }
+      nameInput.removeAttribute("aria-invalid");
+      setName(v);
+      closeNameModal();
+    });
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") saveNameBtn.click();
+      if (e.key === "Escape" && getName()) closeNameModal();
+    });
+
+    $("#changeNameBtn").addEventListener("click", () => openNameModal(getName()));
+
+    // ====== Quiz logic ======
+    const checkBtn = $("#checkBtn");
+    const retryBtn = $("#retryBtn");
+    const scoreBox = $("#scoreBox");
+    const scoreText = $("#scoreText");
+    const percentPill = $("#percentPill");
+    const attemptCount = $("#attemptCount");
+
+    let checked = false;
+
+    function updateAttemptCount(){
+      attemptCount.textContent = String(loadResults().length);
+    }
+
+    function resetUI(){
+      checked = false;
+      checkBtn.disabled = false;
+      scoreBox.style.display = "none";
+
+      inputs.forEach(({inp, corr}) => {
+        inp.disabled = false;
+        inp.value = "";
+        inp.classList.remove("ok", "bad");
+        corr.classList.remove("show");
+      });
+
+      // focus first
+      const first = inputs[0]?.inp;
+      if (first) first.focus();
+    }
+
+    retryBtn.addEventListener("click", resetUI);
+
+    function setCheckedState(){
+      checked = true;
+      checkBtn.disabled = true;
+      inputs.forEach(({inp}) => inp.disabled = true);
+    }
+
+    function compute(){
+      let ok = 0;
+      inputs.forEach(({inp, corr}, i) => {
+        const user = norm(inp.value);
+        const right = norm(answers[i] ?? "");
+
+        if (user === right){
+          ok++;
+          inp.classList.add("ok");
+          inp.classList.remove("bad");
+          corr.classList.remove("show");
+        } else {
+          inp.classList.add("bad");
+          inp.classList.remove("ok");
+          corr.classList.add("show");
+        }
+      });
+
+      return { ok, total: inputs.length };
+    }
+
+    function persistResult(ok, total){
+      const name = getName() || "(isimsiz)";
+      const results = loadResults();
+      results.push({
+        ts: nowISO(),
+        name,
+        ok,
+        total,
+        pct: total ? Math.round((ok/total)*100) : 0
+      });
+      saveResults(results);
+      updateAttemptCount();
+    }
+
+    checkBtn.addEventListener("click", () => {
+      ensureName();
+      const name = getName();
+      if (!name) return; // modal open
+      if (checked) return;
+
+      const { ok, total } = compute();
+      setCheckedState();
+
+      const pct = total ? Math.round((ok/total)*100) : 0;
+      scoreText.textContent = `${ok} / ${total} doğru`;
+      percentPill.textContent = `%${pct}`;
+      scoreBox.style.display = "flex";
+
+      persistResult(ok, total);
+
+      // refresh admin if open
+      if (isAdmin()) renderAdmin();
+    });
+
+    // keyboard: jump between inputs
+    storyEl.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLInputElement) || !t.classList.contains("ans")) return;
+
+      const idx = inputs.findIndex(x => x.inp === t);
+      if (idx < 0) return;
+
+      if (e.key === "Enter"){
+        e.preventDefault();
+        const next = inputs[idx+1]?.inp;
+        if (next) next.focus();
+        else checkBtn.click();
+      }
+
+      if (e.key === "ArrowRight" && t.selectionStart === t.value.length){
+        const next = inputs[idx+1]?.inp;
+        if (next) next.focus();
+      }
+      if (e.key === "ArrowLeft" && t.selectionStart === 0){
+        const prev = inputs[idx-1]?.inp;
+        if (prev) prev.focus();
+      }
+    });
+
+    // ====== Admin ======
+    function isAdmin(){
+      const sp = new URLSearchParams(location.search);
+      return sp.get("admin") === "1";
+    }
+
+    function fmt(ts){
+      try{
+        const d = new Date(ts);
+        return d.toLocaleString("tr-TR", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      }catch{ return ts; }
+    }
+
+    function renderAdmin(){
+      const tbody = $("#adminTbody");
+      const results = loadResults().slice().reverse();
+      tbody.innerHTML = "";
+
+      if (!results.length){
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = "Henüz sonuç yok.";
+        td.style.color = "#5b6572";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for (const r of results){
+        const tr = document.createElement("tr");
+
+        const td1 = document.createElement("td");
+        td1.textContent = fmt(r.ts);
+
+        const td2 = document.createElement("td");
+        td2.textContent = r.name || "—";
+
+        const td3 = document.createElement("td");
+        td3.innerHTML = `<span class="pill">${r.ok} / ${r.total}</span>`;
+
+        const td4 = document.createElement("td");
+        td4.textContent = `%${r.pct ?? (r.total ? Math.round((r.ok/r.total)*100) : 0)}`;
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    $("#exportBtn").addEventListener("click", async () => {
+      const data = JSON.stringify(loadResults(), null, 2);
+      try{
+        await navigator.clipboard.writeText(data);
+        alert("JSON panoya kopyalandı.");
+      }catch{
+        prompt("Kopyalamak için Ctrl/Cmd+C", data);
+      }
+    });
+
+    $("#clearBtn").addEventListener("click", () => {
+      if (!confirm("Tüm sonuçları silmek istiyor musunuz?")) return;
+      localStorage.removeItem(LS_RESULTS);
+      updateAttemptCount();
+      renderAdmin();
+      alert("Sonuçlar temizlendi.");
+    });
+
+    // ====== Init ======
+    function init(){
+      ensureName();
+      updateAttemptCount();
+
+      const admin = isAdmin();
+      $("#adminFlag").textContent = admin ? "Açık" : "Kapalı";
+      if (admin){
+        $("#adminPanel").style.display = "block";
+        renderAdmin();
+      }
+
+      // focus first blank if name exists
+      if (getName()) inputs[0]?.inp?.focus();
+    }
+
+    init();
+  </script>
+</body>
+</html>
