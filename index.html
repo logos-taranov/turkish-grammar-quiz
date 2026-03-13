@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Турецкая грамматика — аффиксы</title>
+  <title>Hoş geldiniz!</title>
   <style>
     :root{
       --bg: #f8f9fa;
@@ -39,78 +39,21 @@
     header.topHeader{
       display:flex;
       align-items:center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 14px;
       margin: 8px 0 16px;
-    }
-
-    .brandRow{
-      display:flex;
-      align-items:center;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .logo{
-      width: 66px;
-      height: 66px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 80% 20%, #7AB4F5 0%, #3478E0 55%, #2C67C7 100%);
-      display:flex;
-      flex-direction: column;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      line-height: 1;
-      box-shadow: 0 10px 22px rgba(52,120,224,.25);
-      border: 1px solid rgba(255,255,255,.35);
-      flex: 0 0 auto;
-      user-select: none;
-    }
-
-    .logoTop{
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-style: italic;
-      font-weight: 850;
-      font-size: 20px;
-      letter-spacing: -0.02em;
-    }
-
-    .logoBottom{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      font-size: 12px;
-      font-weight: 850;
-      opacity: .95;
-      margin-top: 2px;
-      letter-spacing: .02em;
-    }
-
-    .title{
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .welcomeBanner{
-      display:inline-flex;
-      align-items:center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--brand-2), var(--brand));
-      color: #fff;
-      font-weight: 850;
-      width: fit-content;
-      box-shadow: 0 10px 22px rgba(52,120,224,.20);
-      letter-spacing: -0.01em;
+      text-align: center;
     }
 
     h1{
-      font-size: clamp(22px, 4vw, 34px);
-      line-height: 1.15;
+      font-size: clamp(38px, 6vw, 64px);
+      line-height: 1.05;
       margin:0;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       color: var(--brand);
+      width: 100%;
+      text-align: center;
+      text-shadow: 0 12px 30px rgba(52,120,224,.18);
     }
 
     .subtitle{
@@ -119,6 +62,12 @@
       line-height: 1.35;
       font-size: 14px;
       max-width: 72ch;
+    }
+
+    .userRow{
+      display:flex;
+      justify-content: flex-end;
+      margin: 0 0 16px;
     }
 
     .chip{
@@ -156,7 +105,7 @@
 
     @media (max-width: 860px){
       .grid{ grid-template-columns: 1fr; }
-      header.topHeader{ flex-direction: column; align-items: flex-start; }
+      header.topHeader{ flex-direction: column; align-items: center; }
       .chip{ width: fit-content; }
     }
 
@@ -422,26 +371,19 @@
 <body>
   <div class="wrap">
     <header class="topHeader">
-      <div class="brandRow">
-        <div class="logo" aria-hidden="true">
-          <span class="logoTop">Türkçem</span>
-          <span class="logoBottom">NİN hali</span>
-        </div>
+      <h1>Hoş geldiniz!</h1>
+    </header>
 
-        <div class="title">
-          <div class="welcomeBanner">Hoş geldiniz!</div>
-          <h1>Турецкая грамматика (аффиксы)</h1>
-          <p class="subtitle">
-            Впишите в пропуски <b>только аффиксы</b>. Пример: <i>Fırat</i> + <i>'ın</i> → <i>Fırat'ın</i>, <i>ev</i> + <i>i</i> → <i>evi</i>.
-          </p>
-        </div>
-      </div>
+    <p class="subtitle" style="text-align:center; margin: 0 auto 16px;">
+      Впишите в пропуски <b>только аффиксы</b>. Пример: <i>Fırat</i> + <i>'ın</i> → <i>Fırat'ın</i>, <i>ev</i> + <i>i</i> → <i>evi</i>.
+    </p>
 
+    <div class="userRow">
       <div class="chip" id="userChip">
         <span>👤 <b id="userName">—</b></span>
         <button id="changeNameBtn" type="button" title="Изменить имя">Изменить</button>
       </div>
-    </header>
+    </div>
 
     <div class="grid" id="mainGrid">
       <section class="card">
