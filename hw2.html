@@ -80,8 +80,9 @@
       font-size:1.05rem;
       line-height:1;
       outline:none;
-      min-width:6ch;
+      min-width:8ch;
       max-width:100%;
+      width:auto;
       transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
     }
     .wordInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(52,120,224,.14)}
@@ -296,9 +297,9 @@
     }
 
     function autosizeInput(inp){
-      // ширина по символам; минимум 6ch, максимум 18ch
+      // ширина по символам; минимум 8ch, без максимума — слово видно полностью
       const len = (inp.value || '').length;
-      const ch = Math.max(6, Math.min(18, len + 1));
+      const ch = Math.max(8, len + 2);
       inp.style.width = ch + 'ch';
     }
 
