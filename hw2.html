@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 2 — Изафет (родительный + притяжательный)</title>
+  <style>
+    :root{
+      --bg:#e3f2fd;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --accent:#3478E0;
+      --accent-dark:#1f5fc8;
+      --ok:#4CAF50;
+      --bad:#f44336;
+      --field:#f5f9ff;
+      --shadow:0 2px 10px rgba(0,0,0,.08);
+      --radius:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--bg);
+      min-height:100vh;
+      padding:16px;
+      color:var(--text);
+    }
+    .container{max-width:860px;margin:0 auto}
+    .header{text-align:center;margin:8px 0 14px}
+    .header h1{font-size:1.6rem;line-height:1.15;color:var(--accent);margin-bottom:6px}
+    .instructions{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:14px 16px;
+      box-shadow:var(--shadow);
+      font-size:.95rem;
+      line-height:1.45;
+      color:#374151;
+      margin-bottom:14px;
+    }
+    .instructions strong{color:var(--accent)}
+
+    .list{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+    .item{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      border:2px solid transparent;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .item.correct{border-color:rgba(76,175,80,.55);background:#e8f5e9}
+    .item.incorrect{border-color:rgba(244,67,54,.55);background:#ffebee}
+
+    .row{
+      display:grid;
+      grid-template-columns: 34px 1fr auto;
+      gap:10px;
+      align-items:start;
+    }
+    .num{
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(52,120,224,.12);
+      color:var(--accent);
+      font-weight:700;
+    }
+
+    .pair{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+    .fieldWrap{display:inline-flex;align-items:center;gap:8px}
+    .wordInput{
+      appearance:none;
+      border:2px solid #bbdefb;
+      background:var(--field);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:1.05rem;
+      line-height:1;
+      outline:none;
+      min-width:6ch;
+      max-width:100%;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .wordInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(52,120,224,.14)}
+    .wordInput[readonly]{
+      background:#eef2f7;
+      border-color:#d7dde6;
+      color:#4b5563;
+      cursor:default;
+      box-shadow:none;
+    }
+
+    .wordInput.good{border-color:rgba(76,175,80,.9);background:#ffffff}
+    .wordInput.bad{border-color:rgba(244,67,54,.9);background:#ffffff}
+
+    .hint{
+      display:none;
+      font-size:.9rem;
+      color:var(--bad);
+      background:rgba(244,67,54,.08);
+      border:1px solid rgba(244,67,54,.35);
+      border-radius:10px;
+      padding:6px 10px;
+      white-space:nowrap;
+    }
+    .hint.show{display:inline-block}
+
+    .ruCol{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .spoilerBtn{
+      border:none;
+      background:rgba(52,120,224,.12);
+      color:var(--accent);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:.9rem;
+      transition:background .15s ease;
+    }
+    .spoilerBtn:hover{background:rgba(52,120,224,.18)}
+
+    .ru{
+      display:none;
+      max-width:260px;
+      text-align:right;
+      color:#374151;
+      font-size:.95rem;
+      line-height:1.25;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#f3f6ff;
+      border:1px solid rgba(52,120,224,.25);
+    }
+    .ru.show{display:block}
+
+    .feedback{
+      margin-top:10px;
+      font-size:.95rem;
+      color:#374151;
+      display:none;
+    }
+    .feedback.show{display:block}
+    .feedback strong{color:#111827}
+    .feedback .ok{color:var(--ok);font-weight:700}
+    .feedback .bad{color:var(--bad);font-weight:700}
+
+    .footerCard{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+    .checkBtn{
+      border:none;
+      background:var(--accent);
+      color:#fff;
+      padding:12px 18px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:1rem;
+      font-weight:700;
+      transition:background .15s ease, transform .05s ease;
+    }
+    .checkBtn:hover{background:var(--accent-dark)}
+    .checkBtn:active{transform:translateY(1px)}
+
+    .score{
+      font-size:1rem;
+      color:#111827;
+      font-weight:700;
+    }
+    .score small{display:block;font-weight:500;color:var(--muted);margin-top:2px}
+
+    .completion{
+      display:none;
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      background:#e8f5e9;
+      border:2px solid rgba(76,175,80,.45);
+    }
+    .completion h2{color:var(--ok);font-size:1.25rem;margin-bottom:8px}
+    .completion p{color:#1f2937;line-height:1.45}
+    .explanation{
+      margin-top:10px;
+      background:#ffffff;
+      border-radius:12px;
+      padding:12px 14px;
+      border:1px solid rgba(0,0,0,.08);
+      color:#374151;
+      font-size:.95rem;
+      line-height:1.5;
+    }
+
+    @media (max-width: 640px){
+      body{padding:12px}
+      .row{grid-template-columns: 34px 1fr; grid-template-rows:auto auto;}
+      .ruCol{grid-column:1 / -1;align-items:flex-start}
+      .ru{max-width:100%;text-align:left}
+      .actions{flex-direction:column;align-items:stretch}
+      .checkBtn{width:100%}
+      .score{text-align:center}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Упражнение 2</h1>
+    </div>
+
+    <div class="instructions">
+      <strong>Поставьте аффиксы принадлежности и родительного падежа там, где это нужно.</strong>
+      Нажмите на слово, чтобы его отредактировать.
+    </div>
+
+    <div class="list" id="list"></div>
+
+    <div class="footerCard">
+      <div class="actions">
+        <button class="checkBtn" id="checkBtn">Проверить</button>
+        <div class="score" id="score">0 / 10 правильных ответов<small>Можно проверять сколько угодно раз.</small></div>
+      </div>
+
+      <div class="completion" id="completion">
+        <h2>Поздравляем!</h2>
+        <p>Вы правильно заполнили все словосочетания.</p>
+        <div class="explanation">
+          В определённом изафете, когда речь идет о прямой принадлежности, используются оба аффикса.
+          В неопределённом изафете только один — притяжательный аффикс 3-го лица на втором слове,
+          а в безаффиксном изафете первое существительное по сути выполняет роль прилагательного,
+          характеризуя второе слово, и соответственно, никаких аффиксов не применяется.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = [
+      { base1: 'restoran',  base2: 'manzara',  a1: 'restoranın', a2: 'manzarası', ru: 'вид, открывающийся из ресторана', edit1: true,  edit2: true },
+      { base1: 'dünya',     base2: 'son',      a1: 'dünyanın',   a2: 'sonu',      ru: 'конец света',                  edit1: true,  edit2: true },
+      { base1: 'elma',      base2: 'ağaç',     a1: 'elma',       a2: 'ağacı',     ru: 'яблоня',                       edit1: true,  edit2: true },
+      { base1: 'cam',       base2: 'şişe',     a1: 'cam',        a2: 'şişe',      ru: 'стеклянная бутылка',           edit1: true,  edit2: true },
+      { base1: 'plastik',   base2: 'sandalye', a1: 'plastik',    a2: 'sandalye',  ru: 'пластиковый стул',             edit1: true,  edit2: true },
+      { base1: 'tavuk',     base2: 'kanat',    a1: 'tavuk',      a2: 'kanadı',    ru: 'куриное крылышко',             edit1: true,  edit2: true },
+      { base1: 'anahtar',   base2: 'şekil',    a1: 'anahtarın',  a2: 'şekli',     ru: 'форма ключа',                  edit1: true,  edit2: true },
+      { base1: 'evlenme',   base2: 'teklif',   a1: 'evlenme',    a2: 'teklifi',   ru: 'предложение руки и сердца',    edit1: true,  edit2: true },
+      { base1: 'aşk',       base2: 'mektup',   a1: 'aşk',        a2: 'mektubu',   ru: 'любовное письмо',              edit1: false, edit2: true },
+      { base1: 'kedi',      base2: 'mama',     a1: 'kedi',       a2: 'maması',    ru: 'кошачий корм',                 edit1: true,  edit2: true },
+    ];
+
+    const state = {
+      wasCorrect: Array(DATA.length).fill(false),
+      audioCtx: null,
+    };
+
+    function ensureAudio(){
+      if(!state.audioCtx){
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(state.audioCtx.state === 'suspended') state.audioCtx.resume();
+    }
+
+    function beep(freq=880, dur=0.08){
+      ensureAudio();
+      const ctx = state.audioCtx;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + dur);
+    }
+
+    function playCorrect(){
+      // короткая «победная» двухнота
+      beep(659, 0.08);
+      setTimeout(() => beep(880, 0.10), 90);
+    }
+
+    function norm(s){
+      return (s ?? '')
+        .toString()
+        .trim()
+        .replace(/\s+/g,' ')
+        .toLocaleLowerCase('tr-TR');
+    }
+
+    function autosizeInput(inp){
+      // ширина по символам; минимум 6ch, максимум 18ch
+      const len = (inp.value || '').length;
+      const ch = Math.max(6, Math.min(18, len + 1));
+      inp.style.width = ch + 'ch';
+    }
+
+    function makeInput(id, value, editable){
+      const inp = document.createElement('input');
+      inp.className = 'wordInput';
+      inp.type = 'text';
+      inp.autocomplete = 'off';
+      inp.spellcheck = false;
+      inp.value = value;
+      inp.id = id;
+      if(!editable){
+        inp.readOnly = true;
+        inp.tabIndex = -1;
+        inp.setAttribute('aria-label', value);
+      } else {
+        inp.setAttribute('aria-label', 'Редактируемое слово');
+      }
+      autosizeInput(inp);
+      inp.addEventListener('input', () => autosizeInput(inp));
+      inp.addEventListener('focus', () => autosizeInput(inp));
+      inp.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          checkAll();
+        }
+      });
+      return inp;
+    }
+
+    function render(){
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+
+      DATA.forEach((it, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item';
+        card.id = 'item-' + idx;
+
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        const num = document.createElement('div');
+        num.className = 'num';
+        num.textContent = (idx + 1);
+
+        const pair = document.createElement('div');
+        pair.className = 'pair';
+
+        const w1 = document.createElement('div');
+        w1.className = 'fieldWrap';
+        const inp1 = makeInput('w1-' + idx, it.base1, it.edit1);
+        const hint1 = document.createElement('span');
+        hint1.className = 'hint';
+        hint1.id = 'hint1-' + idx;
+        w1.appendChild(inp1);
+        w1.appendChild(hint1);
+
+        const w2 = document.createElement('div');
+        w2.className = 'fieldWrap';
+        const inp2 = makeInput('w2-' + idx, it.base2, it.edit2);
+        const hint2 = document.createElement('span');
+        hint2.className = 'hint';
+        hint2.id = 'hint2-' + idx;
+        w2.appendChild(inp2);
+        w2.appendChild(hint2);
+
+        pair.appendChild(w1);
+        pair.appendChild(w2);
+
+        const ruCol = document.createElement('div');
+        ruCol.className = 'ruCol';
+
+        const b = document.createElement('button');
+        b.className = 'spoilerBtn';
+        b.type = 'button';
+        b.textContent = 'показать перевод';
+
+        const ru = document.createElement('div');
+        ru.className = 'ru';
+        ru.id = 'ru-' + idx;
+        ru.textContent = it.ru;
+
+        b.addEventListener('click', () => {
+          const open = ru.classList.toggle('show');
+          b.textContent = open ? 'скрыть перевод' : 'показать перевод';
+        });
+
+        ruCol.appendChild(b);
+        ruCol.appendChild(ru);
+
+        row.appendChild(num);
+        row.appendChild(pair);
+        row.appendChild(ruCol);
+
+        const fb = document.createElement('div');
+        fb.className = 'feedback';
+        fb.id = 'fb-' + idx;
+
+        card.appendChild(row);
+        card.appendChild(fb);
+        list.appendChild(card);
+      });
+    }
+
+    function markField(inp, ok){
+      inp.classList.remove('good','bad');
+      inp.classList.add(ok ? 'good' : 'bad');
+    }
+
+    function setHint(id, show, text){
+      const el = document.getElementById(id);
+      el.classList.toggle('show', !!show);
+      if(show) el.textContent = '→ ' + text;
+      else el.textContent = '';
+    }
+
+    function checkAll(){
+      ensureAudio();
+
+      let score = 0;
+      let anyChecked = false;
+
+      DATA.forEach((it, idx) => {
+        const card = document.getElementById('item-' + idx);
+        const inp1 = document.getElementById('w1-' + idx);
+        const inp2 = document.getElementById('w2-' + idx);
+        const fb = document.getElementById('fb-' + idx);
+
+        const v1 = norm(inp1.value);
+        const v2 = norm(inp2.value);
+
+        const e1 = norm(it.a1);
+        const e2 = norm(it.a2);
+
+        const ok1 = v1 === e1;
+        const ok2 = v2 === e2;
+        const ok = ok1 && ok2;
+
+        anyChecked = true;
+
+        markField(inp1, ok1);
+        markField(inp2, ok2);
+
+        setHint('hint1-' + idx, !ok1, it.a1);
+        setHint('hint2-' + idx, !ok2, it.a2);
+
+        card.classList.remove('correct','incorrect');
+        card.classList.add(ok ? 'correct' : 'incorrect');
+
+        if(ok){
+          fb.classList.remove('show');
+          fb.innerHTML = '';
+          score++;
+          if(!state.wasCorrect[idx]){
+            // короткий звук только когда впервые стало правильно
+            playCorrect();
+          }
+          state.wasCorrect[idx] = true;
+        } else {
+          state.wasCorrect[idx] = false;
+          fb.classList.add('show');
+          fb.innerHTML = '<span class="bad">Неправильно.</span> <strong>Правильно:</strong> ' +
+            escapeHtml(it.a1) + ' ' + escapeHtml(it.a2);
+        }
+      });
+
+      const scoreEl = document.getElementById('score');
+      scoreEl.firstChild.nodeValue = `${score} / ${DATA.length} правильных ответов`;
+
+      const completion = document.getElementById('completion');
+      completion.style.display = (anyChecked && score === DATA.length) ? 'block' : 'none';
+      if(completion.style.display === 'block') completion.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    function escapeHtml(s){
+      return (s ?? '').toString()
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
+
+    render();
+
+    document.getElementById('checkBtn').addEventListener('click', checkAll);
+    // Разрешаем "пробуждение" аудио контекста на любое взаимодействие
+    ['pointerdown','touchstart','keydown'].forEach(evt => {
+      window.addEventListener(evt, () => { try{ ensureAudio(); }catch(e){} }, {once:true, passive:true});
+    });
+  </script>
+</body>
+</html>
