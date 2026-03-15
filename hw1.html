@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Домашнее задание №1 — Упражнение 1</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #e3f2fd;
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 1.6em;
+    color: #1565c0;
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 0.95em;
+    color: #555;
+  }
+  .game-area {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .instructions {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #444;
+  }
+  .instructions strong { color: #1565c0; }
+
+  .russian-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .ru-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    min-height: 56px;
+  }
+  .ru-item.matched {
+    background: #e8f5e9;
+    border: 2px solid #66bb6a;
+  }
+  .ru-item.matched .ru-text {
+    text-decoration: line-through;
+    color: #888;
+  }
+  .ru-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1565c0;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .ru-item.matched .ru-num {
+    background: #66bb6a;
+  }
+  .ru-text {
+    flex: 1;
+    font-size: 0.95em;
+  }
+  .drop-zone {
+    flex: 1;
+    min-height: 40px;
+    border: 2px dashed #90caf9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    color: #aaa;
+    transition: all 0.2s;
+    padding: 4px 8px;
+  }
+  .drop-zone.drag-over {
+    border-color: #1565c0;
+    background: #e3f2fd;
+  }
+  .drop-zone.filled {
+    border: 2px solid #66bb6a;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .drop-zone.wrong {
+    border-color: #ef5350;
+    background: #ffebee;
+    animation: shake 0.4s;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .word-pool {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 60px;
+    margin-bottom: 24px;
+  }
+  .word-pool h3 {
+    width: 100%;
+    text-align: center;
+    color: #1565c0;
+    font-size: 1em;
+    margin-bottom: 6px;
+  }
+  .tr-word {
+    background: #bbdefb;
+    color: #0d47a1;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: grab;
+    font-size: 0.9em;
+    font-weight: 500;
+    user-select: none;
+    transition: all 0.2s;
+    touch-action: none;
+  }
+  .tr-word:hover {
+    background: #90caf9;
+    transform: scale(1.05);
+  }
+  .tr-word:active, .tr-word.dragging {
+    cursor: grabbing;
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  .tr-word.placed {
+    display: none;
+  }
+
+  .progress-bar {
+    background: #fff;
+    border-radius: 20px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #42a5f5, #66bb6a);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .completion {
+    display: none;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    animation: fadeIn 0.5s;
+  }
+  .completion.show { display: block; }
+  .completion h2 {
+    color: #2e7d32;
+    font-size: 1.5em;
+    margin-bottom: 12px;
+  }
+  .completion .emoji { font-size: 3em; margin-bottom: 12px; }
+  .completion .explanation {
+    background: #f1f8e9;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+    text-align: left;
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: #444;
+  }
+  .completion .explanation strong { color: #2e7d32; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-display {
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📝 Домашнее задание №1</h1>
+  <p>Упражнение 1 — Составьте словосочетания</p>
+</div>
+
+<div class="game-area">
+  <div class="instructions">
+    <strong>Задание:</strong> Перетащите турецкие словосочетания к их русским переводам. При правильном совпадении пара подсветится зелёным ✅
+  </div>
+
+  <div class="score-display">Совпадений: <span id="score">0</span> / <span id="total">12</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="russian-list" id="russianList"></div>
+
+  <div class="word-pool" id="wordPool">
+    <h3>🇹🇷 Турецкие словосочетания</h3>
+  </div>
+
+  <div class="completion" id="completion">
+    <div class="emoji">🎉</div>
+    <h2>Tebrikler! Поздравляем!</h2>
+    <p>Вы правильно составили все словосочетания!</p>
+    <div class="explanation">
+      <strong>📖 Пояснение:</strong><br><br>
+      В случаях, когда у нас были <strong>определённые изафеты</strong> (с двумя аффиксами), мы ставим прилагательное <strong>между</strong> двумя существительными.<br><br>
+      А когда у нас <strong>неопределённые изафеты</strong> (с одним аффиксом), прилагательное ставится <strong>вначале</strong>.
+    </div>
+  </div>
+</div>
+
+<script>
+const pairs = [
+  { ru: "красивые цветы сада", tr: "bahçenin güzel çiçekleri" },
+  { ru: "яркий экран телефона", tr: "telefonun parlak ekranı" },
+  { ru: "каменные стены дома", tr: "evin taş duvarları" },
+  { ru: "старая столовая ложка", tr: "eski yemek kaşığı" },
+  { ru: "брендовые солнечные очки", tr: "marka güneş gözlüğü" },
+  { ru: "узкие улицы города", tr: "şehrin dar sokakları" },
+  { ru: "обеспокоенные глаза женщины", tr: "kadının endişeli gözleri" },
+  { ru: "напряженное лицо мужчины", tr: "adamın gergin yüzü" },
+  { ru: "свежий запах леса", tr: "ormanın ferah kokusu" },
+  { ru: "пожелтевшие страницы книг", tr: "kitabın sararmış sayfaları" },
+  { ru: "антикварный обеденный стол", tr: "antika yemek masası" },
+  { ru: "первая страница книги", tr: "kitabın ilk sayfası" }
+];
+
+// Audio context for success sound
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function playSuccess() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.type = 'sine';
+  // Pleasant two-tone chime
+  osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+  osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.4);
+}
+function playWrong() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.25);
+}
+function playComplete() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.5);
+    osc.start(audioCtx.currentTime + i * 0.15);
+    osc.stop(audioCtx.currentTime + i * 0.15 + 0.5);
+  });
+}
+
+let matched = 0;
+const total = pairs.length;
+let draggedEl = null;
+
+// Shuffle
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Build UI
+const ruList = document.getElementById('russianList');
+const pool = document.getElementById('wordPool');
+
+pairs.forEach((p, i) => {
+  const item = document.createElement('div');
+  item.className = 'ru-item';
+  item.dataset.idx = i;
+  item.innerHTML = `
+    <div class="ru-num">${i + 1}</div>
+    <div class="ru-text">${p.ru}</div>
+    <div class="drop-zone" data-idx="${i}">перетащите сюда</div>
+  `;
+  ruList.appendChild(item);
+});
+
+const shuffled = shuffle(pairs.map((p, i) => ({ tr: p.tr, idx: i })));
+shuffled.forEach(({ tr, idx }) => {
+  const word = document.createElement('div');
+  word.className = 'tr-word';
+  word.draggable = true;
+  word.dataset.idx = idx;
+  word.textContent = tr;
+  pool.appendChild(word);
+});
+
+// Drag events (desktop)
+document.querySelectorAll('.tr-word').forEach(el => {
+  el.addEventListener('dragstart', e => {
+    draggedEl = el;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    draggedEl = null;
+  });
+});
+
+document.querySelectorAll('.drop-zone').forEach(zone => {
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (!draggedEl || zone.classList.contains('filled')) return;
+    handleDrop(zone, draggedEl);
+  });
+});
+
+// Touch events (mobile)
+let touchEl = null;
+let touchClone = null;
+
+document.querySelectorAll('.tr-word').forEach(el => {
+  el.addEventListener('touchstart', e => {
+    touchEl = el;
+    const touch = e.touches[0];
+    touchClone = el.cloneNode(true);
+    touchClone.style.position = 'fixed';
+    touchClone.style.zIndex = '9999';
+    touchClone.style.pointerEvents = 'none';
+    touchClone.style.opacity = '0.8';
+    touchClone.style.left = (touch.clientX - 60) + 'px';
+    touchClone.style.top = (touch.clientY - 20) + 'px';
+    document.body.appendChild(touchClone);
+    el.classList.add('dragging');
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (!touchClone) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchClone.style.left = (touch.clientX - 60) + 'px';
+    touchClone.style.top = (touch.clientY - 20) + 'px';
+  }, { passive: false });
+
+  el.addEventListener('touchend', e => {
+    if (!touchEl || !touchClone) return;
+    const touch = e.changedTouches[0];
+    touchClone.remove();
+    touchClone = null;
+    touchEl.classList.remove('dragging');
+
+    // Find drop zone under finger
+    const elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+    const zone = elUnder?.closest('.drop-zone');
+    if (zone && !zone.classList.contains('filled')) {
+      handleDrop(zone, touchEl);
+    }
+    touchEl = null;
+  });
+});
+
+function handleDrop(zone, word) {
+  const wordIdx = parseInt(word.dataset.idx);
+  const zoneIdx = parseInt(zone.dataset.idx);
+
+  if (wordIdx === zoneIdx) {
+    // Correct!
+    zone.textContent = word.textContent;
+    zone.classList.add('filled');
+    word.classList.add('placed');
+    const item = zone.closest('.ru-item');
+    item.classList.add('matched');
+    matched++;
+    document.getElementById('score').textContent = matched;
+    document.getElementById('progress').style.width = (matched / total * 100) + '%';
+    playSuccess();
+
+    if (matched === total) {
+      setTimeout(() => {
+        playComplete();
+        document.getElementById('completion').classList.add('show');
+      }, 600);
+    }
+  } else {
+    // Wrong
+    zone.classList.add('wrong');
+    playWrong();
+    setTimeout(() => zone.classList.remove('wrong'), 400);
+  }
+}
+
+// Allow clicking filled zones to release word back
+document.querySelectorAll('.drop-zone').forEach(zone => {
+  zone.addEventListener('click', () => {
+    // Only unfilled zones respond to click — no un-matching allowed for matched pairs
+  });
+});
+</script>
+</body>
+</html>
