@@ -140,6 +140,13 @@
     }
     .hint.show{display:block}
 
+    /* предупреждения: правильный ответ, но есть оговорка */
+    .hint.warn{
+      color:#92400e;
+      background:rgba(245,158,11,.12);
+      border:1px solid rgba(245,158,11,.55);
+    }
+
     .footerCard{
       background:var(--card);
       border-radius:var(--radius);
@@ -239,7 +246,21 @@
           'Şu anda böyle şeylere ayıracak vaktim yok',
           'Benim şu anda böyle şeylere ayıracak zamanım yok',
           'Şu anda böyle şeylere ayıracak zamanım yok',
+
           'Benim şu anda böyle şeyler için vaktim yok',
+          'Şu anda böyle şeyler için vaktim yok',
+          'Benim şu anda böyle şeyler için zamanım yok',
+          'Şu anda böyle şeyler için zamanım yok',
+
+          'Benim şu anda bu tür şeyler için vaktim yok',
+          'Şu anda bu tür şeyler için vaktim yok',
+          'Benim şu anda bu tür şeyler için zamanım yok',
+          'Şu anda bu tür şeyler için zamanım yok',
+
+          'Benim şu anda bu tarz şeyler için vaktim yok',
+          'Şu anda bu tarz şeyler için vaktim yok',
+          'Benim şu anda bu tarz şeyler için zamanım yok',
+          'Şu anda bu tarz şeyler için zamanım yok',
         ],
       },
       {
@@ -253,6 +274,8 @@
           'Oldukça güçlü bir hafızası var',
           'Onun güçlü bir hafızası var',
           'Güçlü bir hafızası var',
+          'Onun hafızası çok iyi',
+          'Hafızası çok iyi',
         ],
       },
       {
@@ -297,7 +320,7 @@
         ],
       },
       {
-        ru: 'Эта история нелогична.',
+        ru: 'Эта история нелогична. (досл. «у этой истории нет логичной стороны»)',
         answers: [
           'Bu hikayenin mantıklı bir tarafı yok',
           'Mantıklı bir tarafı yok bu hikayenin',
@@ -358,6 +381,30 @@
         .trim()
         .replace(/\s+/g,' ')
         .toLocaleLowerCase('tr-TR');
+    }
+
+    function dropBirFromNorm(n){
+      return (n ?? '')
+        .toString()
+        .replace(/\bbir\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function answersMatch(v, answers){
+      return answers.some(a => norm(a) === v);
+    }
+
+    function answersMatchNoBir(v, answers){
+      const v2 = dropBirFromNorm(v);
+      return answers.some(a => dropBirFromNorm(norm(a)) === v2);
+    }
+
+    function answersMatchWithNormReplacement(v, answers, from, to){
+      return answers.some(a => {
+        const na = norm(a);
+        return na.includes(from) && na.replaceAll(from, to) === v;
+      });
     }
 
     function escapeHtml(s){
@@ -456,8 +503,20 @@
     function setHint(idx, show, text){
       const el = document.getElementById('hint-' + idx);
       el.classList.toggle('show', !!show);
+      el.classList.toggle('warn', false);
       if(show){
         el.innerHTML = '<strong>Подсказка:</strong> ' + escapeHtml(text);
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    function setWarn(idx, show, text){
+      const el = document.getElementById('hint-' + idx);
+      el.classList.toggle('show', !!show);
+      el.classList.toggle('warn', !!show);
+      if(show){
+        el.innerHTML = escapeHtml(text);
       } else {
         el.innerHTML = '';
       }
@@ -512,14 +571,40 @@
       const it = DATA[idx];
       const ta = document.getElementById('ans-' + idx);
       const v = norm(ta.value);
-      const ok = it.answers.some(a => norm(a) === v);
+
+      let ok = answersMatch(v, it.answers);
+      let warnText = '';
+
+      if(!ok){
+        // Q1: считаем «yeterli» допустимым вариантом вместо «yeterince», но предупреждаем
+        if(idx === 0 && answersMatchWithNormReplacement(v, it.answers, 'yeterince', 'yeterli')){
+          ok = true;
+          warnText = 'Not: по нашему мнению yeterince в этом предложении звучит лучше, чем yeterli, однако ответ засчитан!';
+        }
+
+        // Q2: «şu anda» пишется раздельно, но засчитываем «şuanda»
+        if(!ok && idx === 1 && answersMatchWithNormReplacement(v, it.answers, 'şu anda', 'şuanda')){
+          ok = true;
+          warnText = 'Not: слово şu anda пишется раздельно, но ответ засчитан!';
+        }
+
+        // Q3 + Q5: «bir» опционально
+        if(!ok && (idx === 2 || idx === 4) && answersMatchNoBir(v, it.answers)){
+          ok = true;
+        }
+      }
 
       markTA(ta, ok);
       markCard(idx, ok);
       setStatus(idx, ok);
 
       if(ok){
-        setHint(idx, false, '');
+        if(warnText){
+          setWarn(idx, true, warnText);
+        } else {
+          setHint(idx, false, '');
+        }
+
         if(!state.wasCorrect[idx]) playCorrect();
         state.wasCorrect[idx] = true;
       } else {
