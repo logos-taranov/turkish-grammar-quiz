@@ -279,7 +279,7 @@
         ],
       },
       {
-        ru: 'У Севды в этом городе есть множество знакомых.',
+        ru: 'У Севды в этом городе есть множество знакомых. (Sevda)',
         answers: [
           "Sevda'nın bu şehirde birçok tanıdığı var",
           "Bu şehirde Sevda'nın birçok tanıdığı var",
@@ -586,6 +586,12 @@
         if(!ok && idx === 1 && answersMatchWithNormReplacement(v, it.answers, 'şu anda', 'şuanda')){
           ok = true;
           warnText = 'Not: слово şu anda пишется раздельно, но ответ засчитан!';
+        }
+
+        // Q4: Sevda'nın без апострофа → засчитываем с предупреждением
+        if(!ok && idx === 3 && answersMatchWithNormReplacement(v, it.answers, "sevda'nın", 'sevdanın')){
+          ok = true;
+          warnText = "Not: в слове Sevda'nın у вас пропущен апостроф, но ответ засчитан! Имейте в виду на будущее 😉";
         }
 
         // Q3 + Q5: «bir» опционально
