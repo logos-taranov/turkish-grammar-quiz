@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 5</title>
+  <style>
+    :root{
+      --bg:#e3f2fd;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --accent:#3478E0;
+      --accent-dark:#1f5fc8;
+      --ok:#4CAF50;
+      --bad:#f44336;
+      --field:#f5f9ff;
+      --shadow:0 2px 10px rgba(0,0,0,.08);
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--bg);
+      min-height:100vh;
+      padding:16px;
+      color:var(--text);
+    }
+
+    .container{max-width:860px;margin:0 auto}
+    .header{text-align:center;margin:8px 0 14px}
+    .header h1{font-size:1.6rem;line-height:1.15;color:var(--accent);margin-bottom:6px}
+
+    .instructions{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:14px 16px;
+      box-shadow:var(--shadow);
+      font-size:.95rem;
+      line-height:1.5;
+      color:#374151;
+      margin-bottom:12px;
+    }
+    .instructions ul{
+      padding-left:18px;
+      margin-top:6px;
+    }
+    .instructions li{
+      margin-bottom:2px;
+    }
+
+    .list{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+
+    .item{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      border:2px solid transparent;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .item.correct{border-color:rgba(76,175,80,.55);background:#e8f5e9}
+    .item.incorrect{border-color:rgba(244,67,54,.55);background:#ffebee}
+
+    .row{
+      display:grid;
+      grid-template-columns: 34px 1fr;
+      gap:10px;
+      align-items:start;
+    }
+
+    .num{
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(52,120,224,.12);
+      color:var(--accent);
+      font-weight:800;
+      flex-shrink:0;
+    }
+
+    .prompt{
+      font-weight:700;
+      color:var(--text);
+      font-size:1.05rem;
+      line-height:1.3;
+      margin-top:5px;
+      letter-spacing:.01em;
+    }
+
+    .answerWrap{margin-top:10px}
+
+    .answerInput{
+      display:block;
+      width:100%;
+      min-width:min(100%, 340px);
+      border:2px solid #bbdefb;
+      background:var(--field);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:1.05rem;
+      line-height:1.25;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .answerInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(52,120,224,.14)}
+
+    .answerInput.good{border-color:rgba(76,175,80,.9);background:#ffffff}
+    .answerInput.bad{border-color:rgba(244,67,54,.9);background:#ffffff}
+
+    .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+
+    .checkBtn{
+      border:none;
+      background:var(--accent);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:.98rem;
+      font-weight:900;
+      transition:background .15s ease, transform .05s ease;
+      white-space:nowrap;
+    }
+    .checkBtn:hover{background:var(--accent-dark)}
+    .checkBtn:active{transform:translateY(1px)}
+
+    .status{
+      font-size:.95rem;
+      color:#374151;
+      min-height:1.2em;
+    }
+    .status .ok{color:var(--ok);font-weight:800}
+    .status .bad{color:var(--bad);font-weight:800}
+
+    .hint{
+      display:none;
+      margin-top:8px;
+      font-size:.95rem;
+      color:#991b1b;
+      background:rgba(244,67,54,.08);
+      border:1px solid rgba(244,67,54,.35);
+      border-radius:12px;
+      padding:8px 10px;
+      line-height:1.35;
+    }
+    .hint.show{display:block}
+
+    .footerCard{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+
+    .footerRow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+
+    .resetBtn{
+      border:none;
+      background:rgba(52,120,224,.12);
+      color:var(--accent);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:.98rem;
+      font-weight:900;
+      transition:background .15s ease, transform .05s ease;
+    }
+    .resetBtn:hover{background:rgba(52,120,224,.18)}
+    .resetBtn:active{transform:translateY(1px)}
+
+    .score{
+      font-size:1rem;
+      color:#111827;
+      font-weight:900;
+    }
+    .score small{display:block;font-weight:500;color:var(--muted);margin-top:2px}
+
+    .message{
+      display:none;
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      background:#f3f6ff;
+      border:1px solid rgba(52,120,224,.25);
+      color:#1f2937;
+      line-height:1.45;
+    }
+    .message.show{display:block}
+    .message .title{font-weight:900;color:var(--accent);margin-bottom:6px}
+
+    .back-link{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--accent);
+      font-size:.9rem;
+      font-weight:700;
+      text-decoration:none;
+      margin-bottom:10px;
+    }
+    .back-link:hover{color:var(--accent-dark);text-decoration:underline}
+
+    @media (max-width: 640px){
+      body{padding:12px}
+      .footerRow{flex-direction:column;align-items:stretch}
+      .resetBtn{width:100%}
+      .score{text-align:center}
+      .answerInput{font-size:1rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← Все упражнения</a>
+    <div class="header">
+      <h1>Упражнение 5</h1>
+    </div>
+
+    <div class="instructions">
+      <strong>Переведите словосочетания на турецкий язык.</strong>
+      <ul>
+        <li>Регистр и знаки препинания не важны.</li>
+        <li>Притяжательные местоимения <em>benim / senin / onun / bizim / sizin / onların</em> не влияют на правильность.</li>
+        <li>Нажмите <strong>«Проверить»</strong> рядом с каждым пунктом или <kbd>Enter</kbd>.</li>
+      </ul>
+    </div>
+
+    <div class="list" id="list"></div>
+
+    <div class="footerCard">
+      <div class="footerRow">
+        <button class="resetBtn" id="resetBtn" type="button">Tekrar Dene</button>
+        <div class="score" id="score">0 / 20 doğru<small>Можно проверять сколько угодно раз.</small></div>
+      </div>
+
+      <div class="message" id="message">
+        <div class="title" id="messageTitle"></div>
+        <div id="messageBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = [
+      { ru: 'мои солнечные очки',       answers: ['güneş gözlüğüm'] },
+      { ru: 'наша детская коляска',      answers: ['bebek arabamız'] },
+      { ru: 'его калькулятор',           answers: ['hesap makinesi'] },
+      { ru: 'твоя зубная щётка',         answers: ['diş fırçan'] },
+      { ru: 'ваша банковская карта',     answers: ['banka kartınız'] },
+      { ru: 'их спортивная сумка',       answers: ['spor çantası', 'spor çantaları'] },
+      { ru: 'мой рабочий стол',          answers: ['çalışma masam'] },
+      { ru: 'твой мобильный телефон',    answers: ['cep telefonun'] },
+      { ru: 'его кроссовки',             answers: ['spor ayakkabısı', 'spor ayakkabıları'] },
+      { ru: 'наша стиральная машина',    answers: ['çamaşır makinemiz'] },
+      { ru: 'ваш турецкий кофе',         answers: ['Türk kahveniz'] },
+      { ru: 'их кухонный стол',          answers: ['mutfak masası', 'mutfak masaları'] },
+      { ru: 'мой автобусный билет',      answers: ['otobüs biletim'] },
+      { ru: 'твой компьютерный стол',    answers: ['bilgisayar masan'] },
+      { ru: 'его чайный стакан',         answers: ['çay bardağı'] },
+      { ru: 'наша спальня',              answers: ['yatak odamız'] },
+      { ru: 'ваша входная дверь',        answers: ['giriş kapınız'] },
+      { ru: 'их офисное кресло',         answers: ['ofis koltuğu', 'ofis koltukları'] },
+      { ru: 'их банные полотенца',       answers: ['banyo havluları'] },
+      { ru: 'её сок',                    answers: ['meyve suyu'] },
+    ];
+
+    // Possessive pronouns to strip from the start of an answer
+    const POSSESSIVES = ['benim', 'senin', 'onun', 'bizim', 'sizin', 'onların'];
+
+    const state = {
+      wasCorrect: Array(DATA.length).fill(false),
+      audioCtx: null,
+    };
+
+    function ensureAudio(){
+      if(!state.audioCtx){
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(state.audioCtx.state === 'suspended') state.audioCtx.resume();
+    }
+
+    function beep(freq=880, dur=0.08, gain=0.12){
+      ensureAudio();
+      const ctx = state.audioCtx;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(gain, ctx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + dur);
+    }
+
+    function playCorrect(){
+      beep(659, 0.08, 0.12);
+      setTimeout(() => beep(880, 0.10, 0.12), 90);
+    }
+
+    function playWrong(){
+      beep(220, 0.12, 0.14);
+      setTimeout(() => beep(164, 0.16, 0.14), 120);
+    }
+
+    // Normalize: lowercase (Turkish locale), remove punctuation, trim, collapse spaces
+    function norm(s){
+      return (s ?? '')
+        .toString()
+        .replace(/[.!?,;:]/g, '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLocaleLowerCase('tr-TR');
+    }
+
+    // Strip leading possessive pronoun (e.g. "benim güneş gözlüğüm" → "güneş gözlüğüm")
+    function stripPossessive(s){
+      for(const p of POSSESSIVES){
+        if(s.startsWith(p + ' ')){
+          return s.slice(p.length + 1).trim();
+        }
+      }
+      return s;
+    }
+
+    function normStripped(s){
+      return stripPossessive(norm(s));
+    }
+
+    function checkAnswer(userInput, answers){
+      const v = normStripped(userInput);
+      return answers.some(a => normStripped(a) === v);
+    }
+
+    function escapeHtml(s){
+      return (s ?? '').toString()
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
+
+    function render(){
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+
+      DATA.forEach((it, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item';
+        card.id = 'item-' + idx;
+
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        const num = document.createElement('div');
+        num.className = 'num';
+        num.textContent = String(idx + 1);
+
+        const right = document.createElement('div');
+
+        const prompt = document.createElement('div');
+        prompt.className = 'prompt';
+        prompt.textContent = it.ru;
+
+        const answerWrap = document.createElement('div');
+        answerWrap.className = 'answerWrap';
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'answerInput';
+        inp.id = 'ans-' + idx;
+        inp.placeholder = 'Введите по-турецки…';
+        inp.autocomplete = 'off';
+        inp.spellcheck = false;
+        inp.setAttribute('aria-label', 'Ответ ' + (idx + 1));
+
+        inp.addEventListener('keydown', (e) => {
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            checkOne(idx);
+          }
+        });
+
+        const hint = document.createElement('div');
+        hint.className = 'hint';
+        hint.id = 'hint-' + idx;
+
+        const controls = document.createElement('div');
+        controls.className = 'controls';
+
+        const btn = document.createElement('button');
+        btn.className = 'checkBtn';
+        btn.type = 'button';
+        btn.textContent = 'Проверить';
+        btn.addEventListener('click', () => checkOne(idx));
+
+        const status = document.createElement('div');
+        status.className = 'status';
+        status.id = 'status-' + idx;
+
+        controls.appendChild(btn);
+        controls.appendChild(status);
+
+        answerWrap.appendChild(inp);
+        answerWrap.appendChild(controls);
+        answerWrap.appendChild(hint);
+
+        right.appendChild(prompt);
+        right.appendChild(answerWrap);
+
+        row.appendChild(num);
+        row.appendChild(right);
+        card.appendChild(row);
+        list.appendChild(card);
+      });
+    }
+
+    function setHint(idx, show, text){
+      const el = document.getElementById('hint-' + idx);
+      el.classList.toggle('show', !!show);
+      if(show){
+        el.innerHTML = '<strong>Правильный ответ:</strong> ' + escapeHtml(text);
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    function setStatus(idx, ok){
+      const el = document.getElementById('status-' + idx);
+      if(ok){
+        el.innerHTML = '<span class="ok">✅ Правильно</span>';
+      } else {
+        el.innerHTML = '<span class="bad">❌ Неправильно</span>';
+      }
+    }
+
+    function markCard(idx, ok){
+      const card = document.getElementById('item-' + idx);
+      card.classList.remove('correct','incorrect');
+      card.classList.add(ok ? 'correct' : 'incorrect');
+    }
+
+    function markInput(inp, ok){
+      inp.classList.remove('good','bad');
+      inp.classList.add(ok ? 'good' : 'bad');
+    }
+
+    function updateScoreAndMessage(){
+      const score = state.wasCorrect.filter(Boolean).length;
+      const total = DATA.length;
+      const scoreEl = document.getElementById('score');
+      scoreEl.firstChild.nodeValue = `${score} / ${total} doğru`;
+
+      const box = document.getElementById('message');
+      const title = document.getElementById('messageTitle');
+      const body = document.getElementById('messageBody');
+
+      // Only show message when all items have been attempted at least once
+      const attempted = DATA.filter((_, i) => {
+        const s = document.getElementById('status-' + i);
+        return s && s.innerHTML.trim() !== '';
+      }).length;
+
+      if(score === total){
+        title.textContent = 'Отлично!';
+        body.textContent = 'Эта тема для вас похоже çocuk oyuncağı — так держать! 🎯';
+        box.classList.add('show');
+      } else if(score >= Math.ceil(total * 0.7) && attempted >= total){
+        title.textContent = 'Очень хорошо!';
+        body.textContent = `Bravo! ${score} из ${total} — вы уже крепко держите притяжательные конструкции. Ещё чуть-чуть — и будет идеально! 💪`;
+        box.classList.add('show');
+      } else {
+        box.classList.remove('show');
+        title.textContent = '';
+        body.textContent = '';
+      }
+    }
+
+    function checkOne(idx){
+      ensureAudio();
+
+      const it = DATA[idx];
+      const inp = document.getElementById('ans-' + idx);
+      const ok = checkAnswer(inp.value, it.answers);
+
+      markInput(inp, ok);
+      markCard(idx, ok);
+      setStatus(idx, ok);
+
+      if(ok){
+        setHint(idx, false, '');
+        if(!state.wasCorrect[idx]) playCorrect();
+        state.wasCorrect[idx] = true;
+      } else {
+        playWrong();
+        setHint(idx, true, it.answers[0]);
+        state.wasCorrect[idx] = false;
+      }
+
+      updateScoreAndMessage();
+    }
+
+    function resetAll(){
+      state.wasCorrect = Array(DATA.length).fill(false);
+
+      DATA.forEach((_, idx) => {
+        const card = document.getElementById('item-' + idx);
+        const inp = document.getElementById('ans-' + idx);
+        const status = document.getElementById('status-' + idx);
+
+        inp.value = '';
+        inp.classList.remove('good','bad');
+
+        card.classList.remove('correct','incorrect');
+        status.innerHTML = '';
+        setHint(idx, false, '');
+      });
+
+      updateScoreAndMessage();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    render();
+    updateScoreAndMessage();
+
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+    ['pointerdown','touchstart','keydown'].forEach(evt => {
+      window.addEventListener(evt, () => { try{ ensureAudio(); }catch(e){} }, {once:true, passive:true});
+    });
+  </script>
+</body>
+</html>
