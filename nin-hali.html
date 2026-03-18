@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkçem | NİN hali — Alıştırma</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #eef2ff;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a47b8 0%, #2d5fe0 100%);
+            color: white;
+            padding: 28px 20px 22px;
+            text-align: center;
+            box-shadow: 0 3px 14px rgba(26,71,184,0.35);
+        }
+
+        header .logo {
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        header .logo .pipe {
+            color: #ffd700;
+            margin: 0 8px;
+        }
+
+        header .logo .nin {
+            color: #ffd700;
+        }
+
+        header .subtitle {
+            font-size: 0.85em;
+            opacity: 0.85;
+            margin-top: 6px;
+            letter-spacing: 4px;
+            font-family: sans-serif;
+            font-weight: normal;
+        }
+
+        header .desc {
+            font-size: 0.88em;
+            opacity: 0.72;
+            margin-top: 8px;
+            font-family: sans-serif;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 24px 16px 50px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+        }
+
+        /* ── Registration ── */
+        .reg-card h2 {
+            color: #1a47b8;
+            margin-bottom: 12px;
+            font-size: 1.15em;
+        }
+        .reg-card p {
+            color: #555;
+            font-family: sans-serif;
+            font-size: 0.95em;
+            margin-bottom: 16px;
+        }
+        .reg-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .reg-row input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 11px 14px;
+            border: 2px solid #dde2f5;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .reg-row input[type="text"]:focus {
+            border-color: #1a47b8;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 11px 26px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.18s;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        .btn-primary { background: #1a47b8; color: white; }
+        .btn-primary:hover  { background: #1535a0; transform: translateY(-1px); }
+        .btn-primary:active { background: #1535a0; transform: translateY(0); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover  { background: #545b62; }
+
+        .buttons-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* ── Score card ── */
+        .score-card {
+            display: none;
+            text-align: center;
+            border-top: 4px solid #1a47b8;
+        }
+        .score-card.visible { display: block; }
+        .score-greeting { font-size: 1em; color: #666; margin-bottom: 8px; font-family: sans-serif; }
+        .score-number { font-size: 3.2em; font-weight: bold; color: #1a47b8; line-height: 1; margin-bottom: 8px; }
+        .score-pct { font-size: 1em; color: #888; font-family: sans-serif; }
+        .score-msg { font-size: 1.25em; margin-top: 8px; }
+
+        /* ── Quiz text ── */
+        .quiz-card {
+            line-height: 2.6;
+            font-size: 1.12em;
+        }
+
+        .quiz-card p {
+            margin-bottom: 0.6em;
+        }
+
+        /* blank wrapper: column flex so hint appears below input */
+        .bw {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 1px;
+        }
+
+        input.blank {
+            border: none;
+            border-bottom: 2.5px solid #1a47b8;
+            background: transparent;
+            font-size: inherit;
+            font-family: inherit;
+            color: #1a47b8;
+            text-align: center;
+            outline: none;
+            padding: 2px 4px;
+            min-width: 28px;
+            min-height: 32px;
+            display: block;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input.blank:focus {
+            border-bottom-color: #2d5fe0;
+            background: #f0f4ff;
+            border-radius: 4px 4px 0 0;
+        }
+
+        input.blank.correct {
+            border-bottom-color: #28a745;
+            color: #1a7a35;
+            background: #edfff2;
+            border-radius: 4px 4px 0 0;
+        }
+
+        input.blank.wrong {
+            border-bottom-color: #dc3545;
+            color: #b30000;
+            background: #fff0f0;
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* correct answer revealed below a wrong input */
+        .ans-hint {
+            display: none;
+            font-size: 0.7em;
+            color: #28a745;
+            font-family: sans-serif;
+            font-style: italic;
+            white-space: nowrap;
+            padding: 1px 3px;
+            line-height: 1.3;
+        }
+
+        .bw.show-hint .ans-hint { display: block; }
+
+        .instruction {
+            font-size: 0.88em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 14px;
+            font-family: sans-serif;
+        }
+
+        .legend {
+            font-size: 0.85em;
+            color: #777;
+            text-align: center;
+            margin-top: 14px;
+            font-family: sans-serif;
+        }
+
+        @media (max-width: 600px) {
+            header .logo { font-size: 1.55em; }
+            .quiz-card { font-size: 1em; line-height: 2.8; }
+            input.blank { min-height: 36px; }
+            .btn { padding: 12px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Türkçem <span class="pipe">|</span> <span class="nin">NİN</span> hali</div>
+    <div class="subtitle">İLGİ DURUMU &nbsp;·&nbsp; İYELİK EKLERİ &nbsp;·&nbsp; -(D)İĞİ</div>
+    <div class="desc">Boşlukları doğru eklerle doldurun</div>
+</header>
+
+<div class="container">
+
+    <!-- ── Registration ── -->
+    <div class="card reg-card" id="regSection">
+        <h2>👋 Hoş geldin!</h2>
+        <p>Alıştırmaya başlamadan önce adını yaz:</p>
+        <div class="reg-row">
+            <input type="text" id="nameInput" placeholder="Adın…" maxlength="60">
+            <button class="btn btn-primary" id="startBtn" onclick="startQuiz()">Başla! →</button>
+        </div>
+    </div>
+
+    <!-- ── Quiz section ── -->
+    <div id="quizSection" style="display:none">
+
+        <!-- Score -->
+        <div class="card score-card" id="scoreCard">
+            <div class="score-greeting" id="scoreGreeting"></div>
+            <div class="score-number" id="scoreNumber"></div>
+            <div class="score-pct"    id="scorePct"></div>
+            <div class="score-msg"    id="scoreMsg"></div>
+        </div>
+
+        <!-- Top buttons -->
+        <div class="buttons-row">
+            <button class="btn btn-primary"   onclick="checkAnswers()">✓ Kontrol et</button>
+            <button class="btn btn-secondary" onclick="resetQuiz()">↺ Yeniden dene</button>
+        </div>
+
+        <p class="instruction">Her boşluğa doğru eki yazın. Büyük/küçük harf farkı önemli değil.</p>
+
+        <!-- Quiz text -->
+        <div class="card quiz-card" id="quizText"></div>
+
+        <p class="legend">🟢 Doğru &nbsp;|&nbsp; 🔴 Yanlış — küçük yeşil metin = doğru cevap</p>
+
+        <!-- Bottom buttons -->
+        <div class="buttons-row" style="margin-top:22px">
+            <button class="btn btn-primary"   onclick="checkAnswers()">✓ Kontrol et</button>
+            <button class="btn btn-secondary" onclick="resetQuiz()">↺ Yeniden dene</button>
+        </div>
+
+    </div><!-- /quizSection -->
+
+</div><!-- /container -->
+
+<script>
+// ================================================================
+// QUIZ DATA
+// {t:'text'} — plain text segment
+// {b:'answer', s:'word-suffix'} — blank; s = chars immediately after
+//   the input within the same word (e.g. s:'dan' for "sokaklar___dan")
+// ================================================================
+const SEG = [
+    // ── Paragraph 1 ──────────────────────────────────────────────
+    {t:'Fırat'},{b:"'ın"},
+    {t:' yeni bir evi var. Bu ev şehir merkez'},{b:'inin'},
+    {t:' biraz dışında ama mahalle'},{b:'nin'},
+    {t:' en güzel sokaklar'},{b:'ın',s:'dan'},
+    {t:' bir'},{b:'in',s:'de'},
+    {t:' bulunuyor. Ev'},{b:'in'},
+    {t:' bahçe'},{b:'si'},
+    {t:' küçük ama çok sevimli. Bahçe'},{b:'nin'},
+    {t:' orta'},{b:'sın',s:'da'},
+    {t:' yaşlı bir elma ağac'},{b:'ı'},
+    {t:' var.'},
+
+    // ── Paragraph 2 ──────────────────────────────────────────────
+    {t:'\nFırat'},{b:"'ın"},
+    {t:' ev'},{b:'inin'},
+    {t:' kapı'},{b:'sı'},
+    {t:' yeşil renkte. Kapı'},{b:'nın'},
+    {t:' yanında küçük bir posta kutu'},{b:'su'},
+    {t:' duruyor. Posta kutu'},{b:'sunun'},
+    {t:" üzerinde Fırat'ın soyadı"},{b:''},
+    {t:' yazıyor.'},
+
+    // ── Paragraph 3 ──────────────────────────────────────────────
+    {t:'\nFırat'},{b:"'ın"},
+    {t:' ev'},{b:'inin'},
+    {t:' içinde üç oda var. Oturma oda'},{b:'sı'},
+    {t:' evin en büyük oda'},{b:'sı'},
+    {t:'. Oda'},{b:'nın'},
+    {t:' orta'},{b:'sın',s:'da'},
+    {t:' büyük bir masa var. Masa'},{b:'nın'},
+    {t:' üzerinde Fırat'},{b:"'ın"},
+    {t:' dün al'},{b:'dığı'},
+    {t:' kitap duruyor.'},
+
+    // ── Paragraph 4 ──────────────────────────────────────────────
+    {t:'\nFırat kitap okumayı çok seviyor. Bu yüzden ev'},{b:'in'},
+    {t:' duvarlar'},{b:'ın',s:'da'},
+    {t:' birçok kitap raf'},{b:'ı'},
+    {t:' var. Raflar'},{b:'ın'},
+    {t:' üzerinde Fırat'},{b:"'ın"},
+    {t:' yıllar boyunca topla'},{b:'dığı'},
+    {t:' kitaplar duruyor.'},
+
+    // ── Paragraph 5 ──────────────────────────────────────────────
+    {t:'\nFırat'},{b:"'ın"},
+    {t:' komşular'},{b:'ın',s:'dan'},
+    {t:' bir'},{b:'i'},
+    {t:' yaşlı bir adam. Adam'},{b:'ın'},
+    {t:' en sev'},{b:'diği'},
+    {t:' şey bahçe'},{b:'sin',s:'de'},
+    {t:' çiçek yetiştirmek. Sabahları Fırat çoğu zaman komşu'},{b:'sunun'},
+    {t:' bahçe'},{b:'sin',s:'de'},
+    {t:' çalış'},{b:'tığını'},
+    {t:' görüyor.'},
+
+    // ── Paragraph 6 ──────────────────────────────────────────────
+    {t:'\nFırat, komşu'},{b:'sunun'},
+    {t:' yetiştir'},{b:'diği'},
+    {t:' çiçekler'},{b:'in'},
+    {t:' koku'},{b:'sunu'},
+    {t:' çok seviyor. Özellikle bahar'},{b:'ın'},
+    {t:' ilk günler'},{b:'in',s:'de'},
+    {t:' bahçe'},{b:'nin'},
+    {t:' hava'},{b:'sı'},
+    {t:' çok güzel oluyor.'},
+
+    // ── Paragraph 7 ──────────────────────────────────────────────
+    {t:'\nFırat'},{b:"'ın"},
+    {t:' arkadaş'},{b:'ları'},
+    {t:' da bu evi çok seviyor. Onlar Fırat'},{b:"'ın"},
+    {t:' yeni ev'},{b:'inin'},
+    {t:' ortam'},{b:'ının'},
+    {t:' çok sıcak ol'},{b:'duğunu'},
+    {t:' söylüyorlar.'},
+];
+
+// ================================================================
+let userName   = '';
+let totalBlanks = 0;
+
+function startQuiz() {
+    userName = (document.getElementById('nameInput').value.trim()) || 'Öğrenci';
+    try { localStorage.setItem('tq_ninHali_name', userName); } catch(e){}
+    document.getElementById('regSection').style.display  = 'none';
+    document.getElementById('quizSection').style.display = 'block';
+    renderQuiz();
+}
+
+// ── render ────────────────────────────────────────────────────────
+function renderQuiz() {
+    const container = document.getElementById('quizText');
+    let html = '<p>';
+    let idx  = 0;
+
+    for (const seg of SEG) {
+        if (seg.t !== undefined) {
+            if (seg.t.startsWith('\n')) {
+                html += '</p><p>';
+                html += esc(seg.t.slice(1));
+            } else {
+                html += esc(seg.t);
+            }
+        } else {                                // blank
+            const ans    = seg.b;
+            const suffix = seg.s || '';
+            const sz     = Math.max(3, ans.length + 1);
+            const safeA  = escA(ans);
+
+            html += `<span class="bw" id="bw${idx}">` +
+                    `<input class="blank" id="bl${idx}" type="text"` +
+                    ` data-answer="${safeA}" size="${sz}"` +
+                    ` autocomplete="off" autocorrect="off"` +
+                    ` autocapitalize="off" spellcheck="false">` +
+                    `<span class="ans-hint" id="ah${idx}"></span>` +
+                    `</span>`;
+
+            if (suffix) html += esc(suffix);
+            idx++;
+        }
+    }
+
+    html += '</p>';
+    totalBlanks = idx;
+    container.innerHTML = html;
+}
+
+// ── Turkish-aware normalization ───────────────────────────────────
+function norm(s) {
+    return s.trim()
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .toLowerCase();
+}
+
+// ── check ────────────────────────────────────────────────────────
+function checkAnswers() {
+    let correct = 0;
+
+    for (let i = 0; i < totalBlanks; i++) {
+        const inp    = document.getElementById('bl' + i);
+        const wrap   = document.getElementById('bw' + i);
+        const hint   = document.getElementById('ah' + i);
+        if (!inp) continue;
+
+        const answer  = inp.dataset.answer;   // correct answer
+        const entered = inp.value;
+
+        let ok;
+        if (answer === '') {
+            // Blank 17-type: empty answer — user must leave it empty
+            ok = entered.trim() === '';
+            hint.textContent = ok ? '' : '∅ (boş bırakılmalı)';
+        } else {
+            ok = norm(entered) === norm(answer);
+            hint.textContent = ok ? '' : answer;
+        }
+
+        inp.classList.remove('correct', 'wrong');
+        wrap.classList.remove('show-hint');
+
+        if (ok) {
+            inp.classList.add('correct');
+            if (answer !== '') inp.value = answer;   // normalize casing
+            correct++;
+        } else {
+            inp.classList.add('wrong');
+            wrap.classList.add('show-hint');
+        }
+    }
+
+    showScore(correct);
+}
+
+// ── score ────────────────────────────────────────────────────────
+function showScore(correct) {
+    const pct = Math.round(correct / totalBlanks * 100);
+    let emoji = pct === 100 ? '🎉' : pct >= 85 ? '🌟' : pct >= 70 ? '👏' : pct >= 50 ? '💪' : '📚';
+    let msg   = pct === 100 ? 'Mükemmel! Her şeyi doğru yaptın!'
+              : pct >= 85  ? 'Harika! Neredeyse mükemmel!'
+              : pct >= 70  ? 'Çok iyi! Biraz daha pratik yap!'
+              : pct >= 50  ? 'İyi gidiyorsun, devam et!'
+              :               'Tekrar dene, yapabilirsin!';
+
+    document.getElementById('scoreGreeting').textContent = userName + ', işte sonucun:';
+    document.getElementById('scoreNumber').textContent   = correct + ' / ' + totalBlanks;
+    document.getElementById('scorePct').textContent      = pct + '% doğru';
+    document.getElementById('scoreMsg').textContent      = emoji + ' ' + msg;
+
+    const card = document.getElementById('scoreCard');
+    card.classList.add('visible');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Save to localStorage
+    try {
+        localStorage.setItem('tq_ninHali_lastScore', JSON.stringify({
+            name: userName, correct, total: totalBlanks, pct,
+            ts: new Date().toISOString()
+        }));
+    } catch(e){}
+}
+
+// ── reset ────────────────────────────────────────────────────────
+function resetQuiz() {
+    for (let i = 0; i < totalBlanks; i++) {
+        const inp  = document.getElementById('bl' + i);
+        const wrap = document.getElementById('bw' + i);
+        const hint = document.getElementById('ah' + i);
+        if (inp)  { inp.value = ''; inp.classList.remove('correct','wrong'); }
+        if (wrap) wrap.classList.remove('show-hint');
+        if (hint) hint.textContent = '';
+    }
+    document.getElementById('scoreCard').classList.remove('visible');
+    document.querySelector('.quiz-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── helpers ───────────────────────────────────────────────────────
+function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escA(s) {
+    return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── init ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    try {
+        const saved = localStorage.getItem('tq_ninHali_name');
+        if (saved) document.getElementById('nameInput').value = saved;
+    } catch(e){}
+
+    document.getElementById('nameInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') startQuiz();
+    });
+});
+</script>
+</body>
+</html>
