@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 6 — Краткие инфинитивы</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --field: #f5f9ff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.6rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+
+    .item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      border: 2px solid transparent;
+      transition: border-color .15s, background .15s;
+    }
+    .item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .num {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: rgba(52,120,224,.12);
+      color: var(--accent);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sentence {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .translation {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+      padding: 9px 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--field);
+      outline: none;
+      transition: border-color .15s;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+
+    .check-btn {
+      padding: 9px 20px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+      min-height: 40px;
+    }
+    .check-btn:hover  { background: var(--accent-dark); }
+    .check-btn:active { transform: scale(.97); }
+    .check-btn:disabled { background: #93c5fd; cursor: default; }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      min-height: 1.2em;
+      line-height: 1.4;
+    }
+    .feedback.ok  { color: var(--ok); }
+    .feedback.bad { color: var(--bad); }
+
+    /* ── Final praise ── */
+    .praise-card {
+      display: none;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      border-top: 4px solid var(--ok);
+    }
+    .praise-card.show { display: block; }
+    .praise-score { font-size: 3rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .praise-label { font-size: 1rem; color: var(--muted); margin-top: 4px; }
+    .praise-msg   { font-size: 1.3rem; margin-top: 12px; }
+
+    .retry-btn {
+      display: block;
+      margin: 14px auto 0;
+      padding: 10px 32px;
+      background: #6b7280;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .retry-btn:hover { background: #4b5563; }
+
+    @media (max-width: 520px) {
+      .header h1 { font-size: 1.35rem; }
+      .sentence   { font-size: 1rem; }
+      input[type="text"] { min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Упражнение 6</h1>
+    <p>Вставьте краткие инфинитивы в пропуски</p>
+  </div>
+
+  <div class="instructions">
+    Слова в скобках указывают на смысл пропуска.<br>
+    Введите правильную форму и нажмите <strong>Проверить</strong>.<br>
+    Регистр букв не важен.
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="praise-card" id="praiseCard">
+    <div class="praise-score" id="praiseScore"></div>
+    <div class="praise-label" id="praiseLabel"></div>
+    <div class="praise-msg"   id="praiseMsg"></div>
+    <button class="retry-btn" onclick="retryAll()">↺ Попробовать снова</button>
+  </div>
+
+</div>
+
+<script>
+// ── Audio helpers ─────────────────────────────────────────────────
+const AC = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+
+function getCtx() {
+  if (!ctx) ctx = new AC();
+  return ctx;
+}
+
+function playOk() {
+  try {
+    const c = getCtx();
+    const notes = [523.25, 659.25, 783.99];  // C5 E5 G5
+    notes.forEach((hz, i) => {
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = 'sine';
+      o.frequency.value = hz;
+      const t = c.currentTime + i * 0.12;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.18, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      o.start(t); o.stop(t + 0.38);
+    });
+  } catch(e) {}
+}
+
+function playBad() {
+  try {
+    const c = getCtx();
+    [220, 196].forEach((hz, i) => {
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type = 'sawtooth';
+      o.frequency.value = hz;
+      const t = c.currentTime + i * 0.18;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.12, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      o.start(t); o.stop(t + 0.42);
+    });
+  } catch(e) {}
+}
+
+// ── Data ─────────────────────────────────────────────────────────
+// Each item: { before, answers: [str,...], after, hint, translation }
+// before/after = text around the blank
+// answers = all accepted answers (lowercased comparison)
+// hint = shown when wrong (first answer)
+// translation = Russian
+
+const DATA = [
+  {
+    before: 'Buraya ',
+    answers: ['gelmen'],
+    after: ' hataydı.',
+    hint: 'gelmen',
+    translation: 'Прийти сюда было твоей ошибкой.'
+  },
+  {
+    before: 'Bu kadar ',
+    answers: ['beklemeleri'],
+    after: ' anlamsız.',
+    hint: 'beklemeleri',
+    translation: 'Нет смысла им столько ждать.'
+  },
+  {
+    before: '',
+    answers: ['yardım etmeniz', 'yardımcı olmanız'],
+    after: ' çok dokunaklı.',
+    hint: 'Yardım etmeniz',
+    translation: 'То, что вы помогаете — очень трогательно.'
+  },
+  {
+    before: 'Doktora göre daha çok ',
+    answers: ['su içmem'],
+    after: ' önemliymiş.',
+    hint: 'su içmem',
+    translation: 'Доктор считает, что мне важно пить больше воды.'
+  },
+  {
+    before: 'Bu kadar para ',
+    answers: ['harcaması'],
+    after: ' mantıklı değil.',
+    hint: 'harcaması',
+    translation: 'Тратить столько денег для него неразумно.'
+  },
+  {
+    before: 'Arkadaşlarınla ',
+    answers: ['vakit geçirmen', 'takılman', 'zaman geçirmen'],
+    after: ' çok sevindirici.',
+    hint: 'vakit geçirmen',
+    translation: 'Радует, что ты проводишь время со своими друзьями.'
+  },
+  {
+    before: 'Bu yaşta okuma yazma ',
+    answers: ['bilmesi'],
+    after: ' hepimizi etkiliyor.',
+    hint: 'bilmesi',
+    translation: 'То, что он умеет читать и писать в этом возрасте, всех нас впечатляет.'
+  },
+  {
+    before: 'Böyle bir kızın benim gibi birine ',
+    answers: ['aşık olması'],
+    after: ' mümkün değil.',
+    hint: 'aşık olması',
+    translation: 'Невозможно, чтобы такая девушка влюбилась в такого, как я.'
+  },
+  {
+    before: 'Bu kritik dönemde birbirimizi ',
+    answers: ['desteklememiz'],
+    after: ' şart.',
+    hint: 'desteklememiz',
+    translation: 'В такой критический период мы обязательно должны поддерживать друг друга.'
+  },
+  {
+    before: '',
+    answers: ['geç kalmanız', 'gecikmeniz'],
+    after: ' kabul edilemez.',
+    hint: 'Geç kalmanız',
+    translation: 'Ваше опоздание недопустимо.'
+  }
+];
+
+// ── State ─────────────────────────────────────────────────────────
+const checked = new Array(DATA.length).fill(false);
+const correct = new Array(DATA.length).fill(false);
+
+// ── Normalise for comparison ───────────────────────────────────────
+function norm(s) {
+  return s.trim()
+    .replace(/İ/g, 'i').replace(/I/g, 'ı')
+    .toLowerCase();
+}
+
+// ── Render ────────────────────────────────────────────────────────
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  DATA.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = 'item' + idx;
+
+    div.innerHTML = `
+      <div class="row">
+        <div class="num">${idx + 1}</div>
+        <div>
+          <div class="sentence">
+            ${esc(item.before)}<span style="color:#1a47b8;font-weight:700;">(…)</span>${esc(item.after)}
+          </div>
+          <div class="translation">${esc(item.translation)}</div>
+          <div class="input-row">
+            <input type="text" id="inp${idx}"
+              placeholder="введите инфинитив…"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              onkeydown="if(event.key==='Enter')checkOne(${idx})">
+            <button class="check-btn" id="btn${idx}" onclick="checkOne(${idx})">Проверить</button>
+          </div>
+          <div class="feedback" id="fb${idx}"></div>
+        </div>
+      </div>`;
+
+    list.appendChild(div);
+  });
+}
+
+// ── Check single item ─────────────────────────────────────────────
+function checkOne(idx) {
+  const inp = document.getElementById('inp' + idx);
+  const fb  = document.getElementById('fb'  + idx);
+  const btn = document.getElementById('btn' + idx);
+  const item = document.getElementById('item' + idx);
+
+  const val = norm(inp.value);
+  const ok  = DATA[idx].answers.some(a => norm(a) === val);
+
+  checked[idx] = true;
+  correct[idx] = ok;
+
+  item.classList.remove('correct', 'incorrect');
+  fb.classList.remove('ok', 'bad');
+
+  if (ok) {
+    item.classList.add('correct');
+    fb.classList.add('ok');
+    fb.textContent = '✓ Правильно!';
+    btn.disabled = true;
+    inp.disabled = true;
+    playOk();
+  } else {
+    item.classList.add('incorrect');
+    fb.classList.add('bad');
+    fb.textContent = `✗ Неверно. Правильный ответ: ${DATA[idx].hint}`;
+    playBad();
+  }
+
+  maybeShowPraise();
+}
+
+// ── Show praise when all checked ─────────────────────────────────
+function maybeShowPraise() {
+  if (!checked.every(Boolean)) return;
+
+  const n = correct.filter(Boolean).length;
+  const total = DATA.length;
+  const pct = Math.round(n / total * 100);
+
+  const card  = document.getElementById('praiseCard');
+  const score = document.getElementById('praiseScore');
+  const label = document.getElementById('praiseLabel');
+  const msg   = document.getElementById('praiseMsg');
+
+  score.textContent = `${n} / ${total}`;
+  label.textContent = `${pct}% правильных ответов`;
+
+  if (n === total) {
+    msg.textContent = '🎉 Allah Allah! Идеальный результат!';
+  } else if (n >= 8) {
+    msg.textContent = '🌟 Bravo! Очень хороший результат!';
+  } else if (n >= 6) {
+    msg.textContent = '👏 Хорошая работа! Продолжай в том же духе!';
+  } else if (n >= 4) {
+    msg.textContent = '💪 Неплохо! Ещё немного практики — и будет отлично!';
+  } else {
+    msg.textContent = '📚 Повтори тему и попробуй снова!';
+  }
+
+  card.classList.add('show');
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── Retry ─────────────────────────────────────────────────────────
+function retryAll() {
+  checked.fill(false);
+  correct.fill(false);
+  render();
+  document.getElementById('praiseCard').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
