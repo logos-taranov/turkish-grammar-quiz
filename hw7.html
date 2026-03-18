@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 7 — Краткие инфинитивы (выбор)</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --field: #f5f9ff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.6rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+
+    .item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      border: 2px solid transparent;
+      transition: border-color .15s, background .15s;
+    }
+    .item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .num {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: rgba(52,120,224,.12);
+      color: var(--accent);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sentence {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .blank {
+      display: inline-block;
+      min-width: 100px;
+      border-bottom: 2px dashed var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+      transition: color .2s, border-color .2s;
+    }
+    .blank.filled-ok  { color: var(--ok); border-color: var(--ok); }
+    .blank.filled-bad { color: var(--bad); border-color: var(--bad); text-decoration: line-through; }
+
+    .translation-toggle {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: .85rem;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px dashed var(--accent);
+      transition: opacity .15s;
+    }
+    .translation-toggle:hover { opacity: .7; }
+
+    .translation {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-style: italic;
+      line-height: 1.4;
+      display: none;
+    }
+    .translation.show { display: block; }
+
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .opt-btn {
+      padding: 9px 18px;
+      background: var(--field);
+      color: var(--text);
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, transform .1s;
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #dbeafe; }
+    .opt-btn:active:not(:disabled) { transform: scale(.97); }
+    .opt-btn:disabled { cursor: default; opacity: .7; }
+    .opt-btn.chosen-ok  { background: #e8f5e9; border-color: var(--ok); color: var(--ok); font-weight: 700; }
+    .opt-btn.chosen-bad { background: #ffebee; border-color: var(--bad); color: var(--bad); }
+    .opt-btn.show-correct { background: #e8f5e9; border-color: var(--ok); color: var(--ok); font-weight: 700; }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      min-height: 1.2em;
+      line-height: 1.4;
+    }
+    .feedback.ok  { color: var(--ok); }
+    .feedback.bad { color: var(--bad); }
+
+    /* ── Final praise ── */
+    .praise-card {
+      display: none;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      border-top: 4px solid var(--ok);
+    }
+    .praise-card.show { display: block; }
+    .praise-score { font-size: 3rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .praise-label { font-size: 1rem; color: var(--muted); margin-top: 4px; }
+    .praise-msg   { font-size: 1.3rem; margin-top: 12px; }
+
+    .retry-btn {
+      display: block;
+      margin: 14px auto 0;
+      padding: 10px 32px;
+      background: #6b7280;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .retry-btn:hover { background: #4b5563; }
+
+    @media (max-width: 520px) {
+      .header h1 { font-size: 1.35rem; }
+      .sentence   { font-size: 1rem; }
+      .opt-btn    { font-size: .85rem; padding: 8px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Упражнение 7</h1>
+    <p>Краткие инфинитивы — выберите правильный вариант</p>
+  </div>
+
+  <div class="instructions">
+    Прочитайте предложение и выберите правильную форму краткого инфинитива.<br>
+    Нажмите на область <strong>«Показать перевод»</strong>, чтобы увидеть русский вариант.
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="praise-card" id="praiseCard">
+    <div class="praise-score" id="praiseScore"></div>
+    <div class="praise-label" id="praiseLabel"></div>
+    <div class="praise-msg"   id="praiseMsg"></div>
+    <button class="retry-btn" onclick="retryAll()">↺ Попробовать снова</button>
+  </div>
+
+</div>
+
+<script>
+/* ─── Sound ─── */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+
+function playOk() {
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine'; o.frequency.value = 660;
+  g.gain.setValueAtTime(.22, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .35);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + .35);
+}
+
+function playBad() {
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'square'; o.frequency.value = 220;
+  g.gain.setValueAtTime(.15, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .3);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + .3);
+}
+
+/* ─── Questions data ─── */
+const questions = [
+  {
+    before: "Şu anda bana herhangi bir şey",
+    answer: "sormanı",
+    after: "istemiyorum.",
+    options: ["sormanı", "sormandan", "sormana", "sorman"],
+    ru: "Я не хочу, чтобы ты сейчас меня о чем-либо спрашивал."
+  },
+  {
+    before: "Yeni okula",
+    answer: "alışmana",
+    after: "sevindim.",
+    options: ["alışmana", "alışman", "alışmandan", "alışmanı"],
+    ru: "Я рад, что ты привык к новой школе."
+  },
+  {
+    before: "Annesi, bu saatte",
+    answer: "dışarı çıkmasına",
+    after: "asla izin vermez.",
+    options: ["dışarı çıkmasına", "dışarı çıkmasından", "dışarı çıkmasını", "dışarı çıkmasında"],
+    ru: "Его мама ни за что не разрешит ему гулять в это время."
+  },
+  {
+    before: "",
+    answer: "Kızmanıza",
+    after: "şaşırmıyorum.",
+    options: ["Kızmanıza", "Kızmanızdan", "Kızmanızı", "Kızmanız"],
+    ru: "Я не удивлён тому, что вы сердитесь."
+  },
+  {
+    before: "Onların toplantıya",
+    answer: "katılmalarını",
+    after: "beklemiyordum.",
+    options: ["katılmalarını", "katılmalarından", "katılmalarına", "katılmaları"],
+    ru: "Я не ожидал, что они примут участие в собрании."
+  },
+  {
+    before: "Senin",
+    answer: "yardım etmen",
+    after: "sayesinde işi bitirdik.",
+    options: ["yardım etmen", "yardım etmeni", "yardım etmenden", "yardım etmene"],
+    ru: "Благодаря твоей помощи мы закончили работу."
+  },
+  {
+    before: "",
+    answer: "Makyaj yapmam",
+    after: "yüzünden geç kaldık.",
+    options: ["Makyaj yapmam", "Makyaj yapmama", "Makyaj yapmamı", "Makyaj yapmamdan"],
+    ru: "Из-за того, что я красилась, мы опоздали."
+  },
+  {
+    before: "Şarkı",
+    answer: "söylemen",
+    after: "herkesi uyandırdı.",
+    options: ["söylemen", "söylemeni", "söylemenden", "söylemene"],
+    ru: "Твоё пение всех разбудило."
+  },
+  {
+    before: "Eşim,",
+    answer: "horlamamdan",
+    after: "çok rahatsız oluyor.",
+    options: ["horlamamdan", "horlamama", "horlamamı", "horlamamda"],
+    ru: "Моей жене очень мешает мой храп."
+  },
+  {
+    before: "Bir an önce",
+    answer: "evlenmenizi",
+    after: "öneriyorum.",
+    options: ["evlenmenizi", "evlenmenizden", "evlenmenize", "evlenmeniz"],
+    ru: "Я рекомендую вам как можно скорее пожениться."
+  },
+  {
+    before: "Böyle",
+    answer: "düşünmende",
+    after: "ayıp bir şey yok.",
+    options: ["düşünmende", "düşünmenden", "düşünmeni", "düşünmen"],
+    ru: "В том, что ты так думаешь, нет ничего зазорного."
+  }
+];
+
+/* ─── Shuffle helper ─── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ─── Build UI ─── */
+const listEl = document.getElementById('list');
+let answered = 0;
+const total = questions.length;
+
+function buildItems() {
+  listEl.innerHTML = '';
+  answered = 0;
+  document.getElementById('praiseCard').classList.remove('show');
+
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = 'item-' + i;
+
+    const blankText = '______';
+    const sentenceHTML =
+      (q.before ? escHtml(q.before) + ' ' : '') +
+      '<span class="blank" id="blank-' + i + '">' + blankText + '</span> ' +
+      escHtml(q.after);
+
+    div.innerHTML =
+      '<div class="row">' +
+        '<div class="num">' + (i + 1) + '</div>' +
+        '<div>' +
+          '<div class="sentence">' + sentenceHTML + '</div>' +
+          '<span class="translation-toggle" onclick="toggleTr(' + i + ')">📖 Показать перевод</span>' +
+          '<div class="translation" id="tr-' + i + '">' + escHtml(q.ru) + '</div>' +
+          '<div class="options-row" id="opts-' + i + '"></div>' +
+          '<div class="feedback" id="fb-' + i + '"></div>' +
+        '</div>' +
+      '</div>';
+
+    listEl.appendChild(div);
+
+    // Build shuffled option buttons
+    const optsEl = document.getElementById('opts-' + i);
+    const shuffled = shuffle(q.options);
+    shuffled.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt;
+      btn.onclick = () => pickOption(i, opt, btn);
+      optsEl.appendChild(btn);
+    });
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleTr(i) {
+  const el = document.getElementById('tr-' + i);
+  el.classList.toggle('show');
+}
+
+function pickOption(idx, chosen, btn) {
+  const q = questions[idx];
+  const item = document.getElementById('item-' + idx);
+  const blank = document.getElementById('blank-' + idx);
+  const fb = document.getElementById('fb-' + idx);
+  const optsEl = document.getElementById('opts-' + idx);
+
+  // Already answered?
+  if (item.classList.contains('correct') || item.classList.contains('incorrect')) return;
+
+  const isCorrect = chosen.toLowerCase() === q.answer.toLowerCase();
+
+  // Disable all buttons
+  optsEl.querySelectorAll('.opt-btn').forEach(b => { b.disabled = true; });
+
+  if (isCorrect) {
+    btn.classList.add('chosen-ok');
+    blank.textContent = q.answer;
+    blank.classList.add('filled-ok');
+    item.classList.add('correct');
+    fb.className = 'feedback ok';
+    fb.textContent = '✓ Правильно!';
+    playOk();
+  } else {
+    btn.classList.add('chosen-bad');
+    blank.textContent = chosen;
+    blank.classList.add('filled-bad');
+    item.classList.add('incorrect');
+    fb.className = 'feedback bad';
+    fb.textContent = '✗ Правильный ответ: ' + q.answer;
+    // Highlight the correct button
+    optsEl.querySelectorAll('.opt-btn').forEach(b => {
+      if (b.textContent.toLowerCase() === q.answer.toLowerCase()) {
+        b.classList.add('show-correct');
+      }
+    });
+    playBad();
+  }
+
+  answered++;
+  if (answered === total) {
+    setTimeout(showPraise, 500);
+  }
+}
+
+function showPraise() {
+  const ok = document.querySelectorAll('.item.correct').length;
+  const pc = document.getElementById('praiseCard');
+  document.getElementById('praiseScore').textContent = ok + ' / ' + total;
+  document.getElementById('praiseLabel').textContent = 'правильных ответов';
+
+  if (ok === total) {
+    document.getElementById('praiseMsg').textContent = '🎉 Да вы просто гений кратких инфинитивов!';
+  } else if (ok >= Math.ceil(total * 0.7)) {
+    document.getElementById('praiseMsg').textContent = '👏 Отличный результат! Ещё немного практики — и будете гением!';
+  } else {
+    document.getElementById('praiseMsg').textContent = '💪 Не сдавайтесь! Повторите правила и попробуйте ещё раз.';
+  }
+  pc.classList.add('show');
+  pc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retryAll() {
+  buildItems();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildItems();
+</script>
+</body>
+</html>
