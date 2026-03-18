@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 8 — Диалог: заполни пропуски</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --field: #f5f9ff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.5rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .audio-wrapper {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .audio-wrapper p { font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+    audio { width: 100%; max-width: 500px; }
+
+    .dialogue { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+    .line {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 16px;
+      border: 2px solid transparent;
+      transition: border-color .2s, background .2s;
+    }
+    .line.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .line.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+    .line.no-gap    { background: #f8f9fa; border-color: transparent; }
+
+    .speaker {
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .speaker.wife    { color: #d32f2f; }
+    .speaker.husband { color: #1565c0; }
+
+    .line-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .gap-input {
+      display: inline-block;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--field);
+      min-width: 140px;
+      max-width: 220px;
+      transition: border-color .2s;
+      text-align: center;
+    }
+    .gap-input:focus { outline: none; border-color: var(--accent); }
+    .gap-input.ok  { border-color: var(--ok); background: #e8f5e9; }
+    .gap-input.bad { border-color: var(--bad); background: #ffebee; }
+
+    .correction {
+      display: none;
+      font-size: .88rem;
+      color: var(--ok);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .btn-row { text-align: center; margin: 18px 0; }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 48px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+    .result-box.great { background: #e8f5e9; color: var(--ok); }
+    .result-box.good  { background: #fff3e0; color: #e65100; }
+    .result-box.retry  { background: #ffebee; color: var(--bad); }
+
+    .score-detail {
+      font-size: .95rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📝 Упражнение 8 — Заполни пропуски</h1>
+      <p>Прослушай диалог и впечатай пропущенные слова</p>
+    </div>
+
+    <div class="instructions">
+      🎧 Прослушайте аудиозапись диалога и заполните пропуски в тексте.<br>
+      💡 <strong>Подсказка:</strong> выбирая окончания, опирайтесь не только на звучание, но и на логику грамматики.
+    </div>
+
+    <div class="audio-wrapper">
+      <p>🔊 Аудиозапись диалога</p>
+      <audio controls preload="auto">
+        <source src="audio/hw8_dialogue.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+      </audio>
+    </div>
+
+    <div class="dialogue" id="dialogue">
+
+      <!-- Line 1: wife, no gap -->
+      <div class="line no-gap">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Acıktım ya… Bugün ne yesek?</div>
+      </div>
+
+      <!-- Line 2: husband, no gap -->
+      <div class="line no-gap">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">Daha dün tavuk kanatları yedik, yine mi aynı şeyi istiyorsun?</div>
+      </div>
+
+      <!-- Line 3: wife, gap: tavuk kanatlarının -->
+      <div class="line" data-gap="tavuk kanatlarının">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Ama o <input class="gap-input" type="text" placeholder="..." data-answer="tavuk kanatlarının"> tadı hâlâ damağımda 🤤</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 4: husband, gap: tavuk kanatlarıyla -->
+      <div class="line" data-gap="tavuk kanatlarıyla">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">Tamam da, sürekli <input class="gap-input" type="text" placeholder="..." data-answer="tavuk kanatlarıyla"> beslenemeyiz ki 😄</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 5: wife, no gap -->
+      <div class="line no-gap">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">O zaman başka ne var? Menüye bakalım.</div>
+      </div>
+
+      <!-- Line 6: husband, gap: Patlıcan kebabına -->
+      <div class="line" data-gap="Patlıcan kebabına">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text"><input class="gap-input" type="text" placeholder="..." data-answer="Patlıcan kebabına"> ne dersin?</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 7: wife, gap: patlıcan kebabını -->
+      <div class="line" data-gap="patlıcan kebabını">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Ama <input class="gap-input" type="text" placeholder="..." data-answer="patlıcan kebabını"> hiç sevmediğimi biliyorsun.</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 7b: wife continuation, no gap -->
+      <div class="line no-gap">
+        <div class="speaker wife">👩🦰</div>
+        <div class="line-text">Patlıcan kebabının kokusundan bile rahatsız oluyorum.</div>
+      </div>
+
+      <!-- Line 8: husband, no gap -->
+      <div class="line no-gap">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">Peki ya sebze çorbası?</div>
+      </div>
+
+      <!-- Line 9: wife, gap: sebze çorbasını -->
+      <div class="line" data-gap="sebze çorbasını">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Çorba mı? Ama sen <input class="gap-input" type="text" placeholder="..." data-answer="sebze çorbasını"> sevmiyorsun ki…</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 10: husband, no gap -->
+      <div class="line no-gap">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">O zaman karides güveci var.</div>
+      </div>
+
+      <!-- Line 11: wife, gap: karides güvecinden -->
+      <div class="line" data-gap="karides güvecinden">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Hmm… ama ben <input class="gap-input" type="text" placeholder="..." data-answer="karides güvecinden"> biraz çekiniyorum 😄</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 12: husband, no gap -->
+      <div class="line no-gap">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">Niye ki?</div>
+      </div>
+
+      <!-- Line 13: wife, gap: karides güvecinin -->
+      <div class="line" data-gap="karides güvecinin">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Geçen sefer <input class="gap-input" type="text" placeholder="..." data-answer="karides güvecinin"> sosu çok ağırdı.</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 14: husband, no gap -->
+      <div class="line no-gap">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">Tamam, o zaman en garanti seçenek: yine tavuk kanadı 😄</div>
+      </div>
+
+      <!-- Line 15: wife, gap: tavuk kanatlarını -->
+      <div class="line" data-gap="tavuk kanatlarını">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Ama kabul ediyorum… Ben <input class="gap-input" type="text" placeholder="..." data-answer="tavuk kanatlarını"> gerçekten çok seviyorum.</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 16: husband, gap: tavuk kanatlarının -->
+      <div class="line" data-gap="tavuk kanatlarının">
+        <div class="speaker husband">🧔 Муж:</div>
+        <div class="line-text">O zaman bu sefer farklı yapalım. Mesela <input class="gap-input" type="text" placeholder="..." data-answer="tavuk kanatlarının"> yanında bir de patates kızartması söyleyelim.</div>
+        <div class="correction"></div>
+      </div>
+
+      <!-- Line 17: wife, gap: patates kızartmasına -->
+      <div class="line" data-gap="patates kızartmasına">
+        <div class="speaker wife">👩🦰 Жена:</div>
+        <div class="line-text">Evet! Ve <input class="gap-input" type="text" placeholder="..." data-answer="patates kızartmasına"> bayılırım!</div>
+        <div class="correction"></div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="checkBtn" onclick="checkAnswers()">✅ Проверить</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div id="resultText"></div>
+      <div class="score-detail" id="scoreDetail"></div>
+    </div>
+  </div>
+
+  <script>
+    function normalize(s) {
+      return s.trim().toLowerCase()
+        .replace(/İ/g, 'i').replace(/I/g, 'ı')
+        .replace(/\u00E2/g, 'a') // â → a
+        .replace(/[.,!?…\u2026;:'"()\[\]{}]/g, '')
+        .replace(/\s+/g, ' ');
+    }
+
+    function checkAnswers() {
+      const inputs = document.querySelectorAll('.gap-input');
+      let correct = 0;
+      const total = inputs.length;
+
+      inputs.forEach(inp => {
+        const answer = inp.dataset.answer;
+        const userVal = normalize(inp.value);
+        const expected = normalize(answer);
+        const line = inp.closest('.line');
+        const correction = line.querySelector('.correction');
+
+        inp.classList.remove('ok', 'bad');
+        line.classList.remove('correct', 'incorrect');
+
+        if (userVal === expected) {
+          inp.classList.add('ok');
+          line.classList.add('correct');
+          correction.style.display = 'none';
+          correct++;
+        } else {
+          inp.classList.add('bad');
+          line.classList.add('incorrect');
+          correction.textContent = '✅ Правильный ответ: ' + answer;
+          correction.style.display = 'block';
+        }
+      });
+
+      const box = document.getElementById('resultBox');
+      const text = document.getElementById('resultText');
+      const detail = document.getElementById('scoreDetail');
+      box.style.display = 'block';
+      box.className = 'result-box';
+
+      const pct = Math.round(correct / total * 100);
+      detail.textContent = correct + ' из ' + total + ' (' + pct + '%)';
+
+      if (correct === total) {
+        box.classList.add('great');
+        text.textContent = '🎉 Отлично! Всё правильно!';
+      } else if (correct >= total - 2) {
+        box.classList.add('good');
+        text.textContent = '👏 Почти всё верно! Посмотри ошибки выше.';
+      } else {
+        box.classList.add('retry');
+        text.textContent = '📖 Послушай ещё раз и попробуй снова!';
+      }
+
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>
