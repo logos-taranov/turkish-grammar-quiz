@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 9 — Причастия на -DİĞİ</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --warn: #f59e0b;
+      --field: #f5f9ff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.5rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .exercises { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+    .ex-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      border: 2px solid transparent;
+      transition: border-color .2s, background .2s;
+    }
+    .ex-item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .ex-item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+    .ex-item.apostrophe-warn { border-color: rgba(245,158,11,.6); background: #fffbeb; }
+
+    .ex-num {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .ex-prompt {
+      font-size: 1rem;
+      color: #374151;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .ex-prompt .hint {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .ex-prompt .noun {
+      color: #1f2937;
+    }
+
+    .ex-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ex-input {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--field);
+      min-width: 200px;
+      max-width: 400px;
+      flex: 1;
+      transition: border-color .2s;
+    }
+    .ex-input:focus { outline: none; border-color: var(--accent); }
+    .ex-input.ok  { border-color: var(--ok); background: #e8f5e9; }
+    .ex-input.bad { border-color: var(--bad); background: #ffebee; }
+    .ex-input.warn { border-color: var(--warn); background: #fffbeb; }
+
+    .check-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .check-btn:hover { background: var(--accent-dark); }
+
+    .feedback {
+      margin-top: 6px;
+      font-size: .9rem;
+      line-height: 1.4;
+    }
+    .feedback.ok-msg  { color: var(--ok); font-weight: 600; }
+    .feedback.bad-msg { color: var(--bad); }
+    .feedback.warn-msg { color: var(--warn); font-weight: 600; }
+
+    .ru-hint {
+      font-size: .85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    .btn-row { text-align: center; margin: 18px 0; }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 48px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+    .result-box.great { background: #e8f5e9; color: var(--ok); }
+    .result-box.good  { background: #fff3e0; color: #e65100; }
+    .result-box.retry  { background: #ffebee; color: var(--bad); }
+
+    .score-detail {
+      font-size: .95rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .praise-texts { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📝 Упражнение 9 — Причастия на -DİĞİ</h1>
+      <p>Образуй причастный оборот по подсказке</p>
+    </div>
+
+    <div class="instructions">
+      💡 <strong>Как делать:</strong> по подсказке в скобках образуй причастие на <strong>-dığı / -diği / -duğu / -düğü</strong> и соедини с существительным.<br>
+      Если подсказка содержит существительное — добавь к нему притяжательный аффикс в родительном падеже (генитив).<br>
+      Отрицательные причастия: основа + <strong>ma/me</strong> + dığı...
+    </div>
+
+    <div class="exercises" id="exercises">
+
+      <!-- 1 -->
+      <div class="ex-item" id="ex1">
+        <div class="ex-num">#1</div>
+        <div class="ex-prompt"><span class="hint">(kızmak)</span> <span class="noun">laf</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="kızdığım laf" data-id="1" />
+          <button class="check-btn" onclick="checkOne(1)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb1"></div>
+        <div class="ru-hint">фраза, на которую я сержусь</div>
+      </div>
+
+      <!-- 2 -->
+      <div class="ex-item" id="ex2">
+        <div class="ex-num">#2</div>
+        <div class="ex-prompt"><span class="hint">(içmek)</span> <span class="noun">bira</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="içtiğimiz bira" data-id="2" />
+          <button class="check-btn" onclick="checkOne(2)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb2"></div>
+        <div class="ru-hint">пиво, которое мы пьем</div>
+      </div>
+
+      <!-- 3 -->
+      <div class="ex-item" id="ex3">
+        <div class="ex-num">#3</div>
+        <div class="ex-prompt"><span class="hint">(gezmek)</span> <span class="noun">park</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="gezdikleri park" data-id="3" />
+          <button class="check-btn" onclick="checkOne(3)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb3"></div>
+        <div class="ru-hint">парк, в котором они гуляют</div>
+      </div>
+
+      <!-- 4 -->
+      <div class="ex-item" id="ex4">
+        <div class="ex-num">#4</div>
+        <div class="ex-prompt"><span class="hint">(yapmak)</span> <span class="noun">hata</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="yaptığınız hata" data-id="4" />
+          <button class="check-btn" onclick="checkOne(4)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb4"></div>
+        <div class="ru-hint">ошибка, которую вы совершаете</div>
+      </div>
+
+      <!-- 5 -->
+      <div class="ex-item" id="ex5">
+        <div class="ex-num">#5</div>
+        <div class="ex-prompt"><span class="hint">(Cengiz) (sevmek)</span> <span class="noun">tarz</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="Cengiz'in sevdiği tarz" data-id="5" />
+          <button class="check-btn" onclick="checkOne(5)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb5"></div>
+        <div class="ru-hint">стиль, который любит Дженгиз</div>
+      </div>
+
+      <!-- 6 -->
+      <div class="ex-item" id="ex6">
+        <div class="ex-num">#6</div>
+        <div class="ex-prompt"><span class="hint">(yapmak)</span> <span class="noun">bir şey</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="yapmadığım bir şey" data-id="6" />
+          <button class="check-btn" onclick="checkOne(6)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb6"></div>
+        <div class="ru-hint">вещь, которую я не делал</div>
+      </div>
+
+      <!-- 7 -->
+      <div class="ex-item" id="ex7">
+        <div class="ex-num">#7</div>
+        <div class="ex-prompt"><span class="hint">(çocuk) (sıkılmak)</span> <span class="noun">masal</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="çocuğun sıkılmadığı masal" data-id="7" />
+          <button class="check-btn" onclick="checkOne(7)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb7"></div>
+        <div class="ru-hint">сказка, которая не наскучила ребенку</div>
+      </div>
+
+      <!-- 8 -->
+      <div class="ex-item" id="ex8">
+        <div class="ex-num">#8</div>
+        <div class="ex-prompt"><span class="hint">(kullanmak)</span> <span class="noun">kalemler</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="kullanmadığın kalemler" data-id="8" />
+          <button class="check-btn" onclick="checkOne(8)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb8"></div>
+        <div class="ru-hint">ручки, которыми ты не пользуешься</div>
+      </div>
+
+      <!-- 9 -->
+      <div class="ex-item" id="ex9">
+        <div class="ex-num">#9</div>
+        <div class="ex-prompt"><span class="hint">(hepimiz) (kutlamak)</span> <span class="noun">bayram</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="hepimizin kutladığı bayram" data-id="9" />
+          <button class="check-btn" onclick="checkOne(9)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb9"></div>
+        <div class="ru-hint">праздник, который мы все празднуем</div>
+      </div>
+
+      <!-- 10 -->
+      <div class="ex-item" id="ex10">
+        <div class="ex-num">#10</div>
+        <div class="ex-prompt"><span class="hint">(bayılmak)</span> <span class="noun">resim</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="bayıldığım resim" data-id="10" />
+          <button class="check-btn" onclick="checkOne(10)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb10"></div>
+        <div class="ru-hint">картина, от которой я в восторге</div>
+      </div>
+
+      <!-- 11 -->
+      <div class="ex-item" id="ex11">
+        <div class="ex-num">#11</div>
+        <div class="ex-prompt"><span class="hint">(öğrenci) (zorlanmak)</span> <span class="noun">konu</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="öğrencinin zorlandığı konu" data-id="11" />
+          <button class="check-btn" onclick="checkOne(11)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb11"></div>
+        <div class="ru-hint">тема, с которой затрудняется ученик</div>
+      </div>
+
+      <!-- 12 -->
+      <div class="ex-item" id="ex12">
+        <div class="ex-num">#12</div>
+        <div class="ex-prompt"><span class="noun">mantar</span> <span class="hint">(toplamak)</span> <span class="noun">orman</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="mantar topladığımız orman" data-id="12" />
+          <button class="check-btn" onclick="checkOne(12)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb12"></div>
+        <div class="ru-hint">лес, где мы собираем грибы</div>
+      </div>
+
+      <!-- 13 -->
+      <div class="ex-item" id="ex13">
+        <div class="ex-num">#13</div>
+        <div class="ex-prompt"><span class="hint">(çocuklar) (koşmak)</span> <span class="noun">bahçe</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="çocukların koştukları bahçe" data-id="13" />
+          <button class="check-btn" onclick="checkOne(13)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb13"></div>
+        <div class="ru-hint">сад, где бегают дети</div>
+      </div>
+
+      <!-- 14 -->
+      <div class="ex-item" id="ex14">
+        <div class="ex-num">#14</div>
+        <div class="ex-prompt"><span class="noun">yeni</span> <span class="hint">(almak)</span> <span class="noun">süpürge</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="yeni aldığımız süpürge" data-id="14" />
+          <button class="check-btn" onclick="checkOne(14)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb14"></div>
+        <div class="ru-hint">пылесос, который вы недавно купили</div>
+      </div>
+
+      <!-- 15 -->
+      <div class="ex-item" id="ex15">
+        <div class="ex-num">#15</div>
+        <div class="ex-prompt"><span class="noun">asla</span> <span class="hint">(inanmak)</span> <span class="noun">bir gerçek</span></div>
+        <div class="ex-input-row">
+          <input class="ex-input" type="text" placeholder="..." data-answer="asla inanmadıkları bir gerçek" data-id="15" />
+          <button class="check-btn" onclick="checkOne(15)">Проверить</button>
+        </div>
+        <div class="feedback" id="fb15"></div>
+        <div class="ru-hint">правда, в которую они никогда не верили</div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="checkAll()">✅ Проверить всё</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div id="resultText"></div>
+      <div class="score-detail" id="scoreDetail"></div>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio API sound generation
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function getCtx() {
+      if (!audioCtx) audioCtx = new AudioContext();
+      return audioCtx;
+    }
+
+    function playCorrect() {
+      try {
+        const ctx = getCtx();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523, t);
+        osc.frequency.setValueAtTime(659, t + 0.1);
+        osc.frequency.setValueAtTime(784, t + 0.2);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+        osc.start(t); osc.stop(t + 0.5);
+      } catch(e) {}
+    }
+
+    function playWrong() {
+      try {
+        const ctx = getCtx();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, t);
+        osc.frequency.setValueAtTime(150, t + 0.15);
+        osc.frequency.setValueAtTime(100, t + 0.3);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+        osc.start(t); osc.stop(t + 0.45);
+      } catch(e) {}
+    }
+
+    function playWarn() {
+      try {
+        const ctx = getCtx();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, t);
+        osc.frequency.setValueAtTime(523, t + 0.15);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.start(t); osc.stop(t + 0.4);
+      } catch(e) {}
+    }
+
+    const praises = [
+      '🎉 Отлично!', '✨ Молодец!', '🔥 Правильно!',
+      '💪 Верно!', '🌟 Супер!', '👏 Браво!', '🎯 В точку!'
+    ];
+
+    function randomPraise() {
+      return praises[Math.floor(Math.random() * praises.length)];
+    }
+
+    function normalize(s) {
+      return s.trim()
+        .replace(/İ/g, 'i').replace(/I/g, 'ı')
+        .replace(/\s+/g, ' ');
+    }
+
+    // Strip apostrophes for loose comparison
+    function stripApostrophe(s) {
+      return s.replace(/['''`ʼ]/g, '');
+    }
+
+    function checkOne(id, silent) {
+      const inp = document.querySelector(`[data-id="${id}"]`);
+      const answer = inp.dataset.answer;
+      const fb = document.getElementById('fb' + id);
+      const item = document.getElementById('ex' + id);
+      const userRaw = inp.value;
+      const userNorm = normalize(userRaw);
+      const expectedNorm = normalize(answer);
+
+      inp.classList.remove('ok', 'bad', 'warn');
+      item.classList.remove('correct', 'incorrect', 'apostrophe-warn');
+      fb.className = 'feedback';
+      fb.textContent = '';
+
+      if (!userRaw.trim()) return false;
+
+      if (userNorm === expectedNorm) {
+        // Exact match
+        inp.classList.add('ok');
+        item.classList.add('correct');
+        fb.className = 'feedback ok-msg';
+        fb.textContent = randomPraise();
+        if (!silent) playCorrect();
+        return true;
+      }
+
+      // Check apostrophe: compare without apostrophes
+      const userNoAp = stripApostrophe(userNorm);
+      const expectedNoAp = stripApostrophe(expectedNorm);
+
+      if (userNoAp === expectedNoAp) {
+        // Missing apostrophe — warn but count as correct
+        inp.classList.add('warn');
+        item.classList.add('apostrophe-warn');
+        fb.className = 'feedback warn-msg';
+        fb.textContent = "✅ Правильно! Не забывай апостроф: " + answer;
+        if (!silent) playWarn();
+        return true; // count as correct
+      }
+
+      // Wrong
+      inp.classList.add('bad');
+      item.classList.add('incorrect');
+      fb.className = 'feedback bad-msg';
+      fb.textContent = '❌ Правильный ответ: ' + answer;
+      if (!silent) playWrong();
+      return false;
+    }
+
+    // Allow Enter to trigger check
+    document.querySelectorAll('.ex-input').forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const id = inp.dataset.id;
+          checkOne(parseInt(id));
+        }
+      });
+    });
+
+    function checkAll() {
+      let correct = 0;
+      const total = 15;
+      for (let i = 1; i <= total; i++) {
+        const inp = document.querySelector(`[data-id="${i}"]`);
+        if (inp.value.trim()) {
+          if (checkOne(i, true)) correct++;
+        }
+      }
+
+      // Play overall sound
+      const answered = Array.from(document.querySelectorAll('.ex-input')).filter(i => i.value.trim()).length;
+      if (answered > 0) {
+        if (correct === answered && answered === total) playCorrect();
+        else if (correct < answered) playWrong();
+      }
+
+      const box = document.getElementById('resultBox');
+      const text = document.getElementById('resultText');
+      const detail = document.getElementById('scoreDetail');
+      box.style.display = 'block';
+      box.className = 'result-box';
+
+      const pct = Math.round(correct / total * 100);
+      detail.textContent = correct + ' из ' + total + ' (' + pct + '%)';
+
+      if (correct === total) {
+        box.classList.add('great');
+        text.textContent = '🎉 Превосходно! Все 15 правильно!';
+      } else if (correct >= total - 3) {
+        box.classList.add('good');
+        text.textContent = '👏 Отличный результат! Посмотри на ошибки.';
+      } else {
+        box.classList.add('retry');
+        text.textContent = '📖 Попробуй ещё раз!';
+      }
+
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>
