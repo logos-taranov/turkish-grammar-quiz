@@ -361,10 +361,21 @@ const praises = ['🎉 Отлично!','✨ Молодец!','🔥 Правил
 function rndPraise() { return praises[Math.floor(Math.random() * praises.length)]; }
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function buildBank() {
   const bank = document.getElementById('wordBank');
   bank.innerHTML = '';
-  BANK_WORDS.forEach((word, idx) => {
+  const order = shuffleArray(BANK_WORDS.map((_, idx) => idx));
+  order.forEach(idx => {
+    const word = BANK_WORDS[idx];
     const chipId = 'chip-' + idx;
     const el = document.createElement('span');
     el.className = 'word-chip';
