@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 10 — Послелоги (Drag & Drop)</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --field: #f5f9ff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.5rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    /* ── Word Bank ── */
+    .bank-wrapper {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .bank-title {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+    }
+    .bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 44px;
+    }
+
+    .word-chip {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: grab;
+      user-select: none;
+      transition: opacity .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 2px 6px rgba(52,120,224,.35);
+    }
+    .word-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(52,120,224,.45); }
+    .word-chip.dragging { opacity: .4; transform: scale(.95); }
+    .word-chip.used { opacity: .25; cursor: default; pointer-events: none; }
+
+    /* ── Exercises ── */
+    .exercises { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+    .ex-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      border: 2px solid transparent;
+      transition: border-color .2s, background .2s;
+    }
+    .ex-item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .ex-item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+
+    .ex-num {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .ex-sentence {
+      font-size: 1.05rem;
+      color: #1f2937;
+      line-height: 1.7;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 2px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 110px;
+      min-height: 34px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 2px dashed #93c5fd;
+      background: #eff6ff;
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      vertical-align: middle;
+      position: relative;
+    }
+    .drop-zone.over       { border-color: var(--accent); background: #dbeafe; }
+    .drop-zone.filled     { border-style: solid; border-color: #93c5fd; background: #dbeafe; cursor: pointer; }
+    .drop-zone.correct-dz { border-color: var(--ok); background: #e8f5e9; color: var(--ok); }
+    .drop-zone.wrong-dz   { border-color: var(--bad); background: #ffebee; color: var(--bad); }
+
+    .feedback-inline {
+      font-size: .88rem;
+      margin-top: 6px;
+    }
+    .feedback-inline.ok-msg  { color: var(--ok); font-weight: 600; }
+    .feedback-inline.bad-msg { color: var(--bad); }
+
+    /* Translation toggle */
+    .ru-toggle {
+      margin-top: 8px;
+      font-size: .83rem;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      display: inline-block;
+    }
+    .ru-toggle:hover { text-decoration: underline; }
+    .ru-text {
+      display: none;
+      font-size: .88rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 4px;
+    }
+    .ru-text.visible { display: block; }
+
+    /* Buttons */
+    .btn-row { text-align: center; margin: 18px 0; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 40px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+    .btn.secondary { background: #6b7280; }
+    .btn.secondary:hover { background: #4b5563; }
+
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+    .result-box.great { background: #e8f5e9; color: var(--ok); }
+    .result-box.good  { background: #fff3e0; color: #e65100; }
+    .result-box.retry { background: #ffebee; color: var(--bad); }
+    .score-detail { font-size: .95rem; font-weight: 400; color: var(--muted); margin-top: 6px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🎯 Упражнение 10 — Послелоги</h1>
+    <p>Перетаскивай послелоги в нужные места</p>
+  </div>
+
+  <div class="instructions">
+    💡 <strong>Как делать:</strong> перетащи послелог из банка слов в пустое поле. Нажми на поле, чтобы вернуть слово обратно. Тапни на <em>"👁 перевод"</em>, чтобы увидеть перевод предложения.
+  </div>
+
+  <!-- Word Bank -->
+  <div class="bank-wrapper">
+    <div class="bank-title">🗂 Банк слов</div>
+    <div class="bank" id="wordBank"></div>
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercises" id="exercises"></div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="checkAll()">✅ Проверить всё</button>
+    <button class="btn secondary" onclick="resetAll()">🔄 Сбросить</button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div id="resultText"></div>
+    <div class="score-detail" id="scoreDetail"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const BANK_WORDS = [
+  'kadar', 'gibi', 'gibi', 'için', 'hakkında', 'yüzünden', 'yüzünden', 'sayesinde', 'dışında', 'dışında'
+];
+
+const SENTENCES = [
+  {
+    id: 1,
+    before: 'Moskova, neredeyse İstanbul',
+    after:  'kalabalık bir şehir.',
+    answer: 'kadar',
+    ru: 'Москва — почти такой же многолюдный город, как Стамбул.'
+  },
+  {
+    id: 2,
+    before: 'Onlar',
+    after:  'yaşamak istemiyorum.',
+    answer: 'gibi',
+    ru: 'Я не хочу жить как они.'
+  },
+  {
+    id: 3,
+    before: 'Bunun',
+    after:  'hazır değilim.',
+    answer: 'için',
+    ru: 'Я к этому ещё не готов.'
+  },
+  {
+    id: 4,
+    before: 'Yeni film',
+    after:  'ne düşünüyorsun?',
+    answer: 'hakkında',
+    ru: 'Что ты думаешь о новом фильме?'
+  },
+  {
+    id: 5,
+    before: 'Senin',
+    after:  'her şey bozuldu.',
+    answer: 'yüzünden',
+    ru: 'Всё испортилось из-за тебя.'
+  },
+  {
+    id: 6,
+    before: 'Yapay zeka',
+    after:  'işlerimi daha hızlı hallediyorum.',
+    answer: 'sayesinde',
+    ru: 'Благодаря ИИ я быстрее завершаю свои дела.'
+  },
+  {
+    id: 7,
+    before: 'Senin',
+    after:  'bunu bilen var mı?',
+    answer: 'dışında',
+    ru: 'Кроме тебя кто-то знает это?'
+  },
+  {
+    id: 8,
+    before: 'Pandemi',
+    after:  'insanlar maskeleri takmak zorunda kaldı.',
+    answer: 'yüzünden',
+    ru: 'Из-за пандемии людям пришлось носить маски.'
+  },
+  {
+    id: 9,
+    before: 'Gözleri yıldızlar',
+    after:  'parlıyordu.',
+    answer: 'gibi',
+    ru: 'Её глаза сверкали, точно звёзды.'
+  },
+  {
+    id: 10,
+    before: 'Eski diziler',
+    after:  'hiçbir şey seyretmez.',
+    answer: 'dışında',
+    ru: 'Она ничего не смотрит, кроме старых сериалов.'
+  }
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+// chipId → word
+// dropZoneId ← chipId placed there
+let chips = {};       // chipId -> { word, el }
+let dropState = {};   // sentenceId -> chipId | null
+
+let draggedChipId = null;
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function getCtx() { if (!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
+
+function playCorrect() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523, t);
+    osc.frequency.setValueAtTime(659, t + 0.1);
+    osc.frequency.setValueAtTime(784, t + 0.2);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+    osc.start(t); osc.stop(t + 0.5);
+  } catch(e) {}
+}
+
+function playWrong() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, t);
+    osc.frequency.setValueAtTime(150, t + 0.15);
+    osc.frequency.setValueAtTime(100, t + 0.3);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    osc.start(t); osc.stop(t + 0.45);
+  } catch(e) {}
+}
+
+const praises = ['🎉 Отлично!','✨ Молодец!','🔥 Правильно!','💪 Верно!','🌟 Супер!','👏 Браво!','🎯 В точку!'];
+function rndPraise() { return praises[Math.floor(Math.random() * praises.length)]; }
+
+// ── Build DOM ─────────────────────────────────────────────────────────────────
+function buildBank() {
+  const bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  BANK_WORDS.forEach((word, idx) => {
+    const chipId = 'chip-' + idx;
+    const el = document.createElement('span');
+    el.className = 'word-chip';
+    el.textContent = word;
+    el.id = chipId;
+    el.draggable = true;
+
+    // Check if already used
+    const usedIn = Object.entries(dropState).find(([, cid]) => cid === chipId);
+    if (usedIn) {
+      el.classList.add('used');
+    }
+
+    el.addEventListener('dragstart', e => {
+      draggedChipId = chipId;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      draggedChipId = null;
+    });
+
+    // Touch support
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+
+    chips[chipId] = { word, el };
+    bank.appendChild(el);
+  });
+}
+
+function buildExercises() {
+  const container = document.getElementById('exercises');
+  container.innerHTML = '';
+
+  SENTENCES.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    item.id = 'ex-' + s.id;
+
+    item.innerHTML = `
+      <div class="ex-num">#${s.id}</div>
+      <div class="ex-sentence">
+        <span>${s.before}</span>
+        <span class="drop-zone" id="dz-${s.id}" data-sid="${s.id}">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+        <span>${s.after}</span>
+      </div>
+      <div class="feedback-inline" id="fb-${s.id}"></div>
+      <span class="ru-toggle" onclick="toggleRu(${s.id})">👁 перевод</span>
+      <div class="ru-text" id="ru-${s.id}">${s.ru}</div>
+    `;
+
+    container.appendChild(item);
+
+    const dz = item.querySelector('.drop-zone');
+    setupDropZone(dz, s.id);
+
+    // Restore state if any
+    if (dropState[s.id]) {
+      const chipId = dropState[s.id];
+      const chip = chips[chipId];
+      if (chip) {
+        dz.textContent = chip.word;
+        dz.classList.add('filled');
+      }
+    }
+  });
+}
+
+function setupDropZone(dz, sid) {
+  dz.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    dz.classList.add('over');
+  });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('over');
+    if (draggedChipId) placeChip(sid, draggedChipId);
+  });
+  // Click to return chip
+  dz.addEventListener('click', () => {
+    if (dropState[sid]) returnChip(sid);
+  });
+}
+
+function placeChip(sid, chipId) {
+  // If zone already has a chip, return it first
+  if (dropState[sid]) returnChip(sid);
+
+  const chip = chips[chipId];
+  if (!chip) return;
+
+  // Mark chip as used
+  chip.el.classList.add('used');
+
+  // Update state
+  dropState[sid] = chipId;
+
+  // Update drop zone
+  const dz = document.getElementById('dz-' + sid);
+  dz.textContent = chip.word;
+  dz.classList.add('filled');
+  dz.classList.remove('correct-dz', 'wrong-dz');
+
+  // Clear feedback
+  const fb = document.getElementById('fb-' + sid);
+  fb.textContent = '';
+  fb.className = 'feedback-inline';
+
+  const item = document.getElementById('ex-' + sid);
+  item.classList.remove('correct', 'incorrect');
+}
+
+function returnChip(sid) {
+  const chipId = dropState[sid];
+  if (!chipId) return;
+
+  const chip = chips[chipId];
+  if (chip) chip.el.classList.remove('used');
+
+  dropState[sid] = null;
+
+  const dz = document.getElementById('dz-' + sid);
+  dz.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  dz.classList.remove('filled', 'correct-dz', 'wrong-dz');
+
+  const item = document.getElementById('ex-' + sid);
+  item.classList.remove('correct', 'incorrect');
+
+  const fb = document.getElementById('fb-' + sid);
+  fb.textContent = '';
+  fb.className = 'feedback-inline';
+}
+
+// ── Translation toggle ────────────────────────────────────────────────────────
+function toggleRu(sid) {
+  const el = document.getElementById('ru-' + sid);
+  el.classList.toggle('visible');
+}
+
+// ── Check logic ───────────────────────────────────────────────────────────────
+function checkOne(sid, silent) {
+  const chipId = dropState[sid];
+  const fb = document.getElementById('fb-' + sid);
+  const item = document.getElementById('ex-' + sid);
+  const dz = document.getElementById('dz-' + sid);
+
+  fb.className = 'feedback-inline';
+  item.classList.remove('correct', 'incorrect');
+  dz.classList.remove('correct-dz', 'wrong-dz');
+
+  if (!chipId) return null;
+
+  const chip = chips[chipId];
+  const sentence = SENTENCES.find(s => s.id === sid);
+  const isCorrect = chip.word === sentence.answer;
+
+  if (isCorrect) {
+    item.classList.add('correct');
+    dz.classList.add('correct-dz');
+    fb.className = 'feedback-inline ok-msg';
+    fb.textContent = rndPraise();
+    if (!silent) playCorrect();
+  } else {
+    item.classList.add('incorrect');
+    dz.classList.add('wrong-dz');
+    fb.className = 'feedback-inline bad-msg';
+    fb.textContent = '❌ Правильный ответ: ' + sentence.answer;
+    if (!silent) playWrong();
+  }
+
+  return isCorrect;
+}
+
+function checkAll() {
+  let correct = 0, answered = 0;
+  SENTENCES.forEach(s => {
+    if (dropState[s.id]) {
+      answered++;
+      if (checkOne(s.id, true)) correct++;
+    }
+  });
+
+  const total = SENTENCES.length;
+  if (answered > 0) {
+    if (correct === total) playCorrect();
+    else if (correct < answered) playWrong();
+  }
+
+  const box = document.getElementById('resultBox');
+  const text = document.getElementById('resultText');
+  const detail = document.getElementById('scoreDetail');
+  box.style.display = 'block';
+  box.className = 'result-box';
+
+  const pct = Math.round(correct / total * 100);
+  detail.textContent = correct + ' из ' + total + ' (' + pct + '%)';
+
+  if (correct === total) {
+    box.classList.add('great');
+    text.textContent = '🎉 Превосходно! Все 10 правильно!';
+  } else if (correct >= total - 2) {
+    box.classList.add('good');
+    text.textContent = '👏 Отличный результат! Проверь ошибки.';
+  } else {
+    box.classList.add('retry');
+    text.textContent = '📖 Попробуй ещё раз!';
+  }
+
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetAll() {
+  dropState = {};
+  document.getElementById('resultBox').style.display = 'none';
+  buildBank();
+  buildExercises();
+}
+
+// ── Touch Drag (mobile) ───────────────────────────────────────────────────────
+let touchChipId = null;
+let touchClone = null;
+
+function onTouchStart(e) {
+  const chip = e.currentTarget;
+  if (chip.classList.contains('used')) return;
+  touchChipId = chip.id;
+
+  // Create visual clone
+  const rect = chip.getBoundingClientRect();
+  touchClone = chip.cloneNode(true);
+  touchClone.style.cssText = `
+    position: fixed; z-index: 9999; pointer-events: none; opacity: .85;
+    left: ${rect.left}px; top: ${rect.top}px;
+    width: ${rect.width}px; height: ${rect.height}px;
+    margin: 0;
+  `;
+  document.body.appendChild(touchClone);
+
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend', onTouchEnd);
+}
+
+function onTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  if (touchClone) {
+    touchClone.style.left = (t.clientX - 30) + 'px';
+    touchClone.style.top  = (t.clientY - 20) + 'px';
+  }
+  // Highlight drop zone under finger
+  document.querySelectorAll('.drop-zone').forEach(dz => dz.classList.remove('over'));
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  if (el && el.classList.contains('drop-zone')) el.classList.add('over');
+}
+
+function onTouchEnd(e) {
+  document.removeEventListener('touchmove', onTouchMove);
+  document.removeEventListener('touchend', onTouchEnd);
+
+  if (touchClone) { touchClone.remove(); touchClone = null; }
+
+  document.querySelectorAll('.drop-zone').forEach(dz => dz.classList.remove('over'));
+
+  if (!touchChipId) return;
+
+  const t = e.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  if (el) {
+    const dz = el.closest('.drop-zone');
+    if (dz) {
+      const sid = parseInt(dz.dataset.sid);
+      placeChip(sid, touchChipId);
+    }
+  }
+  touchChipId = null;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildBank();
+buildExercises();
+</script>
+</body>
+</html>
