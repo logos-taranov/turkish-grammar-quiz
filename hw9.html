@@ -342,7 +342,7 @@
         <div class="ex-num">#13</div>
         <div class="ex-prompt"><span class="hint">(çocuklar) (koşmak)</span> <span class="noun">bahçe</span></div>
         <div class="ex-input-row">
-          <input class="ex-input" type="text" placeholder="..." data-answer="çocukların koştukları bahçe" data-id="13" />
+          <input class="ex-input" type="text" placeholder="..." data-answer="çocukların koştukları bahçe" data-alt-answer="çocukların koştuğu bahçe" data-id="13" />
           <button class="check-btn" onclick="checkOne(13)">Проверить</button>
         </div>
         <div class="feedback" id="fb13"></div>
@@ -481,8 +481,12 @@
 
       if (!userRaw.trim()) return false;
 
-      if (userNorm === expectedNorm) {
-        // Exact match
+      // Check alt answer too
+      const altAnswer = inp.dataset.altAnswer || null;
+      const altAnswerNorm = altAnswer ? normalize(altAnswer) : null;
+
+      if (userNorm === expectedNorm || (altAnswerNorm && userNorm === altAnswerNorm)) {
+        // Exact match (main or alt)
         inp.classList.add('ok');
         item.classList.add('correct');
         fb.className = 'feedback ok-msg';
@@ -494,8 +498,9 @@
       // Check apostrophe: compare without apostrophes
       const userNoAp = stripApostrophe(userNorm);
       const expectedNoAp = stripApostrophe(expectedNorm);
+      const altNoAp = altAnswerNorm ? stripApostrophe(altAnswerNorm) : null;
 
-      if (userNoAp === expectedNoAp) {
+      if (userNoAp === expectedNoAp || (altNoAp && userNoAp === altNoAp)) {
         // Missing apostrophe — warn but count as correct
         inp.classList.add('warn');
         item.classList.add('apostrophe-warn');
