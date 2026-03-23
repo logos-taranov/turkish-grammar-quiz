@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 13 — Инфинитив vs -dığı (выбор ответа)</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 780px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.5rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 20px;
+    }
+
+    /* ── Exercise items ── */
+    .exercises { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+    .ex-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      border: 2px solid transparent;
+      transition: border-color .25s, background .25s;
+    }
+    .ex-item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .ex-item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+
+    .ex-num {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .ex-sentence {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+
+    /* Choice buttons */
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .choice-btn {
+      padding: 9px 18px;
+      border: 2px solid #93c5fd;
+      border-radius: 22px;
+      background: #f0f7ff;
+      color: var(--accent);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, transform .1s;
+      user-select: none;
+    }
+    .choice-btn:hover:not(:disabled) {
+      background: #dbeafe;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .choice-btn:active:not(:disabled) { transform: scale(.97); }
+
+    .choice-btn.selected-correct {
+      background: #e8f5e9;
+      border-color: var(--ok);
+      color: #2e7d32;
+    }
+    .choice-btn.selected-wrong {
+      background: #ffebee;
+      border-color: var(--bad);
+      color: #c62828;
+    }
+    .choice-btn.reveal-correct {
+      background: #e8f5e9;
+      border-color: var(--ok);
+      color: #2e7d32;
+    }
+    .choice-btn:disabled { cursor: default; opacity: .85; }
+
+    /* Translation */
+    .ru-toggle {
+      font-size: .83rem;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      display: inline-block;
+    }
+    .ru-toggle:hover { text-decoration: underline; }
+    .ru-text {
+      display: none;
+      font-size: .88rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 5px;
+    }
+    .ru-text.visible { display: block; }
+
+    /* Buttons */
+    .btn-row {
+      text-align: center;
+      margin: 18px 0;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 40px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+    .btn.secondary { background: #6b7280; }
+    .btn.secondary:hover { background: #4b5563; }
+
+    /* Result */
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 24px 20px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+    .result-box.great { background: #e8f5e9; color: #2e7d32; border: 2px solid rgba(76,175,80,.4); }
+    .result-box.good  { background: #fff3e0; color: #e65100; border: 2px solid rgba(255,152,0,.4); }
+    .result-box.retry { background: #ffebee; color: var(--bad); border: 2px solid rgba(244,67,54,.4); }
+    .score-detail { font-size: .95rem; font-weight: 400; color: var(--muted); margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🎯 Упражнение 13 — Инфинитив vs -dığı</h1>
+    <p>Выбери правильную форму: инфинитивная конструкция или форма на <em>-dığı</em></p>
+  </div>
+
+  <div class="instructions">
+    💡 <strong>Как делать:</strong> в каждом предложении пропуск. Выбери правильный вариант из двух. Нажми <em>"👁 перевод"</em>, чтобы увидеть перевод.
+  </div>
+
+  <div class="exercises" id="exercises"></div>
+
+  <div class="btn-row">
+    <button class="btn secondary" onclick="resetAll()">🔄 Начать заново</button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div id="resultText"></div>
+    <div class="score-detail" id="scoreDetail"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const SENTENCES = [
+  {
+    id: 1,
+    template: 'Doktor, ayaklarını sıcak ___ emretti.',
+    answer: 'tutmasını',
+    wrong: 'tuttuğunu',
+    ru: 'Врач сказал держать ноги в тепле.'
+  },
+  {
+    id: 2,
+    template: 'Bu yöntem sayesinde çok para ___ düşünüyorum.',
+    answer: 'kazandığını',
+    wrong: 'kazanmasını',
+    ru: 'Я думаю, что он зарабатывает много денег благодаря этому методу.'
+  },
+  {
+    id: 3,
+    template: 'Köpek, sahibinin eve ___ anlayınca sevindi.',
+    answer: 'dönmesini',
+    wrong: 'döndüğünü',
+    ru: 'Собака обрадовалась, поняв, что хозяин вернулся домой.'
+  },
+  {
+    id: 4,
+    template: 'Bugün her şeyi ___ imkansız.',
+    answer: 'bitirmemiz',
+    wrong: 'bitirdiğimiz',
+    ru: 'Для нас невозможно закончить всё сегодня.'
+  },
+  {
+    id: 5,
+    template: 'Ne ___ hala anlamıyor musun?',
+    answer: 'olduğunu',
+    wrong: 'olmasını',
+    ru: null
+  },
+  {
+    id: 6,
+    template: 'Çocuğa attan ___ yardım etti.',
+    answer: 'inmesine',
+    wrong: 'indiğine',
+    ru: 'Он помог ребенку слезть с коня.'
+  },
+  {
+    id: 7,
+    template: 'Tek tek ___ rica ediyorum.',
+    answer: 'cevap vermenizi',
+    wrong: 'verdiğinizi',
+    ru: 'Я прошу вас отвечать по очереди.'
+  },
+  {
+    id: 8,
+    template: 'Bu konuda ne ___ pek umurumda değil.',
+    answer: 'düşündüğü',
+    wrong: 'düşünmesi',
+    ru: 'Мне всё равно, что он на этот счёт думает.'
+  },
+  {
+    id: 9,
+    template: 'Mahkemeyi ___ düşünüyorsanız yanılıyorsunuz.',
+    answer: 'kandırdığınızı',
+    wrong: 'kandırmanızı',
+    ru: 'Если думаете, что обманули суд — вы ошибаетесь.'
+  },
+  {
+    id: 10,
+    template: 'Bu kompozisyonu kendi kendinize ___ düşünmüyorum.',
+    answer: 'yazdığınızı',
+    wrong: 'yazmanızı',
+    ru: null
+  }
+];
+
+const TOTAL = SENTENCES.length;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let answered = {};
+let shuffledOptions = {};
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playDing() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, t);
+    osc.frequency.setValueAtTime(1100, t + 0.08);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    osc.start(t); osc.stop(t + 0.45);
+  } catch(e) {}
+}
+
+function playBuzz() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.setValueAtTime(120, t + 0.12);
+    osc.frequency.setValueAtTime(80, t + 0.25);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+    osc.start(t); osc.stop(t + 0.4);
+  } catch(e) {}
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function norm(s) { return s.trim().toLowerCase(); }
+
+// Escape single quotes for inline onclick
+function esc(s) { return s.replace(/'/g, "\\'"); }
+
+// ── Build DOM ─────────────────────────────────────────────────────────────────
+function buildExercises() {
+  const container = document.getElementById('exercises');
+  container.innerHTML = '';
+  answered = {};
+  shuffledOptions = {};
+
+  SENTENCES.forEach(s => {
+    const options = shuffle([s.answer, s.wrong]);
+    shuffledOptions[s.id] = options;
+
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    item.id = 'ex-' + s.id;
+
+    const ruBlock = s.ru
+      ? `<span class="ru-toggle" onclick="toggleRu(${s.id})">👁 перевод</span>
+         <div class="ru-text" id="ru-${s.id}">${s.ru}</div>`
+      : '';
+
+    const choicesHTML = options.map(opt =>
+      `<button class="choice-btn" onclick="handleChoice(${s.id}, this, '${esc(opt)}')">${opt}</button>`
+    ).join('');
+
+    // Display sentence with blank marker
+    const displaySentence = s.template.replace('___', '<span style="color:var(--muted)">___</span>');
+
+    item.innerHTML = `
+      <div class="ex-num">Предложение ${s.id} из ${TOTAL}</div>
+      <div class="ex-sentence">${displaySentence}</div>
+      <div class="choices" id="choices-${s.id}">${choicesHTML}</div>
+      ${ruBlock}
+    `;
+
+    container.appendChild(item);
+  });
+
+  document.getElementById('resultBox').style.display = 'none';
+}
+
+// ── Choice handler ────────────────────────────────────────────────────────────
+function handleChoice(id, btn, chosen) {
+  if (answered[id] !== undefined) return;
+
+  const s = SENTENCES.find(x => x.id === id);
+  const isCorrect = norm(chosen) === norm(s.answer);
+
+  const choicesEl = document.getElementById('choices-' + id);
+  choicesEl.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (norm(b.textContent) === norm(s.answer)) {
+      b.classList.add('reveal-correct');
+    }
+  });
+
+  if (isCorrect) {
+    btn.classList.add('selected-correct');
+    document.getElementById('ex-' + id).classList.add('correct');
+    playDing();
+  } else {
+    btn.classList.add('selected-wrong');
+    document.getElementById('ex-' + id).classList.add('incorrect');
+    playBuzz();
+  }
+
+  answered[id] = isCorrect;
+
+  if (Object.keys(answered).length === TOTAL) {
+    showResult();
+  }
+}
+
+// ── Translation toggle ────────────────────────────────────────────────────────
+function toggleRu(id) {
+  const el = document.getElementById('ru-' + id);
+  if (el) el.classList.toggle('visible');
+}
+
+// ── Result ────────────────────────────────────────────────────────────────────
+function showResult() {
+  const correct = Object.values(answered).filter(Boolean).length;
+  const pct = Math.round(correct / TOTAL * 100);
+
+  const box = document.getElementById('resultBox');
+  const text = document.getElementById('resultText');
+  const detail = document.getElementById('scoreDetail');
+
+  box.style.display = 'block';
+  box.className = 'result-box';
+  detail.textContent = correct + ' из ' + TOTAL + ' (' + pct + '%)';
+
+  if (correct === TOTAL) {
+    box.classList.add('great');
+    text.textContent = '🎉 Vay canına, etkileyici!';
+    playDing();
+  } else if (correct >= 8) {
+    box.classList.add('good');
+    text.textContent = '👏 iyi gidiyor, bravo!';
+  } else {
+    box.classList.add('retry');
+    text.textContent = '📖 Tekrar dene!';
+  }
+
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetAll() {
+  buildExercises();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildExercises();
+</script>
+</body>
+</html>
