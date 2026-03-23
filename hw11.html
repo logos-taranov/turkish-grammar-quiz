@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 11 — Формы послелогов (выбор ответа)</title>
+  <style>
+    :root {
+      --bg: #e3f2fd;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #3478E0;
+      --accent-dark: #1f5fc8;
+      --ok: #4CAF50;
+      --bad: #f44336;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .container { max-width: 780px; margin: 0 auto; }
+
+    .header { text-align: center; margin: 8px 0 14px; }
+    .header h1 { font-size: 1.5rem; line-height: 1.15; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    .instructions {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      font-size: .95rem;
+      line-height: 1.5;
+      color: #374151;
+      margin-bottom: 20px;
+    }
+
+    /* ── Exercise items ── */
+    .exercises { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+    .ex-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      border: 2px solid transparent;
+      transition: border-color .25s, background .25s;
+    }
+    .ex-item.correct   { border-color: rgba(76,175,80,.6);  background: #e8f5e9; }
+    .ex-item.incorrect { border-color: rgba(244,67,54,.55); background: #ffebee; }
+
+    .ex-num {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .ex-sentence {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+
+    .ex-sentence .answer-highlight {
+      font-weight: 700;
+      color: var(--accent);
+      background: #dbeafe;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    /* Choice buttons */
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .choice-btn {
+      padding: 9px 18px;
+      border: 2px solid #93c5fd;
+      border-radius: 22px;
+      background: #f0f7ff;
+      color: var(--accent);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, transform .1s;
+      user-select: none;
+    }
+    .choice-btn:hover:not(:disabled) {
+      background: #dbeafe;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .choice-btn:active:not(:disabled) { transform: scale(.97); }
+
+    .choice-btn.selected-correct {
+      background: #e8f5e9;
+      border-color: var(--ok);
+      color: #2e7d32;
+    }
+    .choice-btn.selected-wrong {
+      background: #ffebee;
+      border-color: var(--bad);
+      color: #c62828;
+    }
+    .choice-btn.reveal-correct {
+      background: #e8f5e9;
+      border-color: var(--ok);
+      color: #2e7d32;
+    }
+    .choice-btn:disabled { cursor: default; opacity: .75; }
+
+    /* Translation */
+    .ru-toggle {
+      font-size: .83rem;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      display: inline-block;
+    }
+    .ru-toggle:hover { text-decoration: underline; }
+    .ru-text {
+      display: none;
+      font-size: .88rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 5px;
+    }
+    .ru-text.visible { display: block; }
+
+    /* Buttons */
+    .btn-row {
+      text-align: center;
+      margin: 18px 0;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 40px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+    .btn.secondary { background: #6b7280; }
+    .btn.secondary:hover { background: #4b5563; }
+
+    /* Result */
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 24px 20px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+    .result-box.great { background: #e8f5e9; color: #2e7d32; border: 2px solid rgba(76,175,80,.4); }
+    .result-box.good  { background: #fff3e0; color: #e65100; border: 2px solid rgba(255,152,0,.4); }
+    .result-box.retry { background: #ffebee; color: var(--bad); border: 2px solid rgba(244,67,54,.4); }
+    .score-detail { font-size: .95rem; font-weight: 400; color: var(--muted); margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🎯 Упражнение 11 — Формы послелогов</h1>
+    <p>Прочитай предложение и выбери правильную форму послелога</p>
+  </div>
+
+  <div class="instructions">
+    💡 <strong>Как делать:</strong> в каждом предложении выделен ключевой послелог. Выбери правильную форму из 4 вариантов. Нажми <em>"👁 перевод"</em>, чтобы увидеть перевод.
+  </div>
+
+  <div class="exercises" id="exercises"></div>
+
+  <div class="btn-row">
+    <button class="btn secondary" onclick="resetAll()">🔄 Начать заново</button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div id="resultText"></div>
+    <div class="score-detail" id="scoreDetail"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const SENTENCES = [
+  {
+    id: 1,
+    sentence: 'Dua ettikten sonra <span class="answer-highlight">(içimizde)</span> bir huzur hissettik.',
+    answer: 'içimizde',
+    wrong: ['içinde', 'içinizde', 'içlerinde'],
+    ru: 'После молитвы мы почувствовали покой в душе.'
+  },
+  {
+    id: 2,
+    sentence: 'Sen müdürsün ve müdür olarak <span class="answer-highlight">(üzerinde)</span> çok sorumluluk var.',
+    answer: 'üzerinde',
+    wrong: ['üzerimde', 'üzerimizde', 'üzerinizde'],
+    ru: 'Ты директор, и как директор несёшь большую ответственность.'
+  },
+  {
+    id: 3,
+    sentence: 'Çantanın <span class="answer-highlight">(üstünde)</span> bir etiket var.',
+    answer: 'üstünde',
+    wrong: ['üstümde', 'üstümüzde', 'üstünüzde'],
+    ru: 'На сумке есть этикетка.'
+  },
+  {
+    id: 4,
+    sentence: '<span class="answer-highlight">(Etrafına)</span> bak, ne görüyorsun?',
+    answer: 'Etrafına',
+    wrong: ['etrafında', 'etrafından', 'etrafını'],
+    ru: null
+  },
+  {
+    id: 5,
+    sentence: 'Bu sır <span class="answer-highlight">(aramızda)</span> kalmalı tamam mı?',
+    answer: 'aramızda',
+    wrong: ['aramızdan', 'aramıza', 'aramızı'],
+    ru: 'Этот секрет должен остаться между нами.'
+  },
+  {
+    id: 6,
+    sentence: 'Derslerden sonra okulun <span class="answer-highlight">(karşısında)</span> buluşalım mı?',
+    answer: 'karşısında',
+    wrong: ['karşısına', 'karşısı', 'karşısından'],
+    ru: null
+  },
+  {
+    id: 7,
+    sentence: 'Bazen sanki bütün dünya benim <span class="answer-highlight">(karşımda)</span>.',
+    answer: 'karşımda',
+    wrong: ['karşında', 'karşınızda', 'karşısı'],
+    ru: 'Иногда весь мир словно бы против меня.'
+  },
+  {
+    id: 8,
+    sentence: '<span class="answer-highlight">(Aralarında)</span> yaş farkı olmasaydı evlenirlerdi.',
+    answer: 'Aralarında',
+    wrong: ['aramızda', 'aranızda', 'aramda'],
+    ru: 'Если бы не разница в возрасте, они бы поженились.'
+  },
+  {
+    id: 9,
+    sentence: 'Mektubu en sevdiği kitabının sayfalarının <span class="answer-highlight">(arasına)</span> sakladı.',
+    answer: 'arasına',
+    wrong: ['arasından', 'arasını', 'arası'],
+    ru: 'Она спрятала письмо между страниц любимой книги.'
+  },
+  {
+    id: 10,
+    sentence: '<span class="answer-highlight">(Karşımızda)</span> ciddi bir sorun var, peki nasıl çözelim?',
+    answer: 'Karşımızda',
+    wrong: ['karşımıza', 'karşımızı', 'karşımız'],
+    ru: 'Перед нами серьёзная проблема, как будем решать?'
+  },
+  {
+    id: 11,
+    sentence: '<span class="answer-highlight">(Yanıma)</span> gel, sana bir şey anlatmak istiyorum.',
+    answer: 'Yanıma',
+    wrong: ['yanında', 'yanımdan', 'yanımızda'],
+    ru: 'Подойди ко мне, хочу кое-что рассказать.'
+  },
+  {
+    id: 12,
+    sentence: 'Yolun <span class="answer-highlight">(karşısına)</span> geçmeden önce sola bakın çocuklar.',
+    answer: 'karşısına',
+    wrong: ['karşısında', 'karşısı', 'karşısından'],
+    ru: 'Перед тем как перейти, дети, смотрите налево.'
+  },
+  {
+    id: 13,
+    sentence: 'Sakın <span class="answer-highlight">(yanımdan)</span> ayrılma, kaybolmanı istemiyorum.',
+    answer: 'yanımdan',
+    wrong: ['yanımda', 'yanıma', 'yanımı'],
+    ru: 'Не отходи от меня, не хочу чтобы ты потерялся.'
+  },
+  {
+    id: 14,
+    sentence: 'Evin dışı güzel görünüyor, ama <span class="answer-highlight">(içini)</span> henüz görmedik.',
+    answer: 'içini',
+    wrong: ['içinde', 'içine', 'içinden'],
+    ru: 'Снаружи дом красив, но внутри ещё не видели.'
+  },
+  {
+    id: 15,
+    sentence: 'Karanlık sokakta yürürken sürekli <span class="answer-highlight">(arkasını)</span> kontrol etti.',
+    answer: 'arkasını',
+    wrong: ['arkasında', 'arkası', 'arkasından'],
+    ru: 'Идя по тёмной улице, он постоянно оборачивался.'
+  }
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let answered = {};   // id -> true/false (correct/wrong)
+let shuffledOptions = {}; // id -> shuffled array of options
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playDing() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, t);
+    osc.frequency.setValueAtTime(1100, t + 0.08);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    osc.start(t); osc.stop(t + 0.45);
+  } catch(e) {}
+}
+
+function playBuzz() {
+  try {
+    const ctx = getCtx(), t = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.setValueAtTime(120, t + 0.12);
+    osc.frequency.setValueAtTime(80, t + 0.25);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+    osc.start(t); osc.stop(t + 0.4);
+  } catch(e) {}
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// normalize for comparison: lowercase + trim
+function norm(s) { return s.trim().toLowerCase(); }
+
+// ── Build DOM ─────────────────────────────────────────────────────────────────
+function buildExercises() {
+  const container = document.getElementById('exercises');
+  container.innerHTML = '';
+  answered = {};
+
+  SENTENCES.forEach(s => {
+    // Shuffle options once per build
+    const options = shuffle([s.answer, ...s.wrong]);
+    shuffledOptions[s.id] = options;
+
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    item.id = 'ex-' + s.id;
+
+    // Translation block
+    const ruBlock = s.ru
+      ? `<span class="ru-toggle" onclick="toggleRu(${s.id})">👁 перевод</span>
+         <div class="ru-text" id="ru-${s.id}">${s.ru}</div>`
+      : '';
+
+    // Choices
+    const choicesHTML = options.map(opt =>
+      `<button class="choice-btn" onclick="handleChoice(${s.id}, this, '${opt.replace(/'/g, "\\'")}')">${opt}</button>`
+    ).join('');
+
+    item.innerHTML = `
+      <div class="ex-num">Предложение ${s.id} из ${SENTENCES.length}</div>
+      <div class="ex-sentence">${s.sentence}</div>
+      <div class="choices" id="choices-${s.id}">${choicesHTML}</div>
+      ${ruBlock}
+    `;
+
+    container.appendChild(item);
+  });
+}
+
+// ── Choice handler ────────────────────────────────────────────────────────────
+function handleChoice(id, btn, chosen) {
+  if (answered[id] !== undefined) return; // already answered
+
+  const s = SENTENCES.find(x => x.id === id);
+  const isCorrect = norm(chosen) === norm(s.answer);
+
+  // Disable all buttons in this question
+  const choicesEl = document.getElementById('choices-' + id);
+  choicesEl.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (norm(b.textContent) === norm(s.answer)) {
+      b.classList.add('reveal-correct');
+    }
+  });
+
+  if (isCorrect) {
+    btn.classList.add('selected-correct');
+    document.getElementById('ex-' + id).classList.add('correct');
+    playDing();
+  } else {
+    btn.classList.add('selected-wrong');
+    document.getElementById('ex-' + id).classList.add('incorrect');
+    playBuzz();
+  }
+
+  answered[id] = isCorrect;
+
+  // Check if all answered → show result
+  if (Object.keys(answered).length === SENTENCES.length) {
+    showResult();
+  }
+}
+
+// ── Translation toggle ────────────────────────────────────────────────────────
+function toggleRu(id) {
+  const el = document.getElementById('ru-' + id);
+  if (el) el.classList.toggle('visible');
+}
+
+// ── Result ────────────────────────────────────────────────────────────────────
+function showResult() {
+  const total = SENTENCES.length;
+  const correct = Object.values(answered).filter(Boolean).length;
+  const pct = Math.round(correct / total * 100);
+
+  const box = document.getElementById('resultBox');
+  const text = document.getElementById('resultText');
+  const detail = document.getElementById('scoreDetail');
+
+  box.style.display = 'block';
+  box.className = 'result-box';
+  detail.textContent = correct + ' из ' + total + ' (' + pct + '%)';
+
+  if (correct === total) {
+    box.classList.add('great');
+    text.textContent = '🎉 Vay canına, etkileyici!';
+    playDing();
+  } else if (correct >= 12) {
+    box.classList.add('good');
+    text.textContent = '👏 iyi gidiyor, bravo! начинает получаться!';
+  } else {
+    box.classList.add('retry');
+    text.textContent = '📖 Продолжай практиковаться!';
+  }
+
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetAll() {
+  document.getElementById('resultBox').style.display = 'none';
+  buildExercises();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildExercises();
+</script>
+</body>
+</html>
