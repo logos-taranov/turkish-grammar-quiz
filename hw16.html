@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Упражнение 2 — Управление глаголов</title>
+<style>
+:root {
+  --bg: #f5f0ff;
+  --card: #ffffff;
+  --text: #1f1833;
+  --muted: #7c6f93;
+  --accent: #8b5cf6;
+  --accent-dark: #7c3aed;
+  --accent-light: #ede9fe;
+  --ok: #22c55e;
+  --ok-bg: #dcfce7;
+  --bad: #ef4444;
+  --bad-bg: #fee2e2;
+  --field: #f3e8ff;
+  --shadow: 0 2px 12px rgba(139,92,246,.12);
+  --radius: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);min-height:100vh;padding:0;color:var(--text)}
+.bank-sticky{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:2px solid var(--accent-light);padding:14px 16px;box-shadow:0 4px 16px rgba(139,92,246,.12)}
+.bank-title{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.bank-words{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.verb{display:inline-block;padding:8px 16px;border-radius:10px;background:var(--accent-light);border:2px solid var(--accent);color:var(--accent-dark);font-weight:600;font-size:.92rem;cursor:grab;user-select:none;transition:all .15s;touch-action:none}
+.verb:active{cursor:grabbing;transform:scale(1.05);box-shadow:0 4px 12px rgba(139,92,246,.3)}
+.verb.dragging{opacity:.4}
+.verb.correct{border-color:var(--ok)!important;background:var(--ok-bg)!important;color:#166534!important;cursor:default}
+.verb.wrong{border-color:var(--bad)!important;background:var(--bad-bg)!important;color:#991b1b!important;cursor:default}
+.container{max-width:800px;margin:0 auto;padding:16px}
+.header{text-align:center;margin:16px 0 20px}
+.header h1{font-size:1.4rem;color:var(--accent-dark);line-height:1.3}
+.header .sub{font-size:.88rem;color:var(--muted);font-weight:400}
+.header p{color:var(--muted);font-size:.9rem;margin-top:6px}
+.categories{display:flex;flex-direction:column;gap:16px}
+.cat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.cat-header{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;padding:12px 18px;font-weight:700;font-size:.95rem}
+.cat-header small{font-weight:400;opacity:.8;margin-left:6px}
+.cat-drop{min-height:60px;padding:12px;display:flex;flex-wrap:wrap;gap:8px;border:2px dashed transparent;transition:border-color .2s;align-items:flex-start}
+.cat-drop.over{border-color:var(--accent);background:rgba(139,92,246,.04)}
+.cat-drop .placeholder{color:var(--muted);font-size:.85rem;font-style:italic;width:100%;text-align:center;padding:8px;pointer-events:none}
+.check-btn{display:block;width:100%;max-width:320px;margin:28px auto;padding:16px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(139,92,246,.35);transition:transform .15s,box-shadow .15s}
+.check-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(139,92,246,.45)}
+.check-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.result-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;text-align:center;margin:20px 0;display:none}
+.result-card h2{font-size:1.4rem;margin-bottom:8px}
+.result-card p{color:var(--muted);font-size:1.05rem}
+.score{font-size:2.4rem;font-weight:800;color:var(--accent);margin:12px 0}
+</style>
+</head>
+<body>
+
+<div class="bank-sticky" id="bank">
+<div class="bank-title">Глаголы — перетащите в нужную категорию</div>
+<div class="bank-words" id="bankWords"></div>
+</div>
+
+<div class="container">
+<div class="header">
+<h1>Упражнение 2 — Управление глаголов<br><span class="sub">Fiillerin hâl yönetimi</span></h1>
+<p>Перетащите каждый глагол в нужную категорию падежа</p>
+</div>
+
+<div class="categories" id="cats"></div>
+
+<button class="check-btn" id="checkBtn" onclick="checkAll()">Проверить ✓</button>
+<div class="result-card" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreText"></div>
+<p id="resultMsg"></p>
+</div>
+</div>
+
+<script>
+const CATS = [{"id": "acc", "name": "Винительный падеж", "nameTR": "Belirtili Akkuzatif (-ı/-i/-u/-ü)", "verbs": ["tebrik etmek", "karıştırmak", "düşürmek", "aramak", "tehdit etmek", "bulmak", "yetiştirmek", "öpmek", "beslemek", "beklemek"]}, {"id": "dat", "name": "Направительный падеж", "nameTR": "Yönelme (-a/-e)", "verbs": ["sarılmak", "başlamak", "devam etmek", "yapışmak", "alışmak", "gülmek", "sevinmek", "üzülmek"]}, {"id": "abl", "name": "Исходный падеж", "nameTR": "Ayrılma (-dan/-den)", "verbs": ["zevk almak", "utanmak", "korkmak", "ölmek", "rahatsız olmak"]}, {"id": "ile", "name": "С İLE", "nameTR": "İle / birlikte", "verbs": ["karşılaşmak", "buluşmak", "gurur duymak", "şakalaşmak", "bakışmak", "anlaşmak", "evlenmek"]}, {"id": "none", "name": "Без падежа", "nameTR": "Eksiz (düz kullanım)", "verbs": ["horlamak", "titremek", "büyümek", "yaşlanmak", "artmak"]}];
+const ANSWERS = {"tebrik etmek": "acc", "karıştırmak": "acc", "düşürmek": "acc", "aramak": "acc", "tehdit etmek": "acc", "bulmak": "acc", "yetiştirmek": "acc", "öpmek": "acc", "beslemek": "acc", "beklemek": "acc", "sarılmak": "dat", "başlamak": "dat", "devam etmek": "dat", "yapışmak": "dat", "alışmak": "dat", "gülmek": "dat", "sevinmek": "dat", "üzülmek": "dat", "zevk almak": "abl", "utanmak": "abl", "korkmak": "abl", "ölmek": "abl", "rahatsız olmak": "abl", "karşılaşmak": "ile", "buluşmak": "ile", "gurur duymak": "ile", "şakalaşmak": "ile", "bakışmak": "ile", "anlaşmak": "ile", "evlenmek": "ile", "horlamak": "none", "titremek": "none", "büyümek": "none", "yaşlanmak": "none", "artmak": "none"};
+const VERBS = ["beklemek", "devam etmek", "bulmak", "korkmak", "titremek", "rahatsız olmak", "evlenmek", "sevinmek", "şakalaşmak", "buluşmak", "alışmak", "sarılmak", "başlamak", "bakışmak", "beslemek", "utanmak", "horlamak", "yetiştirmek", "gurur duymak", "tebrik etmek", "yaşlanmak", "yapışmak", "zevk almak", "düşürmek", "büyümek", "anlaşmak", "ölmek", "aramak", "karşılaşmak", "tehdit etmek", "artmak", "gülmek", "üzülmek", "karıştırmak", "öpmek"];
+let checked = false;
+let draggedEl = null;
+
+function init() {
+  // Render bank
+  const bw = document.getElementById('bankWords');
+  VERBS.forEach(v => {
+    const el = mkVerb(v);
+    bw.appendChild(el);
+  });
+
+  // Render categories
+  const catsEl = document.getElementById('cats');
+  CATS.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = '<div class="cat-header">' + c.name + '<small>' + c.nameTR + '</small></div>';
+    const drop = document.createElement('div');
+    drop.className = 'cat-drop';
+    drop.id = 'drop-' + c.id;
+    drop.innerHTML = '<span class="placeholder">Перетащите глаголы сюда</span>';
+    setupDrop(drop, c.id);
+    card.appendChild(drop);
+    catsEl.appendChild(card);
+  });
+}
+
+function mkVerb(v) {
+  const el = document.createElement('span');
+  el.className = 'verb';
+  el.textContent = v;
+  el.setAttribute('data-verb', v);
+  el.draggable = true;
+
+  // Desktop drag
+  el.addEventListener('dragstart', e => {
+    draggedEl = el;
+    el.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', v);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    draggedEl = null;
+  });
+
+  // Touch drag
+  let touchClone = null;
+  let touchStartX, touchStartY;
+  el.addEventListener('touchstart', e => {
+    if (checked) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    draggedEl = el;
+    el.classList.add('dragging');
+    touchClone = el.cloneNode(true);
+    touchClone.style.position = 'fixed';
+    touchClone.style.zIndex = '9999';
+    touchClone.style.pointerEvents = 'none';
+    touchClone.style.opacity = '0.85';
+    touchClone.style.transform = 'scale(1.08)';
+    touchClone.style.left = (t.clientX - 40) + 'px';
+    touchClone.style.top = (t.clientY - 20) + 'px';
+    document.body.appendChild(touchClone);
+  }, {passive: true});
+  el.addEventListener('touchmove', e => {
+    if (!touchClone) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    touchClone.style.left = (t.clientX - 40) + 'px';
+    touchClone.style.top = (t.clientY - 20) + 'px';
+    // Highlight drop zone
+    document.querySelectorAll('.cat-drop').forEach(d => d.classList.remove('over'));
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    if (under) {
+      const dropZone = under.closest('.cat-drop');
+      if (dropZone) dropZone.classList.add('over');
+    }
+  }, {passive: false});
+  el.addEventListener('touchend', e => {
+    if (!touchClone) return;
+    const t = e.changedTouches[0];
+    if (touchClone.parentNode) touchClone.parentNode.removeChild(touchClone);
+    touchClone = null;
+    el.classList.remove('dragging');
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    if (under) {
+      const dropZone = under.closest('.cat-drop');
+      if (dropZone) {
+        const ph = dropZone.querySelector('.placeholder');
+        if (ph) ph.remove();
+        dropZone.appendChild(el);
+      }
+    }
+    draggedEl = null;
+    document.querySelectorAll('.cat-drop').forEach(d => d.classList.remove('over'));
+  });
+
+  // Double-click/tap to return to bank
+  el.addEventListener('dblclick', () => {
+    if (checked) return;
+    document.getElementById('bankWords').appendChild(el);
+  });
+
+  return el;
+}
+
+function setupDrop(drop, catId) {
+  drop.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    drop.classList.add('over');
+  });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('over');
+    if (checked || !draggedEl) return;
+    const ph = drop.querySelector('.placeholder');
+    if (ph) ph.remove();
+    drop.appendChild(draggedEl);
+  });
+}
+
+function checkAll() {
+  if (checked) return;
+  checked = true;
+  let correct = 0;
+  let total = Object.keys(ANSWERS).length;
+
+  CATS.forEach(c => {
+    const drop = document.getElementById('drop-' + c.id);
+    const verbs = drop.querySelectorAll('.verb');
+    verbs.forEach(vel => {
+      const v = vel.getAttribute('data-verb');
+      if (ANSWERS[v] === c.id) {
+        vel.classList.add('correct');
+        correct++;
+      } else {
+        vel.classList.add('wrong');
+      }
+    });
+  });
+
+  // Also mark unplaced verbs as wrong
+  document.getElementById('bankWords').querySelectorAll('.verb').forEach(vel => {
+    vel.classList.add('wrong');
+  });
+
+  const pct = correct / total;
+  document.getElementById('scoreText').textContent = correct + ' / ' + total;
+  if (pct === 1) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF89 Превосходно!';
+    document.getElementById('resultMsg').textContent = 'Все глаголы на своих местах!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+  } else if (pct >= 0.8) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF1F Отличный результат!';
+    document.getElementById('resultMsg').textContent = 'Почти всё верно! Вы хорошо чувствуете управление глаголов!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+  } else if (pct >= 0.6) {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCAA Хороший результат!';
+    document.getElementById('resultMsg').textContent = 'Немного практики \u2014 и будет идеально!';
+    document.getElementById('scoreText').style.color = '#8b5cf6';
+  } else {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCDA Есть куда расти!';
+    document.getElementById('resultMsg').textContent = 'Управление глаголов \u2014 сложная тема. Практика поможет!';
+    document.getElementById('scoreText').style.color = '#ef4444';
+  }
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('checkBtn').disabled = true;
+  document.querySelectorAll('.verb').forEach(v => { v.draggable = false; v.style.cursor = 'default'; });
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+
+init();
+</script>
+</body>
+</html>
