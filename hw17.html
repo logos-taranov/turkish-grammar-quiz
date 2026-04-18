@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Упражнение 3 — Винительный падеж</title>
+<style>
+:root {
+  --bg: #f5f0ff;
+  --card: #ffffff;
+  --text: #1f1833;
+  --muted: #7c6f93;
+  --accent: #8b5cf6;
+  --accent-dark: #7c3aed;
+  --accent-light: #ede9fe;
+  --ok: #22c55e;
+  --ok-bg: #dcfce7;
+  --bad: #ef4444;
+  --bad-bg: #fee2e2;
+  --field: #f3e8ff;
+  --shadow: 0 2px 12px rgba(139,92,246,.12);
+  --radius: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);min-height:100vh;padding:16px;color:var(--text)}
+.container{max-width:760px;margin:0 auto}
+.header{text-align:center;margin:8px 0 24px}
+.header h1{font-size:1.4rem;color:var(--accent-dark);line-height:1.3}
+.header .sub{font-size:.88rem;color:var(--muted);font-weight:400}
+.header p{color:var(--muted);font-size:.9rem;margin-top:6px}
+.q-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px}
+.q-num{display:inline-block;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.85rem;text-align:center;line-height:28px;margin-right:10px;flex-shrink:0}
+.q-row{display:flex;align-items:center;flex-wrap:wrap}
+.q-text{font-size:1.05rem;line-height:1.8;flex:1}
+.blank-input{display:inline-block;width:150px;padding:5px 10px;border-radius:10px;background:var(--field);border:2px solid var(--accent);text-align:center;font-size:1rem;font-weight:500;color:var(--text);outline:none;transition:all .2s;vertical-align:middle}
+.blank-input::placeholder{color:var(--accent);font-style:italic;opacity:.7}
+.blank-input:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.blank-input.correct{border-color:var(--ok)!important;background:var(--ok-bg)!important;color:#166534!important}
+.blank-input.wrong{border-color:var(--bad)!important;background:var(--bad-bg)!important;color:#991b1b!important}
+.correction{font-size:.8rem;color:var(--bad);font-weight:500;margin-left:6px}
+.hint-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 12px;border:1px solid var(--accent-light);border-radius:8px;background:transparent;color:var(--muted);font-size:.82rem;cursor:pointer;transition:all .15s}
+.hint-btn:hover{background:var(--accent-light);color:var(--accent-dark)}
+.hint-text{font-size:.88rem;color:var(--muted);font-style:italic;margin-top:4px;display:none;padding-left:38px}
+.hint-text.show{display:block}
+.check-btn{display:block;width:100%;max-width:320px;margin:28px auto;padding:16px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(139,92,246,.35);transition:transform .15s,box-shadow .15s}
+.check-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(139,92,246,.45)}
+.check-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.result-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;text-align:center;margin:20px 0;display:none}
+.result-card h2{font-size:1.4rem;margin-bottom:8px}
+.result-card p{color:var(--muted);font-size:1.05rem}
+.score{font-size:2.4rem;font-weight:800;color:var(--accent);margin:12px 0}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Упражнение 3 — Винительный падеж<br><span class="sub">Belirtili Akkuzatif</span></h1>
+<p>Впишите пропущенное слово на турецком языке. Нажмите 💡 чтобы увидеть перевод предложения.</p>
+</div>
+<div id="quiz"></div>
+<button class="check-btn" id="checkBtn" onclick="checkAll()">Проверить ✓</button>
+<div class="result-card" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreText"></div>
+<p id="resultMsg"></p>
+</div>
+</div>
+<script>
+const Q = [{"id": 0, "before": "", "after": " temizledim.", "clue": "холодильник", "correct": "Buzdolabını", "tr": "Я помыл холодильник."}, {"id": 1, "before": "Çiçek ", "after": " çok seviyorum.", "clue": "запах", "correct": "kokusunu", "tr": "Я очень люблю запах цветов."}, {"id": 2, "before": "Kapının ", "after": " duydum.", "clue": "звук", "correct": "sesini", "tr": "Я услышал звук двери."}, {"id": 3, "before": "Telefonunun ", "after": " kırdı.", "clue": "экран", "correct": "ekranını", "tr": "Он разбил экран своего телефона."}, {"id": 4, "before": "Annem yemeğin ", "after": " beğenmedi.", "clue": "вкус", "correct": "tadını", "tr": "Маме не понравился вкус еды."}, {"id": 5, "before": "Bu filmin ", "after": " hatırlamıyorum.", "clue": "конец", "correct": "sonunu", "tr": "Я не помню конец этого фильма."}, {"id": 6, "before": "Kitabın ", "after": " değiştirdiler.", "clue": "обложку", "correct": "kapağını", "tr": "Они поменяли обложку книги."}, {"id": 7, "before": "Arabanın ", "after": " kapattım.", "clue": "дверь", "correct": "kapısını", "tr": "Я закрыл дверь машины."}, {"id": 8, "before": "Bahçenin ", "after": " kilitlediler.", "clue": "ворота", "correct": "kapısını", "tr": "Они заперли ворота сада."}, {"id": 9, "before": "Abim ", "after": " hiç kimseyle paylaşmaz.", "clue": "свои игрушки", "correct": "oyuncaklarını", "tr": "Мой брат ни с кем не делится своими игрушками."}, {"id": 10, "before": "Öğretmen öğrencinin ", "after": " hemen fark etti.", "clue": "ошибку", "correct": "hatasını", "tr": "Учитель сразу заметил ошибку ученика."}, {"id": 11, "before": "Patron çalışanların ", "after": " değerlendirdi.", "clue": "производительность", "correct": "performansını", "tr": "Начальник оценил производительность сотрудников."}, {"id": 12, "before": "Dün gece rüzgarın ", "after": " dinledim.", "clue": "звук", "correct": "sesini", "tr": "Вчера ночью я слушал звук ветра."}, {"id": 13, "before": "Denizin ", "after": " çok beğendik.", "clue": "цвет", "correct": "rengini", "tr": "Нам очень понравился цвет моря."}, {"id": 14, "before": "", "after": " gördün mü?", "clue": "выражение его лица", "correct": "Yüz ifadesini", "tr": "Ты видела выражение его лица?"}];
+let checked = false;
+
+function render() {
+  const el = document.getElementById('quiz');
+  Q.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+
+    let sentenceHTML = '<div class="q-row"><span class="q-num">' + (i+1) + '</span><span class="q-text">';
+    if (q.before) sentenceHTML += q.before;
+    sentenceHTML += '<input class="blank-input" id="inp' + i + '" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="' + q.clue + '"/>';
+    sentenceHTML += '<span class="correction" id="corr' + i + '"></span>';
+    if (q.after) sentenceHTML += q.after;
+    sentenceHTML += '</span></div>';
+
+    sentenceHTML += '<button class="hint-btn" onclick="toggleHint(' + i + ')">\uD83D\uDCA1 перевод</button>';
+    sentenceHTML += '<div class="hint-text" id="hint' + i + '">' + q.tr + '</div>';
+
+    card.innerHTML = sentenceHTML;
+    el.appendChild(card);
+  });
+}
+
+function toggleHint(i) {
+  const h = document.getElementById('hint' + i);
+  h.classList.toggle('show');
+}
+
+function normalize(s) {
+  return s.trim().toLowerCase().replace(/\u0130/g, 'i').replace(/İ/g, 'i');
+}
+
+function checkAll() {
+  if (checked) return;
+  checked = true;
+  let correct = 0;
+  Q.forEach((q, i) => {
+    const inp = document.getElementById('inp' + i);
+    const corr = document.getElementById('corr' + i);
+    const val = normalize(inp.value);
+    const ans = normalize(q.correct);
+    if (val === ans) {
+      inp.classList.add('correct');
+      correct++;
+    } else {
+      inp.classList.add('wrong');
+      corr.textContent = '\u2192 ' + q.correct;
+    }
+    inp.readOnly = true;
+    // Show all hints
+    document.getElementById('hint' + i).classList.add('show');
+  });
+  const pct = correct / Q.length;
+  document.getElementById('scoreText').textContent = correct + ' / ' + Q.length;
+  if (pct === 1) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF89 Превосходно!';
+    document.getElementById('resultMsg').textContent = 'Все ответы правильные! Винительный падеж вам покорился!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+  } else if (pct >= 0.8) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF1F Отличный результат!';
+    document.getElementById('resultMsg').textContent = 'Почти всё верно! Ещё чуть-чуть практики!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+  } else if (pct >= 0.6) {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCAA Хороший результат!';
+    document.getElementById('resultMsg').textContent = 'Немного подтянете \u2014 и будет идеально!';
+    document.getElementById('scoreText').style.color = '#8b5cf6';
+  } else {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCDA Есть куда расти!';
+    document.getElementById('resultMsg').textContent = 'Практика \u2014 ключ к успеху!';
+    document.getElementById('scoreText').style.color = '#ef4444';
+  }
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
