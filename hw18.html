@@ -59,6 +59,16 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;back
 .result-card p{color:var(--muted);font-size:1rem;line-height:1.5}
 .result-card .emoji{font-size:3rem;margin-bottom:12px}
 
+/* Alternative orderings */
+.alt-orderings{padding:8px 18px 14px;border-top:1px solid #e5e0ec}
+.alt-label{font-size:.75rem;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+.alt-sentence{display:block;font-size:.82rem;color:#6b5b8a;line-height:1.5;padding-left:8px}
+.alt-sentence::before{content:"• ";color:var(--accent)}
+
+/* Drop area insertion marker */
+.word.insert-before{border-left:3px solid var(--accent-dark);padding-left:11px}
+.word.insert-after{border-right:3px solid var(--accent-dark);padding-right:11px}
+
 /* Touch clone */
 .touch-clone{position:fixed;z-index:9999;pointer-events:none;opacity:.88;transform:scale(1.08)}
 
@@ -98,7 +108,7 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;back
 </div>
 
 <script>
-const DATA = [{"id": 1, "words": ["onunla", "tanıdık", "beklerken", "biraz", "gördüm", "ve", "konuştum", "birini", "dün", "parkta"], "valid": [["dün", "parkta", "beklerken", "tanıdık", "birini", "gördüm", "ve", "onunla", "biraz", "konuştum"]], "ru": "Вчера, пока ждал в парке, я увидел знакомого и немного поговорил с ним."}, {"id": 2, "words": ["tahtaya", "çağırdı", "ikimizi", "için", "projeyi", "de", "anlatmamız", "öğretmen"], "valid": [["öğretmen", "projeyi", "anlatmamız", "için", "ikimizi", "de", "tahtaya", "çağırdı"], ["öğretmen", "ikimizi", "de", "tahtaya", "çağırdı", "projeyi", "anlatmamız", "için"]], "ru": "Учитель вызвал нас двоих к доске, чтобы мы объяснили проект."}, {"id": 3, "words": ["için", "üçünüzü", "bu", "hızlı", "seçtim", "bitirmek", "özellikle", "işi", "de"], "valid": [["bu", "işi", "hızlı", "bitirmek", "için", "üçünüzü", "de", "özellikle", "seçtim"], ["üçünüzü", "de", "özellikle", "bu", "işi", "hızlı", "bitirmek", "için", "seçtim"]], "ru": "Я специально выбрал вас троих, чтобы быстро закончить эту работу."}, {"id": 4, "words": ["görevlendirecek", "müdür", "toplantıda", "birimizi", "için", "konuşmak"], "valid": [["müdür", "toplantıda", "konuşmak", "için", "birimizi", "görevlendirecek"], ["müdür", "birimizi", "toplantıda", "konuşmak", "için", "görevlendirecek"]], "ru": "Руководитель назначит одного из нас выступить на встрече."}, {"id": 5, "words": ["kontrol", "bu", "şeyi", "istiyorum", "değil", "mümkün", "etmek", "bazen", "ama", "her"], "valid": [["bazen", "her", "şeyi", "kontrol", "etmek", "istiyorum", "ama", "bu", "mümkün", "değil"]], "ru": "Иногда я хочу всё контролировать, но это невозможно."}, {"id": 6, "words": ["sana", "bekliyorum", "zamanı", "bir", "doğru", "şey", "söylemek", "ama", "önemli", "istiyorum"], "valid": [["sana", "önemli", "bir", "şey", "söylemek", "istiyorum", "ama", "doğru", "zamanı", "bekliyorum"], ["önemli", "bir", "şey", "söylemek", "istiyorum", "sana", "ama", "doğru", "zamanı", "bekliyorum"]], "ru": "Я хочу сказать тебе одну важную вещь, но жду подходящего момента."}, {"id": 7, "words": ["konuda", "bu", "herhangi", "sana", "sorabilirsin", "ederim", "bir", "bana", "şey", "yardım"], "valid": [["bu", "konuda", "bana", "herhangi", "bir", "şey", "sorabilirsin", "sana", "yardım", "ederim"], ["herhangi", "bir", "şey", "sorabilirsin", "bana", "bu", "konuda", "sana", "yardım", "ederim"]], "ru": "Ты можешь спросить меня что угодно по этой теме, я помогу."}, {"id": 8, "words": ["hepsini", "birini", "alamayız", "zorundayız", "seçmek", "listeden"], "valid": [["listeden", "birini", "seçmek", "zorundayız", "hepsini", "alamayız"]], "ru": "Мы должны выбрать кого-то одного из списка, всех взять нельзя."}, {"id": 9, "words": ["tek", "çantamdaki", "ettim", "ve", "eşyaları", "tek", "çıkardım", "hepsini", "kontrol"], "valid": [["çantamdaki", "eşyaları", "çıkardım", "ve", "hepsini", "tek", "tek", "kontrol", "ettim"], ["çantamdaki", "eşyaları", "çıkardım", "ve", "tek", "tek", "kontrol", "ettim", "hepsini"]], "ru": "Я вытащил вещи из сумки и проверил их все по очереди."}, {"id": 10, "words": ["sokakta", "gittim", "ettim", "yanına", "fark", "ve", "yardım", "isteyen", "birini"], "valid": [["sokakta", "yardım", "isteyen", "birini", "fark", "ettim", "ve", "yanına", "gittim"], ["yardım", "isteyen", "birini", "fark", "ettim", "sokakta", "ve", "yanına", "gittim"]], "ru": "Я заметил человека, который просил помощи на улице, и подошёл к нему."}];
+const DATA = [{"id": 1, "words": ["onunla", "tanıdık", "beklerken", "biraz", "gördüm", "ve", "konuştum", "birini", "dün", "parkta"], "valid": [["dün", "parkta", "beklerken", "tanıdık", "birini", "gördüm", "ve", "onunla", "biraz", "konuştum"]], "ru": "Вчера, пока ждал в парке, я увидел знакомого и немного поговорил с ним."}, {"id": 2, "words": ["tahtaya", "çağırdı", "ikimizi", "için", "projeyi", "de", "anlatmamız", "öğretmen"], "valid": [["öğretmen", "projeyi", "anlatmamız", "için", "ikimizi", "de", "tahtaya", "çağırdı"], ["öğretmen", "ikimizi", "de", "tahtaya", "çağırdı", "projeyi", "anlatmamız", "için"]], "ru": "Учитель вызвал нас двоих к доске, чтобы мы объяснили проект."}, {"id": 3, "words": ["için", "üçünüzü", "bu", "hızlı", "seçtim", "bitirmek", "özellikle", "işi", "de"], "valid": [["bu", "işi", "hızlı", "bitirmek", "için", "üçünüzü", "de", "özellikle", "seçtim"], ["üçünüzü", "de", "özellikle", "bu", "işi", "hızlı", "bitirmek", "için", "seçtim"], ["özellikle", "üçünüzü", "de", "seçtim", "bu", "işi", "hızlı", "bitirmek", "için"], ["üçünüzü", "de", "özellikle", "seçtim", "bu", "işi", "hızlı", "bitirmek", "için"]], "ru": "Я специально выбрал вас троих, чтобы быстро закончить эту работу."}, {"id": 4, "words": ["görevlendirecek", "müdür", "toplantıda", "birimizi", "için", "konuşmak"], "valid": [["müdür", "toplantıda", "konuşmak", "için", "birimizi", "görevlendirecek"], ["müdür", "birimizi", "toplantıda", "konuşmak", "için", "görevlendirecek"]], "ru": "Руководитель назначит одного из нас выступить на встрече."}, {"id": 5, "words": ["kontrol", "bu", "şeyi", "istiyorum", "değil", "mümkün", "etmek", "bazen", "ama", "her"], "valid": [["bazen", "her", "şeyi", "kontrol", "etmek", "istiyorum", "ama", "bu", "mümkün", "değil"]], "ru": "Иногда я хочу всё контролировать, но это невозможно."}, {"id": 6, "words": ["sana", "bekliyorum", "zamanı", "bir", "doğru", "şey", "söylemek", "ama", "önemli", "istiyorum"], "valid": [["sana", "önemli", "bir", "şey", "söylemek", "istiyorum", "ama", "doğru", "zamanı", "bekliyorum"], ["önemli", "bir", "şey", "söylemek", "istiyorum", "sana", "ama", "doğru", "zamanı", "bekliyorum"]], "ru": "Я хочу сказать тебе одну важную вещь, но жду подходящего момента."}, {"id": 7, "words": ["konuda", "bu", "herhangi", "sana", "sorabilirsin", "ederim", "bir", "bana", "şey", "yardım"], "valid": [["bu", "konuda", "bana", "herhangi", "bir", "şey", "sorabilirsin", "sana", "yardım", "ederim"], ["herhangi", "bir", "şey", "sorabilirsin", "bana", "bu", "konuda", "sana", "yardım", "ederim"], ["bana", "bu", "konuda", "herhangi", "bir", "şey", "sorabilirsin", "sana", "yardım", "ederim"]], "ru": "Ты можешь спросить меня что угодно по этой теме, я помогу."}, {"id": 8, "words": ["hepsini", "birini", "alamayız", "zorundayız", "seçmek", "listeden"], "valid": [["listeden", "birini", "seçmek", "zorundayız", "hepsini", "alamayız"]], "ru": "Мы должны выбрать кого-то одного из списка, всех взять нельзя."}, {"id": 9, "words": ["tek", "çantamdaki", "ettim", "ve", "eşyaları", "tek", "çıkardım", "hepsini", "kontrol"], "valid": [["çantamdaki", "eşyaları", "çıkardım", "ve", "hepsini", "tek", "tek", "kontrol", "ettim"], ["çantamdaki", "eşyaları", "çıkardım", "ve", "tek", "tek", "kontrol", "ettim", "hepsini"]], "ru": "Я вытащил вещи из сумки и проверил их все по очереди."}, {"id": 10, "words": ["sokakta", "gittim", "ettim", "yanına", "fark", "ve", "yardım", "isteyen", "birini"], "valid": [["sokakta", "yardım", "isteyen", "birini", "fark", "ettim", "ve", "yanına", "gittim"], ["yardım", "isteyen", "birini", "fark", "ettim", "sokakta", "ve", "yanına", "gittim"]], "ru": "Я заметил человека, который просил помощи на улице, и подошёл к нему."}];
 
 let completedCount = 0;
 const totalSentences = DATA.length;
@@ -189,12 +199,19 @@ function mkWord(text, sid, idx) {
     const t = e.touches[0];
     clone.style.left = (t.clientX - 30) + 'px';
     clone.style.top = (t.clientY - 18) + 'px';
-    // Highlight drop areas
-    document.querySelectorAll('.drop-area').forEach(d => d.classList.remove('over'));
+    // Highlight drop areas and show insertion markers
+    document.querySelectorAll('.drop-area').forEach(d => {
+      d.classList.remove('over');
+      clearInsertMarkers(d);
+    });
     const under = document.elementFromPoint(t.clientX, t.clientY);
     if (under) {
       const dz = under.closest('.drop-area');
-      if (dz) dz.classList.add('over');
+      if (dz) {
+        dz.classList.add('over');
+        const target = getInsertTarget(dz, t.clientX, t.clientY, el);
+        if (target) target.classList.add('insert-before');
+      }
     }
   }, {passive: false});
 
@@ -204,14 +221,18 @@ function mkWord(text, sid, idx) {
     clone.remove();
     clone = null;
     el.classList.remove('dragging');
-    document.querySelectorAll('.drop-area').forEach(d => d.classList.remove('over'));
+    document.querySelectorAll('.drop-area').forEach(d => {
+      d.classList.remove('over');
+      clearInsertMarkers(d);
+    });
 
     const under = document.elementFromPoint(t.clientX, t.clientY);
     if (under) {
       const dz = under.closest('.drop-area');
       const bank = under.closest('.word-bank');
       if (dz) {
-        moveToDrop(el, dz);
+        const target = getInsertTarget(dz, t.clientX, t.clientY, el);
+        moveToDrop(el, dz, target);
       } else if (bank) {
         moveToBank(el, bank);
       }
@@ -262,17 +283,43 @@ function mkWord(text, sid, idx) {
   return el;
 }
 
-function moveToDrop(el, dropArea) {
+function moveToDrop(el, dropArea, beforeEl) {
   const sid = el.dataset.sid;
   const dropSid = dropArea.id.replace('drop-', '');
   if (sid !== dropSid) return; // Only allow words in their own sentence's drop
   
   const ph = dropArea.querySelector('.placeholder');
   if (ph) ph.style.display = 'none';
-  const checkMark = dropArea.querySelector('.check-mark');
-  dropArea.insertBefore(el, checkMark);
+  
+  if (beforeEl && beforeEl.classList.contains('word') && beforeEl.parentElement === dropArea) {
+    dropArea.insertBefore(el, beforeEl);
+  } else {
+    const checkMark = dropArea.querySelector('.check-mark');
+    dropArea.insertBefore(el, checkMark);
+  }
   el.classList.add('in-drop');
+  clearInsertMarkers(dropArea);
   checkSentence(sid);
+}
+
+function clearInsertMarkers(dropArea) {
+  if (dropArea) {
+    dropArea.querySelectorAll('.word').forEach(w => {
+      w.classList.remove('insert-before', 'insert-after');
+    });
+  }
+}
+
+function getInsertTarget(dropArea, clientX, clientY, draggedEl) {
+  const words = Array.from(dropArea.querySelectorAll('.word')).filter(w => w !== draggedEl);
+  for (const w of words) {
+    const rect = w.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (clientX < midX) {
+      return w; // Insert before this word
+    }
+  }
+  return null; // Insert at end
 }
 
 function moveToBank(el, bank) {
@@ -300,17 +347,29 @@ function setupDropArea(drop, sid) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     drop.classList.add('over');
+    // Show insertion marker
+    const el = window._dragEl;
+    if (el) {
+      clearInsertMarkers(drop);
+      const target = getInsertTarget(drop, e.clientX, e.clientY, el);
+      if (target) target.classList.add('insert-before');
+    }
   });
-  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('dragleave', () => {
+    drop.classList.remove('over');
+    clearInsertMarkers(drop);
+  });
   drop.addEventListener('drop', e => {
     e.preventDefault();
     drop.classList.remove('over');
+    clearInsertMarkers(drop);
     const el = window._dragEl;
     if (!el) return;
     if (el.dataset.sid !== String(sid)) return;
     const card = document.getElementById('card-' + sid);
     if (card.classList.contains('correct')) return;
-    moveToDrop(el, drop);
+    const target = getInsertTarget(drop, e.clientX, e.clientY, el);
+    moveToDrop(el, drop, target);
   });
 
   // Also allow dropping back to bank
@@ -354,11 +413,33 @@ function checkSentence(sid) {
         w.draggable = false;
         w.style.cursor = 'default';
       });
+      // Show alternative orderings
+      showAlternatives(sid, words);
       if (completedCount === totalSentences) {
         setTimeout(showFinalResult, 500);
       }
     }
   }
+}
+
+function showAlternatives(sid, currentWords) {
+  const s = DATA.find(x => x.id === Number(sid));
+  if (s.valid.length <= 1) return; // No alternatives to show
+  
+  const currentStr = currentWords.join(' ').toLowerCase();
+  const alts = s.valid.filter(v => v.join(' ').toLowerCase() !== currentStr);
+  if (alts.length === 0) return;
+  
+  const card = document.getElementById('card-' + sid);
+  // Remove old alt block if any
+  const old = card.querySelector('.alt-orderings');
+  if (old) old.remove();
+  
+  const altDiv = document.createElement('div');
+  altDiv.className = 'alt-orderings';
+  altDiv.innerHTML = '<span class="alt-label">Также можно:</span>' +
+    alts.map(a => '<span class="alt-sentence">' + escHtml(a.join(' ')) + '</span>').join('');
+  card.appendChild(altDiv);
 }
 
 function updateProgress() {
