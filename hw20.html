@@ -38,6 +38,8 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;back
 .blank-input::placeholder{color:var(--accent);font-style:italic;opacity:.7}
 .blank-input.wide{width:260px}
 .blank-input.wide::placeholder{font-size:.78rem}
+.blank-input.xwide{width:300px}
+.blank-input.xwide::placeholder{font-size:.68rem}
 .blank-input:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
 .blank-input.correct{border-color:var(--ok)!important;background:var(--ok-bg)!important;color:#166534!important}
 .blank-input.wrong{border-color:var(--bad)!important;background:var(--bad-bg)!important;color:#991b1b!important}
@@ -57,6 +59,7 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;back
   .q-text{font-size:1rem}
   .blank-input{width:130px;font-size:.92rem}
   .blank-input.wide{width:200px}
+  .blank-input.xwide{width:240px}
   .tr-line{font-size:.82rem;padding:6px 10px}
 }
 </style>
@@ -77,7 +80,7 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;back
 </div>
 <canvas id="confettiCanvas"></canvas>
 <script>
-const Q = [{"id": 0, "before": "Dün anahtarı bulamadım, ", "correct": ["ablamdakini"], "hint": "тот, что у моей старшей сестры", "after": " kullanmak zorunda kaldım.", "translation": "Я не нашёл ключ от дома, пришлось использовать тот, что у моей старшей сестры."}, {"id": 1, "before": "Elektrikli süpürgem bozulmuş, ", "correct": ["seninkini"], "hint": "твой", "after": " ödünç alabilir miyim?", "translation": "У меня сломался пылесос, могу я одолжить твой?"}, {"id": 2, "before": "Bahçedeki tüm sandalyeler ıslak, ", "correct": ["balkondakini"], "hint": "тот, что на балконе", "after": " getireyim.", "translation": "Все стулья в саду мокрые, принесу тот, что на балконе."}, {"id": 3, "before": "Bu yılki tatil güzeldi ama ", "correct": ["geçen yılkini", "geçen senekini"], "hint": "прошлогодний", "after": " unutamıyorum.", "translation": "В этом году отпуск был хорош, но прошлогодний забыть не могу."}, {"id": 4, "before": "Eski telefonum daha hızlıydı, ", "correct": ["şimdikini"], "hint": "нынешний", "after": " pek beğenmiyorum.", "translation": "Мой старый телефон был быстрее, нынешний мне не очень нравится."}, {"id": 5, "before": "Sınıftaki öğrenciler çok çalışkan, özellikle ", "correct": ["arkadakini"], "hint": "того, что сзади", "after": " takdir ediyorum.", "translation": "Ученики в классе очень старательные, особенно я ценю того, кто сидит сзади."}, {"id": 6, "before": "Dolaptaki elbiselerden hiçbirini beğenmedim, ", "correct": ["vitrindekini"], "hint": "то, что на витрине", "after": " almak istiyorum.", "translation": "Мне не понравилось ни одно платье из шкафа, хочу купить то, что на витрине."}];
+const Q = [{"id": 0, "before": "Dün anahtarı bulamadım, ", "correct": ["ablamdakini", "ablamınkini"], "hint": "тот, что у моей старшей сестры", "after": " kullanmak zorunda kaldım.", "translation": "Я не нашёл ключ от дома, пришлось использовать тот, что у моей старшей сестры."}, {"id": 1, "before": "Elektrikli süpürgem bozulmuş, ", "correct": ["seninkini"], "hint": "твой", "after": " ödünç alabilir miyim?", "translation": "У меня сломался пылесос, могу я одолжить твой?"}, {"id": 2, "before": "Bahçedeki tüm sandalyeler ıslak, ", "correct": ["balkondakini"], "hint": "тот, что на балконе", "after": " getireyim.", "translation": "Все стулья в саду мокрые, принесу тот, что на балконе."}, {"id": 3, "before": "Bu yılki tatil güzeldi ama ", "correct": ["geçen yılkini", "geçen senekini"], "hint": "прошлогодний", "after": " unutamıyorum.", "translation": "В этом году отпуск был хорош, но прошлогодний забыть не могу."}, {"id": 4, "before": "Eski telefonum daha hızlıydı, ", "correct": ["şimdikini"], "hint": "нынешний", "after": " pek beğenmiyorum.", "translation": "Мой старый телефон был быстрее, нынешний мне не очень нравится."}, {"id": 5, "before": "Sınıftaki öğrenciler çok çalışkan, özellikle ", "correct": ["arkadakini"], "hint": "того, что сзади", "after": " takdir ediyorum.", "translation": "Ученики в классе очень старательные, особенно я ценю того, кто сидит сзади."}, {"id": 6, "before": "Dolaptaki elbiselerden hiçbirini beğenmedim, ", "correct": ["vitrindekini"], "hint": "то, что на витрине", "after": " almak istiyorum.", "translation": "Мне не понравилось ни одно платье из шкафа, хочу купить то, что на витрине."}];
 let checked = false;
 
 function render() {
@@ -87,8 +90,9 @@ function render() {
     card.className = 'q-card';
     card.id = 'card' + i;
 
+    const isXWide = q.hint.length > 20;
     const isWide = q.hint.length > 10;
-    const cls = 'blank-input' + (isWide ? ' wide' : '');
+    const cls = 'blank-input' + (isXWide ? ' xwide' : isWide ? ' wide' : '');
 
     let html = '<div class="q-row"><span class="q-num">' + (i+1) + '</span><span class="q-text">';
     if (q.before) html += q.before;
