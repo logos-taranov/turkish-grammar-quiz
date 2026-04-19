@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Задание 6 — Аффикс -ki + винительный падеж</title>
+<style>
+:root {
+  --bg: #faf5ff;
+  --card: #ffffff;
+  --text: #1f1833;
+  --muted: #7c6f93;
+  --accent: #8b5cf6;
+  --accent-dark: #7c3aed;
+  --accent-light: #ede9fe;
+  --ok: #22c55e;
+  --ok-bg: #dcfce7;
+  --bad: #ef4444;
+  --bad-bg: #fee2e2;
+  --field: #f3e8ff;
+  --shadow: 0 2px 12px rgba(139,92,246,.12);
+  --radius: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);min-height:100vh;padding:16px;color:var(--text)}
+.container{max-width:760px;margin:0 auto;padding-bottom:40px}
+.header{text-align:center;margin:8px 0 24px}
+.header h1{font-size:1.4rem;color:var(--accent-dark);line-height:1.3;margin-bottom:6px}
+.header .sub{font-size:.88rem;color:var(--muted);font-weight:400}
+.header p{color:var(--muted);font-size:.9rem;margin-top:6px;line-height:1.5;max-width:580px;margin-left:auto;margin-right:auto}
+.q-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;border-left:4px solid var(--accent);transition:border-color .3s}
+.q-card.checked-ok{border-left-color:var(--ok)}
+.q-card.checked-bad{border-left-color:var(--bad)}
+.q-num{display:inline-block;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.85rem;text-align:center;line-height:28px;margin-right:10px;flex-shrink:0;vertical-align:middle}
+.q-row{display:flex;align-items:baseline;flex-wrap:wrap}
+.q-text{font-size:1.05rem;line-height:2;flex:1}
+.blank-input{display:inline-block;width:150px;padding:5px 10px;border-radius:10px;background:var(--field);border:2px solid var(--accent);text-align:center;font-size:1rem;font-weight:500;color:var(--text);outline:none;transition:all .2s;vertical-align:middle}
+.blank-input::placeholder{color:var(--accent);font-style:italic;opacity:.7}
+.blank-input.wide{width:260px}
+.blank-input.wide::placeholder{font-size:.78rem}
+.blank-input:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.blank-input.correct{border-color:var(--ok)!important;background:var(--ok-bg)!important;color:#166534!important}
+.blank-input.wrong{border-color:var(--bad)!important;background:var(--bad-bg)!important;color:#991b1b!important}
+.correction{font-size:.8rem;color:var(--bad);font-weight:500;margin-left:6px;display:inline}
+.tr-line{margin-top:8px;padding:8px 14px;background:var(--accent-light);border-radius:10px;color:var(--accent-dark);font-size:.88rem;font-style:italic;line-height:1.5}
+.check-btn{display:block;width:100%;max-width:320px;margin:28px auto;padding:16px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(139,92,246,.35);transition:transform .15s,box-shadow .15s}
+.check-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(139,92,246,.45)}
+.check-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.result-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;text-align:center;margin:20px 0;display:none;animation:fadeIn .4s ease-out}
+.result-card h2{font-size:1.4rem;margin-bottom:8px}
+.result-card p{color:var(--muted);font-size:1.05rem}
+.score{font-size:2.4rem;font-weight:800;color:var(--accent);margin:12px 0}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+@media(max-width:480px){
+  .q-card{padding:16px 14px}
+  .q-text{font-size:1rem}
+  .blank-input{width:130px;font-size:.92rem}
+  .blank-input.wide{width:200px}
+  .tr-line{font-size:.82rem;padding:6px 10px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Задание 6 — Аффикс -ki + винительный падеж<br><span class="sub">-ki eki + Belirtili Akkuzatif</span></h1>
+<p>Напишите нужное слово с использованием аффикса ki и винительного падежа</p>
+</div>
+<div id="quiz"></div>
+<button class="check-btn" id="checkBtn" onclick="checkAll()">Проверить ✓</button>
+<div class="result-card" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreText"></div>
+<p id="resultMsg"></p>
+</div>
+</div>
+<canvas id="confettiCanvas"></canvas>
+<script>
+const Q = [{"id": 0, "before": "Dün anahtarı bulamadım, ", "correct": ["ablamdakini"], "hint": "тот, что у моей старшей сестры", "after": " kullanmak zorunda kaldım.", "translation": "Я не нашёл ключ от дома, пришлось использовать тот, что у моей старшей сестры."}, {"id": 1, "before": "Elektrikli süpürgem bozulmuş, ", "correct": ["seninkini"], "hint": "твой", "after": " ödünç alabilir miyim?", "translation": "У меня сломался пылесос, могу я одолжить твой?"}, {"id": 2, "before": "Bahçedeki tüm sandalyeler ıslak, ", "correct": ["balkondakini"], "hint": "тот, что на балконе", "after": " getireyim.", "translation": "Все стулья в саду мокрые, принесу тот, что на балконе."}, {"id": 3, "before": "Bu yılki tatil güzeldi ama ", "correct": ["geçen yılkini", "geçen senekini"], "hint": "прошлогодний", "after": " unutamıyorum.", "translation": "В этом году отпуск был хорош, но прошлогодний забыть не могу."}, {"id": 4, "before": "Eski telefonum daha hızlıydı, ", "correct": ["şimdikini"], "hint": "нынешний", "after": " pek beğenmiyorum.", "translation": "Мой старый телефон был быстрее, нынешний мне не очень нравится."}, {"id": 5, "before": "Sınıftaki öğrenciler çok çalışkan, özellikle ", "correct": ["arkadakini"], "hint": "того, что сзади", "after": " takdir ediyorum.", "translation": "Ученики в классе очень старательные, особенно я ценю того, кто сидит сзади."}, {"id": 6, "before": "Dolaptaki elbiselerden hiçbirini beğenmedim, ", "correct": ["vitrindekini"], "hint": "то, что на витрине", "after": " almak istiyorum.", "translation": "Мне не понравилось ни одно платье из шкафа, хочу купить то, что на витрине."}];
+let checked = false;
+
+function render() {
+  const el = document.getElementById('quiz');
+  Q.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card' + i;
+
+    const isWide = q.hint.length > 10;
+    const cls = 'blank-input' + (isWide ? ' wide' : '');
+
+    let html = '<div class="q-row"><span class="q-num">' + (i+1) + '</span><span class="q-text">';
+    if (q.before) html += q.before;
+    html += '<input class="' + cls + '" id="inp' + i + '" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="' + q.hint + '"/>';
+    html += '<span class="correction" id="corr' + i + '"></span>';
+    if (q.after) html += q.after;
+    html += '</span></div>';
+
+    html += '<div class="tr-line">' + q.translation + '</div>';
+
+    card.innerHTML = html;
+    el.appendChild(card);
+  });
+}
+
+function normalize(s) {
+  return s.trim().toLowerCase()
+    .replace(/\u0130/g, 'i')
+    .replace(/İ/g, 'i')
+    .replace(/I/g, 'ı')
+    .replace(/\s+/g, ' ');
+}
+
+function checkAll() {
+  if (checked) return;
+  checked = true;
+  let score = 0;
+  Q.forEach((q, i) => {
+    const inp = document.getElementById('inp' + i);
+    const corr = document.getElementById('corr' + i);
+    const card = document.getElementById('card' + i);
+    const val = normalize(inp.value);
+    const isCorrect = q.correct.some(ans => normalize(ans) === val);
+    if (isCorrect) {
+      inp.classList.add('correct');
+      card.classList.add('checked-ok');
+      score++;
+    } else {
+      inp.classList.add('wrong');
+      card.classList.add('checked-bad');
+      corr.textContent = '\u2192 ' + q.correct[0];
+    }
+    inp.readOnly = true;
+  });
+
+  const pct = score / Q.length;
+  document.getElementById('scoreText').textContent = score + ' / ' + Q.length;
+
+  if (pct === 1) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF89 Превосходно!';
+    document.getElementById('resultMsg').textContent = 'Все ответы правильные! Аффикс -ki и винительный падеж вам покорились!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+    launchConfetti();
+    playSound();
+  } else if (pct >= 0.8) {
+    document.getElementById('resultTitle').textContent = '\uD83C\uDF1F Отличный результат!';
+    document.getElementById('resultMsg').textContent = 'Почти всё верно! Ещё чуть-чуть практики!';
+    document.getElementById('scoreText').style.color = '#22c55e';
+  } else if (pct >= 0.6) {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCAA Хороший результат!';
+    document.getElementById('resultMsg').textContent = 'Немного подтянете — и будет идеально!';
+    document.getElementById('scoreText').style.color = '#8b5cf6';
+  } else {
+    document.getElementById('resultTitle').textContent = '\uD83D\uDCDA Есть куда расти!';
+    document.getElementById('resultMsg').textContent = 'Практика — ключ к успеху!';
+    document.getElementById('scoreText').style.color = '#ef4444';
+  }
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+
+/* ---- Confetti ---- */
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#8b5cf6','#a78bfa','#c4b5fd','#22c55e','#fbbf24','#f472b6','#60a5fa','#34d399'];
+  const pieces = [];
+  for (let i = 0; i < 150; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: Math.random() * 3 + 2,
+      vx: (Math.random() - 0.5) * 2,
+      rot: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 8
+    });
+  }
+  let frames = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rot += p.vr;
+      p.vy += 0.04;
+    });
+    frames++;
+    if (frames < 200) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
+
+/* ---- Sound ---- */
+function playSound() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ac.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.15 + 0.5);
+      osc.connect(gain);
+      gain.connect(ac.destination);
+      osc.start(ac.currentTime + i * 0.15);
+      osc.stop(ac.currentTime + i * 0.15 + 0.5);
+    });
+  } catch(e) {}
+}
+
+render();
+</script>
+</body>
+</html>
