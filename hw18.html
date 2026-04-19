@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Упражнение 4 — Порядок слов</title>
+<style>
+:root {
+  --bg: #faf5ff;
+  --card: #ffffff;
+  --text: #1f1833;
+  --muted: #7c6f93;
+  --accent: #8b5cf6;
+  --accent-dark: #7c3aed;
+  --accent-light: #ede9fe;
+  --ok: #22c55e;
+  --ok-bg: #dcfce7;
+  --bad: #ef4444;
+  --bad-bg: #fee2e2;
+  --shadow: 0 2px 12px rgba(139,92,246,.12);
+  --radius: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);min-height:100vh;padding:0;color:var(--text)}
+
+.container{max-width:720px;margin:0 auto;padding:16px 16px 80px}
+.header{text-align:center;margin:12px 0 24px}
+.header h1{font-size:1.35rem;color:var(--accent-dark);line-height:1.3}
+.header .sub{font-size:.88rem;color:var(--muted);font-weight:400;display:block;margin-top:4px}
+.header p{color:var(--muted);font-size:.88rem;margin-top:8px}
+
+.progress-bar{width:100%;height:6px;background:var(--accent-light);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:3px;transition:width .4s ease;width:0%}
+
+.sentence-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;transition:border-color .3s,box-shadow .3s;border:2px solid transparent}
+.sentence-card.correct{border-color:var(--ok);box-shadow:0 2px 16px rgba(34,197,94,.2)}
+.sentence-card.correct .drop-area{background:#f0fdf4}
+
+.sentence-header{padding:14px 18px 10px;display:flex;gap:10px;align-items:flex-start}
+.sentence-num{font-weight:800;font-size:1.1rem;color:var(--accent);min-width:28px}
+.sentence-ru{font-size:.9rem;color:var(--muted);line-height:1.4;font-style:italic}
+
+.word-bank{padding:4px 18px 12px;display:flex;flex-wrap:wrap;gap:8px;min-height:44px}
+.word-bank-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:0 18px;margin-top:2px}
+
+.word{display:inline-flex;align-items:center;padding:7px 14px;border-radius:10px;background:var(--accent-light);border:2px solid var(--accent);color:var(--accent-dark);font-weight:600;font-size:.9rem;cursor:grab;user-select:none;transition:all .15s;touch-action:none;white-space:nowrap}
+.word:active{cursor:grabbing;transform:scale(1.06);box-shadow:0 4px 12px rgba(139,92,246,.3)}
+.word.dragging{opacity:.35;transform:scale(.95)}
+.word.in-drop{background:#fff;border-color:var(--accent)}
+
+.drop-area{margin:0 18px 14px;min-height:50px;padding:10px;border:2px dashed #d4b8ff;border-radius:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;transition:all .2s;background:rgba(139,92,246,.02)}
+.drop-area.over{border-color:var(--accent);background:rgba(139,92,246,.06)}
+.drop-area .placeholder{color:#bca6d6;font-size:.82rem;font-style:italic;width:100%;text-align:center;pointer-events:none}
+.drop-area .check-mark{display:none;margin-left:auto;font-size:1.2rem}
+.sentence-card.correct .drop-area .check-mark{display:inline-block}
+
+.result-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;text-align:center;margin:24px 0;display:none}
+.result-card h2{font-size:1.4rem;margin-bottom:8px;color:var(--accent-dark)}
+.result-card p{color:var(--muted);font-size:1rem;line-height:1.5}
+.result-card .emoji{font-size:3rem;margin-bottom:12px}
+
+/* Touch clone */
+.touch-clone{position:fixed;z-index:9999;pointer-events:none;opacity:.88;transform:scale(1.08)}
+
+/* Confetti */
+.confetti-piece{position:fixed;z-index:10000;pointer-events:none;animation:confetti-fall linear forwards}
+@keyframes confetti-fall{
+  0%{opacity:1;transform:translateY(0) rotate(0deg)}
+  100%{opacity:0;transform:translateY(100vh) rotate(720deg)}
+}
+
+/* Responsive */
+@media(max-width:480px){
+  .container{padding:10px 10px 60px}
+  .header h1{font-size:1.15rem}
+  .sentence-header{padding:10px 12px 8px}
+  .word-bank{padding:4px 12px 10px}
+  .word-bank-label{padding:0 12px}
+  .drop-area{margin:0 12px 10px}
+  .word{padding:6px 10px;font-size:.82rem}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Упражнение 4 — Порядок слов<span class="sub">Cümle düzeni — belirtili akkuzatif</span></h1>
+    <p>Перетащите слова в правильном порядке, чтобы составить предложение</p>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="sentences"></div>
+  <div class="result-card" id="result">
+    <div class="emoji">🎉</div>
+    <h2>Поздравляем!</h2>
+    <p>Вы хорошо освоили порядок слов в предложениях с винительным падежом!</p>
+  </div>
+</div>
+
+<script>
+const DATA = [{"id": 1, "words": ["onunla", "tanıdık", "beklerken", "biraz", "gördüm", "ve", "konuştum", "birini", "dün", "parkta"], "valid": [["dün", "parkta", "beklerken", "tanıdık", "birini", "gördüm", "ve", "onunla", "biraz", "konuştum"]], "ru": "Вчера, пока ждал в парке, я увидел знакомого и немного поговорил с ним."}, {"id": 2, "words": ["tahtaya", "çağırdı", "ikimizi", "için", "projeyi", "de", "anlatmamız", "öğretmen"], "valid": [["öğretmen", "projeyi", "anlatmamız", "için", "ikimizi", "de", "tahtaya", "çağırdı"], ["öğretmen", "ikimizi", "de", "tahtaya", "çağırdı", "projeyi", "anlatmamız", "için"]], "ru": "Учитель вызвал нас двоих к доске, чтобы мы объяснили проект."}, {"id": 3, "words": ["için", "üçünüzü", "bu", "hızlı", "seçtim", "bitirmek", "özellikle", "işi", "de"], "valid": [["bu", "işi", "hızlı", "bitirmek", "için", "üçünüzü", "de", "özellikle", "seçtim"], ["üçünüzü", "de", "özellikle", "bu", "işi", "hızlı", "bitirmek", "için", "seçtim"]], "ru": "Я специально выбрал вас троих, чтобы быстро закончить эту работу."}, {"id": 4, "words": ["görevlendirecek", "müdür", "toplantıda", "birimizi", "için", "konuşmak"], "valid": [["müdür", "toplantıda", "konuşmak", "için", "birimizi", "görevlendirecek"], ["müdür", "birimizi", "toplantıda", "konuşmak", "için", "görevlendirecek"]], "ru": "Руководитель назначит одного из нас выступить на встрече."}, {"id": 5, "words": ["kontrol", "bu", "şeyi", "istiyorum", "değil", "mümkün", "etmek", "bazen", "ama", "her"], "valid": [["bazen", "her", "şeyi", "kontrol", "etmek", "istiyorum", "ama", "bu", "mümkün", "değil"]], "ru": "Иногда я хочу всё контролировать, но это невозможно."}, {"id": 6, "words": ["sana", "bekliyorum", "zamanı", "bir", "doğru", "şey", "söylemek", "ama", "önemli", "istiyorum"], "valid": [["sana", "önemli", "bir", "şey", "söylemek", "istiyorum", "ama", "doğru", "zamanı", "bekliyorum"], ["önemli", "bir", "şey", "söylemek", "istiyorum", "sana", "ama", "doğru", "zamanı", "bekliyorum"]], "ru": "Я хочу сказать тебе одну важную вещь, но жду подходящего момента."}, {"id": 7, "words": ["konuda", "bu", "herhangi", "sana", "sorabilirsin", "ederim", "bir", "bana", "şey", "yardım"], "valid": [["bu", "konuda", "bana", "herhangi", "bir", "şey", "sorabilirsin", "sana", "yardım", "ederim"], ["herhangi", "bir", "şey", "sorabilirsin", "bana", "bu", "konuda", "sana", "yardım", "ederim"]], "ru": "Ты можешь спросить меня что угодно по этой теме, я помогу."}, {"id": 8, "words": ["hepsini", "birini", "alamayız", "zorundayız", "seçmek", "listeden"], "valid": [["listeden", "birini", "seçmek", "zorundayız", "hepsini", "alamayız"]], "ru": "Мы должны выбрать кого-то одного из списка, всех взять нельзя."}, {"id": 9, "words": ["tek", "çantamdaki", "ettim", "ve", "eşyaları", "tek", "çıkardım", "hepsini", "kontrol"], "valid": [["çantamdaki", "eşyaları", "çıkardım", "ve", "hepsini", "tek", "tek", "kontrol", "ettim"], ["çantamdaki", "eşyaları", "çıkardım", "ve", "tek", "tek", "kontrol", "ettim", "hepsini"]], "ru": "Я вытащил вещи из сумки и проверил их все по очереди."}, {"id": 10, "words": ["sokakta", "gittim", "ettim", "yanına", "fark", "ve", "yardım", "isteyen", "birini"], "valid": [["sokakta", "yardım", "isteyen", "birini", "fark", "ettim", "ve", "yanına", "gittim"], ["yardım", "isteyen", "birini", "fark", "ettim", "sokakta", "ve", "yanına", "gittim"]], "ru": "Я заметил человека, который просил помощи на улице, и подошёл к нему."}];
+
+let completedCount = 0;
+const totalSentences = DATA.length;
+
+function init() {
+  const container = document.getElementById('sentences');
+  DATA.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'sentence-card';
+    card.id = 'card-' + s.id;
+    card.dataset.sid = s.id;
+
+    // Header: number + Russian translation
+    const header = document.createElement('div');
+    header.className = 'sentence-header';
+    header.innerHTML = '<span class="sentence-num">' + s.id + '.</span><span class="sentence-ru">' + escHtml(s.ru) + '</span>';
+    card.appendChild(header);
+
+    // Word bank label
+    const label = document.createElement('div');
+    label.className = 'word-bank-label';
+    label.textContent = 'Слова:';
+    card.appendChild(label);
+
+    // Word bank
+    const bank = document.createElement('div');
+    bank.className = 'word-bank';
+    bank.id = 'bank-' + s.id;
+    s.words.forEach((w, idx) => {
+      bank.appendChild(mkWord(w, s.id, idx));
+    });
+    card.appendChild(bank);
+
+    // Drop area
+    const drop = document.createElement('div');
+    drop.className = 'drop-area';
+    drop.id = 'drop-' + s.id;
+    drop.innerHTML = '<span class="placeholder">Составьте предложение здесь ↓</span><span class="check-mark">✅</span>';
+    setupDropArea(drop, s.id);
+    card.appendChild(drop);
+
+    container.appendChild(card);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function mkWord(text, sid, idx) {
+  const el = document.createElement('span');
+  el.className = 'word';
+  el.textContent = text;
+  el.dataset.word = text;
+  el.dataset.sid = sid;
+  el.dataset.idx = idx;
+  el.draggable = true;
+
+  // Desktop drag
+  el.addEventListener('dragstart', e => {
+    window._dragEl = el;
+    el.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', text);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    window._dragEl = null;
+  });
+
+  // Touch
+  let clone = null;
+  el.addEventListener('touchstart', e => {
+    if (document.getElementById('card-' + sid).classList.contains('correct')) return;
+    const t = e.touches[0];
+    window._dragEl = el;
+    el.classList.add('dragging');
+    clone = el.cloneNode(true);
+    clone.className = 'word touch-clone';
+    clone.style.left = (t.clientX - 30) + 'px';
+    clone.style.top = (t.clientY - 18) + 'px';
+    document.body.appendChild(clone);
+  }, {passive: true});
+
+  el.addEventListener('touchmove', e => {
+    if (!clone) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    clone.style.left = (t.clientX - 30) + 'px';
+    clone.style.top = (t.clientY - 18) + 'px';
+    // Highlight drop areas
+    document.querySelectorAll('.drop-area').forEach(d => d.classList.remove('over'));
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    if (under) {
+      const dz = under.closest('.drop-area');
+      if (dz) dz.classList.add('over');
+    }
+  }, {passive: false});
+
+  el.addEventListener('touchend', e => {
+    if (!clone) return;
+    const t = e.changedTouches[0];
+    clone.remove();
+    clone = null;
+    el.classList.remove('dragging');
+    document.querySelectorAll('.drop-area').forEach(d => d.classList.remove('over'));
+
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    if (under) {
+      const dz = under.closest('.drop-area');
+      const bank = under.closest('.word-bank');
+      if (dz) {
+        moveToDrop(el, dz);
+      } else if (bank) {
+        moveToBank(el, bank);
+      }
+    }
+    window._dragEl = null;
+  });
+
+  // Double-click/tap to toggle between bank and drop
+  el.addEventListener('dblclick', () => {
+    const card = document.getElementById('card-' + sid);
+    if (card.classList.contains('correct')) return;
+    const drop = document.getElementById('drop-' + sid);
+    const bank = document.getElementById('bank-' + sid);
+    if (el.parentElement === drop || el.parentElement.id === drop.id) {
+      moveToBank(el, bank);
+    } else {
+      moveToDrop(el, drop);
+    }
+  });
+
+  // Single tap on mobile — also toggle
+  let tapTimeout = null;
+  let tapped = false;
+  el.addEventListener('click', e => {
+    // Only respond to taps (no drag)
+    if (e.detail >= 2) return; // handled by dblclick
+    const card = document.getElementById('card-' + sid);
+    if (card.classList.contains('correct')) return;
+    
+    if (tapped) {
+      tapped = false;
+      clearTimeout(tapTimeout);
+      return;
+    }
+    tapped = true;
+    tapTimeout = setTimeout(() => {
+      tapped = false;
+      const drop = document.getElementById('drop-' + sid);
+      const bank = document.getElementById('bank-' + sid);
+      if (el.parentElement === drop || el.parentElement.id === drop.id) {
+        moveToBank(el, bank);
+      } else {
+        moveToDrop(el, drop);
+      }
+    }, 250);
+  });
+
+  return el;
+}
+
+function moveToDrop(el, dropArea) {
+  const sid = el.dataset.sid;
+  const dropSid = dropArea.id.replace('drop-', '');
+  if (sid !== dropSid) return; // Only allow words in their own sentence's drop
+  
+  const ph = dropArea.querySelector('.placeholder');
+  if (ph) ph.style.display = 'none';
+  const checkMark = dropArea.querySelector('.check-mark');
+  dropArea.insertBefore(el, checkMark);
+  el.classList.add('in-drop');
+  checkSentence(sid);
+}
+
+function moveToBank(el, bank) {
+  const sid = el.dataset.sid;
+  bank.appendChild(el);
+  el.classList.remove('in-drop');
+  // Show placeholder if drop is empty
+  const drop = document.getElementById('drop-' + sid);
+  const words = drop.querySelectorAll('.word');
+  if (words.length === 0) {
+    const ph = drop.querySelector('.placeholder');
+    if (ph) ph.style.display = '';
+  }
+  // Un-complete if was correct
+  const card = document.getElementById('card-' + sid);
+  if (card.classList.contains('correct')) {
+    card.classList.remove('correct');
+    completedCount--;
+    updateProgress();
+  }
+}
+
+function setupDropArea(drop, sid) {
+  drop.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    drop.classList.add('over');
+  });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('over');
+    const el = window._dragEl;
+    if (!el) return;
+    if (el.dataset.sid !== String(sid)) return;
+    const card = document.getElementById('card-' + sid);
+    if (card.classList.contains('correct')) return;
+    moveToDrop(el, drop);
+  });
+
+  // Also allow dropping back to bank
+  const bank = document.getElementById('bank-' + sid);
+  if (bank) {
+    bank.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    bank.addEventListener('drop', e => {
+      e.preventDefault();
+      const el = window._dragEl;
+      if (!el) return;
+      if (el.dataset.sid !== String(sid)) return;
+      moveToBank(el, bank);
+    });
+  }
+}
+
+function checkSentence(sid) {
+  const s = DATA.find(x => x.id === Number(sid));
+  const drop = document.getElementById('drop-' + sid);
+  const card = document.getElementById('card-' + sid);
+  const words = Array.from(drop.querySelectorAll('.word')).map(w => w.dataset.word.toLowerCase());
+  
+  if (words.length !== s.words.length) return; // Not all words placed yet
+  
+  // Check against all valid orderings (case-insensitive)
+  const isCorrect = s.valid.some(v => {
+    if (v.length !== words.length) return false;
+    return v.every((w, i) => w.toLowerCase() === words[i]);
+  });
+
+  if (isCorrect) {
+    if (!card.classList.contains('correct')) {
+      card.classList.add('correct');
+      completedCount++;
+      updateProgress();
+      // Disable dragging for this sentence
+      drop.querySelectorAll('.word').forEach(w => {
+        w.draggable = false;
+        w.style.cursor = 'default';
+      });
+      if (completedCount === totalSentences) {
+        setTimeout(showFinalResult, 500);
+      }
+    }
+  }
+}
+
+function updateProgress() {
+  const pct = (completedCount / totalSentences) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function showFinalResult() {
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+  launchConfetti();
+  playSuccessSound();
+}
+
+function launchConfetti() {
+  const colors = ['#8b5cf6','#a78bfa','#c4b5fd','#22c55e','#fbbf24','#f472b6','#60a5fa'];
+  for (let i = 0; i < 120; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.top = '-10px';
+      piece.style.width = (Math.random() * 8 + 5) + 'px';
+      piece.style.height = (Math.random() * 8 + 5) + 'px';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      piece.style.animationDelay = '0s';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 4500);
+    }, i * 25);
+  }
+}
+
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.5);
+    });
+  } catch(e) {}
+}
+
+// Setup bank drop listeners after DOM
+document.addEventListener('DOMContentLoaded', () => {
+  DATA.forEach(s => {
+    const bank = document.getElementById('bank-' + s.id);
+    bank.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    bank.addEventListener('drop', e => {
+      e.preventDefault();
+      const el = window._dragEl;
+      if (!el) return;
+      if (el.dataset.sid !== String(s.id)) return;
+      moveToBank(el, bank);
+    });
+  });
+});
+
+init();
+</script>
+</body>
+</html>
