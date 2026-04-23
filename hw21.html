@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ворд-серч: Работа 🇹🇷</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #8b5cf6;
+  --accent-light: #c4b5fd;
+  --accent-bg: #ede9fe;
+  --blue: #93c5fd;
+  --blue-bg: #dbeafe;
+  --cell-size: 26px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f8f7ff;
+  color: #1e1b4b;
+  padding: 14px 10px 40px;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 2px;
+  letter-spacing: -0.3px;
+}
+.subtitle {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #7c3aed;
+  opacity: 0.75;
+  margin-bottom: 12px;
+}
+.progress-wrap {
+  max-width: 440px;
+  margin: 0 auto 12px;
+}
+.progress-label {
+  font-size: 0.72rem;
+  color: #6b7280;
+  text-align: right;
+  margin-bottom: 3px;
+}
+.progress-track {
+  height: 6px;
+  background: #e0d9ff;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+#grid-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+  overflow-x: hidden;
+}
+#grid {
+  display: inline-grid;
+  border: 2px solid var(--accent-light);
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 24px rgba(139,92,246,0.12);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+  font-size: calc(var(--cell-size) * 0.44);
+  font-weight: 600;
+  border: 0.5px solid #f0ebff;
+  cursor: pointer;
+  text-transform: uppercase;
+  color: #334155;
+  transition: background 0.08s;
+}
+.cell.selecting {
+  background: var(--blue-bg) !important;
+  color: #2563eb !important;
+}
+.cell.found {
+  color: white !important;
+  border-color: transparent;
+}
+.word-section {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.word-section h2 {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 9px;
+}
+.words-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+@media (min-width: 480px) {
+  .words-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+.word-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 9px;
+  background: white;
+  border: 1.5px solid #ddd6fe;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  min-width: 0;
+  transition: all 0.25s;
+}
+.word-item.found-word {
+  background: var(--accent-bg);
+  border-color: var(--accent-light);
+  text-decoration: line-through;
+  color: #a78bfa;
+}
+.ru-text {
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hint-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 1px 2px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.65;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.hint-btn:hover { opacity: 1; }
+.hint-btn:active { transform: scale(0.82); }
+.hint-text {
+  display: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: white;
+  border: 1px solid var(--accent-light);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.hint-text.show { display: block; }
+#victory-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(91,33,182,0.15);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#victory-overlay.show { display: flex; }
+.victory-box {
+  background: white;
+  border-radius: 22px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(139,92,246,0.28);
+  max-width: 320px;
+  width: 100%;
+  animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+@keyframes popIn {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.victory-icon { font-size: 3.5rem; display: block; margin-bottom: 14px; }
+.victory-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+.btn-restart {
+  display: inline-block;
+  padding: 12px 30px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-restart:hover { background: #7c3aed; }
+.btn-restart:active { transform: scale(0.95); }
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 199;
+}
+</style>
+</head>
+<body>
+
+<h1>🔍 Ворд-серч: Работа</h1>
+<p class="subtitle">Ищи слова вертикально или по диагонали ↓ ↘ ↙</p>
+
+<div class="progress-wrap">
+  <div class="progress-label"><span id="found-count">0</span> / 15 слов найдено</div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="grid-wrapper">
+  <div id="grid"></div>
+</div>
+
+<div class="word-section">
+  <h2>Слова для поиска</h2>
+  <div class="words-grid" id="words-grid"></div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div id="victory-overlay">
+  <div class="victory-box">
+    <span class="victory-icon">🎉</span>
+    <p class="victory-text" id="victory-msg"></p>
+    <button class="btn-restart" onclick="location.reload()">Ещё раз!</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Data ────────────────────────────────────────────────────────────────────
+const WORDS = [
+  { tr: 'beceri',    ru: 'навык' },
+  { tr: 'yetenek',   ru: 'талант' },
+  { tr: 'emekli',    ru: 'пенсионер' },
+  { tr: 'görev',     ru: 'должность' },
+  { tr: 'işsizlik',  ru: 'безработица' },
+  { tr: 'kazanmak',  ru: 'зарабатывать' },
+  { tr: 'mesai',     ru: 'рабочие часы' },
+  { tr: 'mola',      ru: 'перерыв' },
+  { tr: 'patron',    ru: 'начальник' },
+  { tr: 'meslektaş', ru: 'коллега' },
+  { tr: 'müşteri',   ru: 'клиент' },
+  { tr: 'sigorta',   ru: 'страховка' },
+  { tr: 'tatil',     ru: 'отпуск' },
+  { tr: 'toplantı',  ru: 'встреча' },
+  { tr: 'zam',       ru: 'повышение' },
+];
+
+const MSGS = [
+  "Да вы просто властелин лексики! 👑",
+  "Вот это да, вы просто ходячий турецко-русский словарь! 📖",
+  "Ничего себе! Все только и говорят о вашем невероятном словарном запасе! 🌟",
+  "Потрясающе! Турецкий язык покорён! 🎉",
+];
+
+// placement directions: [dr, dc]
+// vertical ↓, diagonal-right ↘, diagonal-left ↙
+const DIRS = [[1,0],[1,1],[1,-1]];
+
+const TR_ALPHA = 'abcçdefgğhıijklmnoöprsştuüvyz';
+const N = 20;
+
+const FOUND_COLORS = [
+  '#7c3aed','#4f46e5','#0891b2','#0d9488',
+  '#1d4ed8','#9333ea','#6d28d9','#1e40af',
+];
+
+// ── Grid state ──────────────────────────────────────────────────────────────
+let grid = [];
+let placements = [];
+let found = new Set();
+let colorIdx = 0;
+
+function initGrid() {
+  grid = Array.from({length: N}, () => new Array(N).fill(''));
+}
+
+function canPlace(word, r, c, dr, dc) {
+  for (let i = 0; i < word.length; i++) {
+    const nr = r + i * dr, nc = c + i * dc;
+    if (nr < 0 || nr >= N || nc < 0 || nc >= N) return false;
+    if (grid[nr][nc] !== '') return false;
+  }
+  return true;
+}
+
+function doPlace(word, r, c, dr, dc) {
+  for (let i = 0; i < word.length; i++) grid[r + i * dr][c + i * dc] = word[i];
+}
+
+function undoPlace(word, r, c, dr, dc) {
+  for (let i = 0; i < word.length; i++) grid[r + i * dr][c + i * dc] = '';
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = 0 | (Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildPosCache() {
+  // Pre-compute valid (r,c,dr,dc) for each word length
+  const cache = new Map();
+  for (let len = 1; len <= 15; len++) {
+    const positions = [];
+    for (const [dr, dc] of DIRS) {
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          const er = r + (len - 1) * dr;
+          const ec = c + (len - 1) * dc;
+          if (er >= 0 && er < N && ec >= 0 && ec < N) {
+            positions.push([r, c, dr, dc]);
+          }
+        }
+      }
+    }
+    cache.set(len, positions);
+  }
+  return cache;
+}
+
+function generateGrid() {
+  initGrid();
+  placements = [];
+  const posCache = buildPosCache();
+  const sorted = [...WORDS].sort((a, b) => b.tr.length - a.tr.length);
+
+  function backtrack(idx) {
+    if (idx === sorted.length) return true;
+    const word = sorted[idx].tr.toLowerCase();
+    const positions = shuffle(posCache.get(word.length) || []);
+    for (const [r, c, dr, dc] of positions) {
+      if (canPlace(word, r, c, dr, dc)) {
+        doPlace(word, r, c, dr, dc);
+        placements.push({ ...sorted[idx], r, c, dr, dc });
+        if (backtrack(idx + 1)) return true;
+        placements.pop();
+        undoPlace(word, r, c, dr, dc);
+      }
+    }
+    return false;
+  }
+
+  if (!backtrack(0)) return false;
+
+  // Fill empty cells with random Turkish letters
+  for (let r = 0; r < N; r++)
+    for (let c = 0; c < N; c++)
+      if (grid[r][c] === '')
+        grid[r][c] = TR_ALPHA[0 | (Math.random() * TR_ALPHA.length)];
+
+  return true;
+}
+
+// ── Audio ───────────────────────────────────────────────────────────────────
+let audioCtx = null;
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playNote(freq, startAt, duration, vol) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, startAt);
+  gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+  osc.start(startAt);
+  osc.stop(startAt + duration);
+}
+
+function playDing() {
+  ensureAudio();
+  const t = audioCtx.currentTime;
+  playNote(660, t, 0.12, 0.3);
+  playNote(880, t + 0.06, 0.12, 0.2);
+  playNote(1100, t + 0.12, 0.35, 0.25);
+}
+
+function playTaDa() {
+  ensureAudio();
+  const t = audioCtx.currentTime;
+  [[523,0],[659,0.13],[784,0.26],[1047,0.39],[1047,0.52],[784,0.62],[1047,0.72]].forEach(([f, d]) => {
+    playNote(f, t + d, 0.4, 0.2);
+  });
+}
+
+// ── Confetti ─────────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const palette = ['#8b5cf6','#93c5fd','#f472b6','#fbbf24','#34d399','#f87171','#a78bfa','#60a5fa'];
+  const pieces = Array.from({length: 170}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height * 0.6 - 10,
+    w: Math.random() * 13 + 5,
+    h: Math.random() * 7 + 3,
+    color: palette[0 | (Math.random() * palette.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 5,
+    vy: Math.random() * 4 + 2,
+    vr: (Math.random() - 0.5) * 0.22,
+    alpha: 1,
+  }));
+
+  let frame = 0;
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      if (frame > 160) p.alpha = Math.max(0, p.alpha - 0.008);
+    });
+    frame++;
+    if (frame < 350) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  tick();
+}
+
+// ── DOM Rendering ────────────────────────────────────────────────────────────
+function computeCellSize() {
+  const avail = window.innerWidth - 20; // 10px padding each side
+  return Math.max(13, Math.min(30, Math.floor(avail / N)));
+}
+
+function renderGrid() {
+  const sz = computeCellSize();
+  document.documentElement.style.setProperty('--cell-size', sz + 'px');
+
+  const el = document.getElementById('grid');
+  el.style.gridTemplateColumns = `repeat(${N}, var(--cell-size))`;
+  el.innerHTML = '';
+
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = grid[r][c].toUpperCase();
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      el.appendChild(cell);
+    }
+  }
+}
+
+function renderWords() {
+  const container = document.getElementById('words-grid');
+  container.innerHTML = '';
+
+  WORDS.forEach(({ tr, ru }) => {
+    const item = document.createElement('div');
+    item.className = 'word-item';
+    item.id = 'wi-' + tr;
+
+    const span = document.createElement('span');
+    span.className = 'ru-text';
+    span.textContent = ru;
+
+    const btn = document.createElement('button');
+    btn.className = 'hint-btn';
+    btn.setAttribute('aria-label', 'Показать турецкое слово');
+    btn.textContent = '💡';
+
+    const hintSpan = document.createElement('span');
+    hintSpan.className = 'hint-text';
+    hintSpan.textContent = tr;
+
+    let hintTimeout, pressTimer;
+
+    function showHint() {
+      hintSpan.classList.add('show');
+      clearTimeout(hintTimeout);
+      hintTimeout = setTimeout(() => hintSpan.classList.remove('show'), 1500);
+    }
+
+    btn.addEventListener('click', e => { e.stopPropagation(); showHint(); });
+    btn.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      pressTimer = setTimeout(showHint, 500);
+    }, { passive: true });
+    btn.addEventListener('touchend', () => clearTimeout(pressTimer));
+    btn.addEventListener('touchcancel', () => clearTimeout(pressTimer));
+
+    item.append(span, btn, hintSpan);
+    container.appendChild(item);
+  });
+}
+
+function cellEl(r, c) {
+  return document.querySelector(`#grid .cell[data-r="${r}"][data-c="${c}"]`);
+}
+
+// ── Selection ────────────────────────────────────────────────────────────────
+let active = false;
+let selStart = null;
+let selCells = [];
+
+function getPointerCell(e) {
+  let x, y;
+  if (e.touches && e.touches.length > 0) {
+    x = e.touches[0].clientX; y = e.touches[0].clientY;
+  } else if (e.changedTouches && e.changedTouches.length > 0) {
+    x = e.changedTouches[0].clientX; y = e.changedTouches[0].clientY;
+  } else {
+    x = e.clientX; y = e.clientY;
+  }
+  const el = document.elementFromPoint(x, y);
+  if (!el || !el.classList.contains('cell')) return null;
+  return { r: +el.dataset.r, c: +el.dataset.c };
+}
+
+function getValidDir(r1, c1, r2, c2) {
+  const dr = r2 - r1, dc = c2 - c1;
+  if (dr === 0 && dc === 0) return null;
+  const steps = Math.max(Math.abs(dr), Math.abs(dc));
+  const udr = dr / steps, udc = dc / steps;
+  for (const [d, e] of DIRS) {
+    if (d === udr && e === udc) return [udr, udc, steps];
+  }
+  return null;
+}
+
+function buildLine(r1, c1, r2, c2) {
+  const dir = getValidDir(r1, c1, r2, c2);
+  if (!dir) return [{ r: r1, c: c1 }];
+  const [dr, dc, steps] = dir;
+  const cells = [];
+  for (let i = 0; i <= steps; i++) {
+    const r = r1 + i * dr, c = c1 + i * dc;
+    if (r < 0 || r >= N || c < 0 || c >= N) return [{ r: r1, c: c1 }];
+    cells.push({ r, c });
+  }
+  return cells;
+}
+
+function clearSelecting() {
+  document.querySelectorAll('#grid .cell.selecting').forEach(el => el.classList.remove('selecting'));
+}
+
+function applySelecting(cells) {
+  cells.forEach(({ r, c }) => {
+    const el = cellEl(r, c);
+    if (el && !el.classList.contains('found')) el.classList.add('selecting');
+  });
+}
+
+function onStart(e) {
+  ensureAudio();
+  const pos = getPointerCell(e);
+  if (!pos) return;
+  active = true;
+  selStart = pos;
+  selCells = [{ ...pos }];
+  clearSelecting();
+  applySelecting(selCells);
+}
+
+function onMove(e) {
+  if (!active || !selStart) return;
+  const pos = getPointerCell(e);
+  if (!pos) return;
+  selCells = buildLine(selStart.r, selStart.c, pos.r, pos.c);
+  clearSelecting();
+  applySelecting(selCells);
+}
+
+function onEnd() {
+  if (!active) return;
+  active = false;
+  clearSelecting();
+  if (selCells.length >= 2) checkSelection(selCells);
+  selCells = [];
+  selStart = null;
+}
+
+function checkSelection(cells) {
+  const formed = cells.map(({ r, c }) => grid[r][c]).join('').toLowerCase();
+  for (const p of placements) {
+    if (found.has(p.tr)) continue;
+    if (formed !== p.tr.toLowerCase()) continue;
+    if (cells.length !== p.tr.length) continue;
+    let ok = true;
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i].r !== p.r + i * p.dr || cells[i].c !== p.c + i * p.dc) {
+        ok = false; break;
+      }
+    }
+    if (ok) { markFound(p, cells); return; }
+  }
+}
+
+function markFound(placement, cells) {
+  found.add(placement.tr);
+  const color = FOUND_COLORS[colorIdx++ % FOUND_COLORS.length];
+
+  cells.forEach(({ r, c }) => {
+    const el = cellEl(r, c);
+    if (el) { el.classList.add('found'); el.style.background = color; }
+  });
+
+  const wi = document.getElementById('wi-' + placement.tr);
+  if (wi) wi.classList.add('found-word');
+
+  const n = found.size;
+  document.getElementById('found-count').textContent = n;
+  document.getElementById('prog-fill').style.width = (n / WORDS.length * 100) + '%';
+
+  playDing();
+  if (n === WORDS.length) setTimeout(showVictory, 600);
+}
+
+function showVictory() {
+  playTaDa();
+  launchConfetti();
+  document.getElementById('victory-msg').textContent = MSGS[0 | (Math.random() * MSGS.length)];
+  document.getElementById('victory-overlay').classList.add('show');
+}
+
+// ── Events ───────────────────────────────────────────────────────────────────
+function setupEvents() {
+  const gridEl = document.getElementById('grid');
+
+  gridEl.addEventListener('mousedown', onStart);
+  gridEl.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+
+  gridEl.addEventListener('touchstart', e => { e.preventDefault(); onStart(e); }, { passive: false });
+  gridEl.addEventListener('touchmove', e => { e.preventDefault(); onMove(e); }, { passive: false });
+  gridEl.addEventListener('touchend', e => { e.preventDefault(); onEnd(); }, { passive: false });
+  gridEl.addEventListener('touchcancel', () => { active = false; clearSelecting(); selCells = []; selStart = null; });
+}
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+(function init() {
+  let ok = false;
+  for (let attempt = 0; attempt < 8 && !ok; attempt++) ok = generateGrid();
+  if (!ok) { document.body.innerHTML = '<p style="padding:40px;text-align:center;color:red">Ошибка генерации сетки. Перезагрузите страницу.</p>'; return; }
+  renderGrid();
+  renderWords();
+  setupEvents();
+})();
+</script>
+</body>
+</html>
