@@ -12,7 +12,7 @@
   --accent-bg: #ede9fe;
   --blue: #93c5fd;
   --blue-bg: #dbeafe;
-  --cell-size: 26px;
+  --cell-size: 32px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
@@ -231,7 +231,7 @@ h1 {
 <body>
 
 <h1>🔍 Ворд-серч: Работа</h1>
-<p class="subtitle">Ищи слова вертикально или по диагонали ↓ ↘ ↙</p>
+<p class="subtitle">Ищи слова вертикально ↓ или горизонтально →</p>
 
 <div class="progress-wrap">
   <div class="progress-label"><span id="found-count">0</span> / 15 слов найдено</div>
@@ -287,10 +287,10 @@ const MSGS = [
 
 // placement directions: [dr, dc]
 // vertical ↓, diagonal-right ↘, diagonal-left ↙
-const DIRS = [[1,0],[1,1],[1,-1]];
+const DIRS = [[1,0],[0,1]]; // vertical ↓, horizontal →
 
 const TR_ALPHA = 'abcçdefgğhıijklmnoöprsştuüvyz';
-const N = 20;
+const N = 15;
 
 const FOUND_COLORS = [
   '#7c3aed','#4f46e5','#0891b2','#0d9488',
