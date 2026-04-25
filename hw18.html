@@ -312,13 +312,31 @@ function clearInsertMarkers(dropArea) {
 
 function getInsertTarget(dropArea, clientX, clientY, draggedEl) {
   const words = Array.from(dropArea.querySelectorAll('.word')).filter(w => w !== draggedEl);
+  if (!words.length) return null;
+  // Group words into rows by vertical position
+  const rows = [];
   for (const w of words) {
     const rect = w.getBoundingClientRect();
-    const midX = rect.left + rect.width / 2;
-    if (clientX < midX) {
-      return w; // Insert before this word
-    }
+    let row = rows.find(r => Math.abs(r.top - rect.top) < 8);
+    if (!row) { row = { top: rect.top, bottom: rect.bottom, words: [] }; rows.push(row); }
+    else if (rect.bottom > row.bottom) { row.bottom = rect.bottom; }
+    row.words.push({ el: w, rect });
   }
+  rows.sort((a, b) => a.top - b.top);
+  // Find row closest to clientY
+  let targetRow = rows[0], minDist = Infinity;
+  for (const row of rows) {
+    if (clientY >= row.top && clientY <= row.bottom) { targetRow = row; break; }
+    const dist = Math.min(Math.abs(clientY - row.top), Math.abs(clientY - row.bottom));
+    if (dist < minDist) { minDist = dist; targetRow = row; }
+  }
+  // Within target row, find insertion point by X
+  for (const { el, rect } of targetRow.words) {
+    if (clientX < rect.left + rect.width / 2) return el;
+  }
+  // Past all words in this row — go to first word of next row if exists
+  const rowIdx = rows.indexOf(targetRow);
+  if (rowIdx < rows.length - 1) return rows[rowIdx + 1].words[0].el;
   return null; // Insert at end
 }
 
