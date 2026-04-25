@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Упражнение 8 — Инфинитив или -dığı/-eceği</title>
+<style>
+:root {
+  --accent: #8b5cf6;
+  --accent-light: #ede9fe;
+  --accent-dark: #6d28d9;
+  --correct: #10b981;
+  --wrong: #ef4444;
+  --bg: #faf7ff;
+  --card: #ffffff;
+  --text: #1e1b4b;
+  --text-muted: #6b7280;
+  --border: #e0d9f5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 20px 16px 48px;
+}
+.header {
+  text-align: center;
+  padding: 24px 16px 20px;
+  max-width: 680px;
+  margin: 0 auto 28px;
+}
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--accent-dark);
+  margin-bottom: 10px;
+}
+.header p {
+  font-size: 0.97rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.header p strong { color: var(--accent-dark); }
+
+.questions-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.question-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: border-color 0.2s;
+}
+.question-card.answered-correct { border-color: var(--correct); }
+.question-card.answered-wrong   { border-color: var(--wrong); }
+
+.q-number {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.q-sentence {
+  font-size: 1.05rem;
+  color: var(--text);
+  line-height: 1.6;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.q-sentence .blank {
+  display: inline-block;
+  min-width: 40px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent);
+  font-style: italic;
+  padding: 0 4px;
+  margin: 0 2px;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.opt-btn {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 140px;
+  background: var(--accent-light);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.93rem;
+  color: var(--accent-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+.opt-btn:hover:not(:disabled) {
+  background: #ddd6fe;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.opt-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  color: white;
+}
+.opt-btn.correct-revealed {
+  background: #d1fae5 !important;
+  border-color: var(--correct) !important;
+  color: #065f46 !important;
+}
+.opt-btn.wrong-revealed {
+  background: #fee2e2 !important;
+  border-color: var(--wrong) !important;
+  color: #991b1b !important;
+}
+.opt-btn:disabled { cursor: default; }
+
+.translation-wrap { margin-top: 8px; }
+.translation-toggle {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.83rem;
+  cursor: pointer;
+  padding: 2px 0;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+.translation-toggle:hover { color: var(--accent-dark); }
+.translation-text {
+  display: none;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-style: italic;
+  line-height: 1.5;
+  padding: 7px 12px;
+  background: var(--accent-light);
+  border-radius: 8px;
+}
+.translation-text.visible { display: block; }
+
+.check-wrap {
+  max-width: 680px;
+  margin: 28px auto 0;
+  text-align: center;
+}
+.check-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 40px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+}
+.check-btn:hover  { background: var(--accent-dark); transform: translateY(-1px); }
+.check-btn:active { transform: translateY(1px); }
+
+.result-msg {
+  max-width: 680px;
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 22px 20px;
+  border-radius: 14px;
+  display: none;
+  line-height: 1.6;
+}
+.result-msg.show    { display: block; }
+.result-msg.perfect { background: #d1fae5; color: #065f46; }
+.result-msg.good    { background: #ede9fe; color: var(--accent-dark); }
+.result-msg.try     { background: #fef3c7; color: #92400e; }
+
+canvas#confetti-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="header">
+  <h1>Упражнение 8</h1>
+  <p>Выберите, что подходит в предложении —<br>
+  <strong>краткий инфинитив</strong> или <strong>форма с -dığı / -eceği</strong>.</p>
+</div>
+
+<div class="questions-wrap" id="questions"></div>
+
+<div class="check-wrap">
+  <button class="check-btn" id="check-btn" onclick="checkAnswers()">Проверить ✓</button>
+</div>
+<div class="result-msg" id="result-msg"></div>
+
+<script>
+const Qs = [
+  {
+    before: "Toplantıya zamanında",
+    after: "rica ederiz.",
+    options: ["a. gelmenizi", "b. geldiğinizi"],
+    answer: 0,
+    tr: "Просим вас приходить на встречу вовремя."
+  },
+  {
+    before: "Bu işi neden",
+    after: "öğrenmek istiyorum.",
+    options: ["a. bıraktığını", "b. bırakmayı"],
+    answer: 0,
+    tr: "Я хочу узнать, почему ты оставил эту работу."
+  },
+  {
+    before: "Sizden bu kurallara",
+    after: "bekliyoruz.",
+    options: ["a. uymanızı", "b. uyduğunuzu"],
+    answer: 0,
+    tr: "Мы ожидаем, что вы будете соблюдать эти правила."
+  },
+  {
+    before: "Onun doğruyu",
+    after: "biliyoruz.",
+    options: ["a. söylemesini", "b. söylediğini"],
+    answer: 1,
+    tr: "Мы знаем, что он говорит правду."
+  },
+  {
+    before: "Bu kadar geç",
+    after: "tavsiye etmem.",
+    options: ["a. yatmanı", "b. yattığını"],
+    answer: 0,
+    tr: "Я не советую тебе ложиться так поздно."
+  },
+  {
+    before: "Plan yapmadan",
+    after: "sevmiyorum.",
+    options: ["a. hareket ettiğimi", "b. hareket etmeyi"],
+    answer: 1,
+    tr: "Я не люблю действовать без плана."
+  },
+  {
+    before: "Neden böyle",
+    after: "merak ediyorum.",
+    options: ["a. düşündüğünü", "b. düşünmeni"],
+    answer: 0,
+    tr: "Мне интересно, почему ты так думаешь."
+  },
+  {
+    before: "Bana ne",
+    after: "açıkça söyle.",
+    options: ["a. istemeyi", "b. istediğini"],
+    answer: 1,
+    tr: "Скажи мне прямо, чего ты хочешь."
+  },
+  {
+    before: "Telefonlarınızı",
+    after: "önemle rica ederiz.",
+    options: ["a. kapattığınızı", "b. kapatmanızı"],
+    answer: 1,
+    tr: "Настоятельно просим вас выключить ваши телефоны."
+  },
+  {
+    before: "Başkalarının işine",
+    after: "sevmiyorum.",
+    options: ["a. karıştığımı", "b. karışmayı"],
+    answer: 1,
+    tr: "Я не люблю вмешиваться в чужие дела."
+  }
+];
+
+const selected = new Array(Qs.length).fill(null);
+
+function render() {
+  const wrap = document.getElementById('questions');
+  wrap.innerHTML = Qs.map((q, i) => `
+    <div class="question-card" id="qcard-${i}">
+      <div class="q-number">Вопрос ${i+1} / ${Qs.length}</div>
+      <div class="q-sentence">
+        ${q.before} <span class="blank" id="blank-${i}">___</span> ${q.after}
+      </div>
+      <div class="options">
+        ${q.options.map((opt, j) => `
+          <button class="opt-btn" id="opt-${i}-${j}" onclick="pick(${i},${j})">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="translation-wrap">
+        <button class="translation-toggle" onclick="toggleTr(${i})">💡 Перевод</button>
+        <div class="translation-text" id="tr-${i}">${q.tr}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function pick(qi, oi) {
+  if (document.getElementById(`opt-${qi}-0`).disabled) return;
+  selected[qi] = oi;
+  Qs[qi].options.forEach((_, j) => {
+    document.getElementById(`opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  });
+  // Show chosen word in blank
+  const word = Qs[qi].options[oi].replace(/^[ab]\.\s*/,'');
+  document.getElementById(`blank-${qi}`).textContent = word;
+}
+
+function toggleTr(i) {
+  document.getElementById(`tr-${i}`).classList.toggle('visible');
+}
+
+function checkAnswers() {
+  if (selected.includes(null)) {
+    const n = selected.filter(s => s === null).length;
+    alert(`Пожалуйста, ответьте на все вопросы (осталось: ${n}).`);
+    return;
+  }
+
+  let correct = 0;
+  Qs.forEach((q, i) => {
+    const isOk = selected[i] === q.answer;
+    if (isOk) correct++;
+    q.options.forEach((_, j) => {
+      const btn = document.getElementById(`opt-${i}-${j}`);
+      btn.disabled = true;
+      btn.classList.remove('selected');
+      if (j === q.answer) btn.classList.add('correct-revealed');
+      else if (j === selected[i] && !isOk) btn.classList.add('wrong-revealed');
+    });
+    document.getElementById(`qcard-${i}`).classList.add(isOk ? 'answered-correct' : 'answered-wrong');
+    document.getElementById(`tr-${i}`).classList.add('visible');
+  });
+
+  const msg = document.getElementById('result-msg');
+  msg.classList.add('show');
+  document.getElementById('check-btn').style.display = 'none';
+
+  if (correct === Qs.length) {
+    msg.textContent = 'Похоже, вы научились безошибочно различать эти формы! 🎉';
+    msg.className = 'result-msg show perfect';
+    playWin(); launchConfetti();
+  } else if (correct >= Math.ceil(Qs.length * 0.7)) {
+    msg.textContent = `Хороший результат — ${correct} из ${Qs.length}! Ещё чуть-чуть — и всё будет идеально 💜`;
+    msg.className = 'result-msg show good';
+  } else {
+    msg.textContent = `${correct} из ${Qs.length}. Посмотрите на правильные ответы и попробуйте снова — вы справитесь! 🌟`;
+    msg.className = 'result-msg show try';
+  }
+
+  msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function playWin() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523,0],[659,0.15],[784,0.3],[1047,0.45],[1319,0.6]].forEach(([f,t]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = f; o.type = 'sine';
+      const st = ctx.currentTime + t;
+      g.gain.setValueAtTime(0.35, st);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.45);
+      o.start(st); o.stop(st + 0.5);
+    });
+  } catch(e) {}
+}
+
+function launchConfetti() {
+  const cv = document.getElementById('confetti-canvas');
+  const cx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#8b5cf6','#a78bfa','#c4b5fd','#7c3aed','#f0abfc','#ddd6fe','#e879f9'];
+  const ps = Array.from({length: 130}, () => ({
+    x: Math.random() * cv.width, y: -10 - Math.random() * 60,
+    w: 7 + Math.random() * 7, h: 4 + Math.random() * 5,
+    r: Math.random() * Math.PI * 2, dr: (Math.random() - 0.5) * 0.18,
+    vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 3.5,
+    c: cols[Math.floor(Math.random() * cols.length)], a: 1
+  }));
+  let fr;
+  (function draw() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    let alive = false;
+    ps.forEach(p => {
+      if (p.a <= 0) return;
+      alive = true;
+      p.x += p.vx; p.y += p.vy; p.r += p.dr; p.vy += 0.04;
+      if (p.y > cv.height * 0.65) p.a -= 0.014;
+      cx.globalAlpha = Math.max(0, p.a);
+      cx.fillStyle = p.c;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r);
+      cx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      cx.restore();
+    });
+    cx.globalAlpha = 1;
+    if (alive) fr = requestAnimationFrame(draw);
+    else cx.clearRect(0, 0, cv.width, cv.height);
+  })();
+  setTimeout(() => { cancelAnimationFrame(fr); cx.clearRect(0, 0, cv.width, cv.height); }, 6000);
+}
+
+render();
+</script>
+</body>
+</html>
