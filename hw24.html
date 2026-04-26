@@ -1,460 +1,314 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Упражнение 11 — Вставь слово (поход)</title>
-  <style>
-    :root {
-      --bg: #f8f7ff;
-      --card: #ffffff;
-      --text: #1e1b4b;
-      --muted: #6b7280;
-      --accent: #7c3aed;
-      --accent-dark: #5b21b6;
-      --accent-light: #c4b5fd;
-      --accent-bg: #ede9fe;
-      --hint-color: #a78bfa;
-      --ok: #16a34a;
-      --ok-bg: #dcfce7;
-      --bad: #dc2626;
-      --bad-bg: #fee2e2;
-      --shadow: 0 2px 14px rgba(124,58,237,.1);
-      --radius: 14px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Упражнение 11 — Вставьте пропущенные слова</title>
+<style>
+:root {
+  --accent: #8b5cf6;
+  --accent-light: #ede9fe;
+  --accent-dark: #6d28d9;
+  --correct: #10b981;
+  --wrong: #ef4444;
+  --bg: #faf7ff;
+  --card: #ffffff;
+  --text: #1e1b4b;
+  --text-muted: #6b7280;
+  --border: #e0d9f5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding: 20px 16px 56px;
+}
+.header { text-align: center; max-width: 720px; margin: 0 auto 28px; padding: 24px 16px 0; }
+.header h1 { font-size: 1.5rem; color: var(--accent-dark); margin-bottom: 10px; }
+.header p  { font-size: 0.97rem; color: var(--text-muted); line-height: 1.6; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+.text-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 24px;
+  max-width: 720px; margin: 0 auto 20px;
+  line-height: 2.1; font-size: 1.03rem;
+}
+.text-card p { margin-bottom: 14px; }
+.text-card p:last-child { margin-bottom: 0; }
 
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      padding: 16px 12px 40px;
-      color: var(--text);
-    }
+.blank {
+  border: none; border-bottom: 2.5px solid var(--accent);
+  background: transparent; color: var(--accent-dark);
+  font-family: inherit; font-size: 0.96rem; font-weight: 600;
+  outline: none; padding: 1px 4px;
+  min-width: 55px; width: auto; text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+  vertical-align: middle; margin: 0 2px;
+}
+.blank::placeholder { color: #a78bfa; font-weight: 400; font-style: italic; font-size: 0.83rem; }
+.blank:focus { border-bottom-color: var(--accent-dark); }
+.blank.correct { border-bottom-color: var(--correct); color: var(--correct); background: #ecfdf5; border-radius: 4px 4px 0 0; }
+.blank.wrong   { border-bottom-color: var(--wrong);   color: var(--wrong);   background: #fef2f2; border-radius: 4px 4px 0 0; }
 
-    .container { max-width: 800px; margin: 0 auto; }
+/* Word list */
+.wordlist-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px 24px;
+  max-width: 720px; margin: 0 auto 20px;
+}
+.wordlist-card h3 {
+  font-size: 0.82rem; color: var(--accent); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+}
+.wordlist-grid { display: flex; flex-direction: column; gap: 6px; }
+.wordlist-item { display: flex; gap: 8px; font-size: 0.93rem; line-height: 1.5; align-items: baseline; }
+.word-tr { color: var(--accent-dark); font-weight: 600; min-width: 170px; }
+.word-ru { color: var(--text-muted); }
 
-    /* Header */
-    .header { text-align: center; margin: 8px 0 20px; }
-    .header h1 { font-size: 1.55rem; line-height: 1.2; color: var(--accent); margin-bottom: 6px; }
-    .header p  { color: var(--muted); font-size: .95rem; }
+/* Buttons */
+.check-wrap { max-width: 720px; margin: 20px auto 0; text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.check-btn {
+  background: var(--accent); color: white; border: none; border-radius: 12px;
+  padding: 13px 36px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+  transition: background 0.2s, transform 0.1s;
+}
+.check-btn:hover  { background: var(--accent-dark); transform: translateY(-1px); }
+.check-btn:active { transform: translateY(1px); }
+.reset-btn {
+  background: var(--accent-light); color: var(--accent-dark);
+  border: 2px solid var(--border); border-radius: 12px;
+  padding: 13px 24px; font-size: 1rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.reset-btn:hover { background: #ddd6fe; }
 
-    /* Word bank */
-    .word-bank {
-      background: var(--card);
-      border: 2px solid var(--accent-light);
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-    .word-bank h3 {
-      color: var(--accent);
-      font-size: .85rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .wb-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 20px;
-    }
-    .wb-item {
-      font-size: .9rem;
-      color: var(--text);
-      white-space: nowrap;
-    }
-    .wb-item strong { color: var(--accent-dark); }
+/* Result */
+.result-msg {
+  max-width: 720px; margin: 20px auto 0; text-align: center;
+  font-size: 1.05rem; font-weight: 600; padding: 20px;
+  border-radius: 14px; display: none; line-height: 1.6;
+}
+.result-msg.show    { display: block; }
+.result-msg.perfect { background: #d1fae5; color: #065f46; }
+.result-msg.good    { background: #ede9fe; color: var(--accent-dark); }
+.result-msg.hard    { background: #fef3c7; color: #92400e; }
 
-    /* Text card */
-    .text-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px 20px;
-      margin-bottom: 20px;
-      font-size: 1.05rem;
-      line-height: 2.4;
-      color: var(--text);
-    }
+/* Answer key */
+.answer-key {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px 24px;
+  max-width: 720px; margin: 20px auto 0; display: none;
+}
+.answer-key.show { display: block; }
+.answer-key h3 {
+  font-size: 0.82rem; color: var(--accent); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px;
+}
+.answer-key p { font-size: 0.95rem; line-height: 1.9; color: var(--text); margin-bottom: 10px; }
+.answer-key p:last-child { margin-bottom: 0; }
+.ak { color: var(--correct); font-weight: 700; }
 
-    .text-card p { margin-bottom: 8px; }
-
-    /* Blank inputs */
-    .blank {
-      display: inline-block;
-      border: none;
-      border-bottom: 2.5px solid var(--accent-light);
-      background: var(--accent-bg);
-      border-radius: 6px 6px 2px 2px;
-      padding: 2px 8px;
-      font-size: .97rem;
-      font-family: inherit;
-      color: var(--text);
-      min-width: 110px;
-      max-width: 220px;
-      vertical-align: middle;
-      transition: border-color .2s, background .2s;
-      outline: none;
-      margin: 0 1px;
-    }
-    .blank:focus {
-      border-color: var(--accent);
-      background: #f0ebff;
-    }
-    .blank::placeholder {
-      color: var(--hint-color);
-      font-style: italic;
-      font-size: .88rem;
-    }
-    .blank.correct {
-      background: var(--ok-bg);
-      border-color: var(--ok);
-      color: var(--ok);
-      font-weight: 600;
-    }
-    .blank.incorrect {
-      background: var(--bad-bg);
-      border-color: var(--bad);
-      color: var(--bad);
-    }
-
-    /* Buttons */
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 20px 0 16px;
-    }
-    .btn {
-      padding: 12px 30px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-      background: var(--accent);
-      cursor: pointer;
-      transition: background .15s, transform .1s;
-    }
-    .btn:hover { background: var(--accent-dark); }
-    .btn:active { transform: scale(.97); }
-    .btn.show-btn { background: #9333ea; }
-    .btn.show-btn:hover { background: #7e22ce; }
-    .btn.reset-btn { background: #6b7280; }
-    .btn.reset-btn:hover { background: #4b5563; }
-
-    /* Result */
-    .result-box {
-      display: none;
-      text-align: center;
-      padding: 22px 20px;
-      border-radius: var(--radius);
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin: 14px 0;
-    }
-    .result-box.great { background: var(--ok-bg); color: var(--ok); border: 2px solid rgba(22,163,74,.3); }
-    .result-box.good  { background: #fefce8; color: #a16207; border: 2px solid rgba(234,179,8,.4); }
-    .result-box.retry { background: var(--bad-bg); color: var(--bad); border: 2px solid rgba(220,38,38,.3); }
-    .score-detail { font-size: .92rem; font-weight: 400; color: var(--muted); margin-top: 8px; }
-
-    /* Full text */
-    .full-text {
-      display: none;
-      background: var(--card);
-      border: 2px solid var(--accent-light);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-top: 16px;
-      box-shadow: var(--shadow);
-    }
-    .full-text h3 {
-      color: var(--accent);
-      margin-bottom: 14px;
-      font-size: .95rem;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .full-text p {
-      line-height: 1.9;
-      margin-bottom: 10px;
-      font-size: .97rem;
-    }
-    .full-text mark {
-      background: var(--accent-bg);
-      color: var(--accent-dark);
-      font-weight: 700;
-      border-radius: 3px;
-      padding: 1px 4px;
-    }
-
-    /* Confetti canvas */
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-  </style>
+canvas#cc { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+</style>
 </head>
 <body>
-<canvas id="confetti-canvas"></canvas>
+<canvas id="cc"></canvas>
 
-<div class="container">
+<div class="header">
+  <h1>Упражнение 11</h1>
+  <p>Дополните пропуски, вставив пропущенные слова.<br>
+  Подсказка на русском видна в поле — введите турецкий эквивалент.</p>
+</div>
 
-  <div class="header">
-    <h1>🏕️ Упражнение 11 — Вставь форму</h1>
-    <p>Впиши правильную турецкую форму в каждый пропуск. Подсказка — по-русски.</p>
+<div class="text-card">
+  <p>
+    İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler.
+    Onlarla <input class="blank" id="b1" placeholder="проводить время" data-ans="vakit geçirmeyi" size="18">
+    gerçekten çok seviyorum.
+  </p>
+  <p>
+    Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana
+    <input class="blank" id="b2" placeholder="отвезти" data-ans="götürmek" size="10">
+    istedi.
+  </p>
+  <p>
+    Bize doğada
+    <input class="blank" id="b3" placeholder="жить" data-ans="yaşamayı" size="9">
+    öğretmek
+    <input class="blank" id="b4" placeholder="хочет" data-ans="istediğini" size="11">
+    söyledi, biz de hemen kabul ettik.
+  </p>
+  <p>
+    Ormana gidince bize ateş
+    <input class="blank" id="b5" placeholder="зажигать" data-ans="yakmayı" size="8">,
+    çadır
+    <input class="blank" id="b6" placeholder="ставить" data-ans="kurmayı" size="8">
+    ve balık
+    <input class="blank" id="b7" placeholder="ловить" data-ans="tutmayı" size="8">
+    gösterdi.
+  </p>
+  <p>
+    Hangi meyveleri yemememiz
+    <input class="blank" id="b8" placeholder="необходимо" data-ans="gerektiğini" size="12">
+    de anlattı.
+  </p>
+  <p>
+    Ben balık
+    <input class="blank" id="b9" placeholder="ловить" data-ans="tutmayı" size="8">
+    çok sevdim, ama çadır
+    <input class="blank" id="b10" placeholder="ставить" data-ans="kurmayı" size="8">
+    beceremedim.
+    Meşale
+    <input class="blank" id="b11" placeholder="делать" data-ans="yapmayı" size="8">
+    çok eğlenceliydi, fakat Kemal amca ateşle
+    <input class="blank" id="b12" placeholder="нам не играть" data-ans="oynamamamızı" size="15">
+    söyledi.
+  </p>
+  <p>
+    Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu
+    <input class="blank" id="b13" placeholder="мы потеряли" data-ans="kaybettiğimizi" size="15">
+    fark ettik ve yağmur yağmaya başladı.
+    Biraz
+    <input class="blank" id="b14" placeholder="я испугался" data-ans="korktum" size="9">
+    itiraf etmeliyim.
+  </p>
+  <p>
+    Ama Kemal amca yolu çabuk
+    <input class="blank" id="b15" placeholder="что он найдёт" data-ans="bulacağını" size="12">
+    ve bizi kamp yerine geri
+    <input class="blank" id="b16" placeholder="отведёт" data-ans="götüreceğini" size="13">
+    söyledi.
+    Yosunun her zaman ağacın kuzey tarafında
+    <input class="blank" id="b17" placeholder="появляется" data-ans="yetiştiğini" size="12">
+    açıkladı, böylece her zaman kuzeyi
+    <input class="blank" id="b18" placeholder="мы сумеем найти" data-ans="bulabileceğimizi" size="17">
+    söyledi.
+  </p>
+  <p>
+    Gerçekten de kısa süre sonra yolu
+    <input class="blank" id="b19" placeholder="он нашёл" data-ans="bulduğunu" size="10">
+    gördük.
+    Bizi tekrar kampa
+    <input class="blank" id="b20" placeholder="отвести" data-ans="götürmeyi" size="10">
+    başardı.
+  </p>
+  <p>
+    Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik.
+    Bu günü asla
+    <input class="blank" id="b21" placeholder="не смогу забыть" data-ans="unutamayacağımı" size="17">
+    biliyorum.
+  </p>
+</div>
+
+<div class="wordlist-card">
+  <h3>Слова в помощь</h3>
+  <div class="wordlist-grid">
+    <div class="wordlist-item"><span class="word-tr">vakit geçirmek</span><span class="word-ru">– проводить время</span></div>
+    <div class="wordlist-item"><span class="word-tr">götürmek</span><span class="word-ru">– отводить, отвозить</span></div>
+    <div class="wordlist-item"><span class="word-tr">ateş yakmak</span><span class="word-ru">– зажигать костёр</span></div>
+    <div class="wordlist-item"><span class="word-tr">çadır kurmak</span><span class="word-ru">– ставить палатку</span></div>
+    <div class="wordlist-item"><span class="word-tr">balık tutmak</span><span class="word-ru">– ловить рыбу</span></div>
+    <div class="wordlist-item"><span class="word-tr">meşale yapmak</span><span class="word-ru">– делать факел</span></div>
+    <div class="wordlist-item"><span class="word-tr">itiraf etmek</span><span class="word-ru">– признаваться</span></div>
+    <div class="wordlist-item"><span class="word-tr">yosun</span><span class="word-ru">– мох</span></div>
+    <div class="wordlist-item"><span class="word-tr">kuzey</span><span class="word-ru">– север</span></div>
   </div>
+</div>
 
-  <!-- Word bank -->
-  <div class="word-bank">
-    <h3>📚 Слова для справки</h3>
-    <div class="wb-grid">
-      <div class="wb-item"><strong>vakit geçirmek</strong> – проводить время</div>
-      <div class="wb-item"><strong>götürmek</strong> – отводить, отвозить</div>
-      <div class="wb-item"><strong>ateş yakmak</strong> – зажигать костёр</div>
-      <div class="wb-item"><strong>çadır kurmak</strong> – ставить палатку</div>
-      <div class="wb-item"><strong>balık tutmak</strong> – ловить рыбу</div>
-      <div class="wb-item"><strong>meşale yapmak</strong> – делать факел</div>
-      <div class="wb-item"><strong>itiraf etmek</strong> – признаваться</div>
-      <div class="wb-item"><strong>yosun</strong> – мох</div>
-      <div class="wb-item"><strong>kuzey</strong> – север</div>
-    </div>
-  </div>
+<div class="check-wrap">
+  <button class="check-btn" id="check-btn" onclick="checkAnswers()">Проверить ✓</button>
+  <button class="reset-btn" onclick="resetAll()">Сначала ↺</button>
+</div>
+<div class="result-msg" id="result-msg"></div>
 
-  <!-- Exercise text -->
-  <div class="text-card" id="textBlock"></div>
-
-  <div class="btn-row">
-    <button class="btn" onclick="checkAnswers()">✔️ Проверить</button>
-    <button class="btn show-btn" onclick="showAnswers()">👁 Показать ответы</button>
-    <button class="btn reset-btn" onclick="resetAll()">🔄 Заново</button>
-  </div>
-
-  <div class="result-box" id="resultBox">
-    <div id="resultText"></div>
-    <div class="score-detail" id="scoreDetail"></div>
-  </div>
-
-  <div class="full-text" id="fullText"></div>
-
+<div class="answer-key" id="answer-key">
+  <h3>Текст с правильными ответами</h3>
+  <p>İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler. Onlarla <span class="ak">vakit geçirmeyi</span> gerçekten çok seviyorum.</p>
+  <p>Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana <span class="ak">götürmek</span> istedi.</p>
+  <p>Bize doğada <span class="ak">yaşamayı</span> öğretmek <span class="ak">istediğini</span> söyledi, biz de hemen kabul ettik.</p>
+  <p>Ormana gidince bize ateş <span class="ak">yakmayı</span>, çadır <span class="ak">kurmayı</span> ve balık <span class="ak">tutmayı</span> gösterdi.</p>
+  <p>Hangi meyveleri yemememiz <span class="ak">gerektiğini</span> de anlattı.</p>
+  <p>Ben balık <span class="ak">tutmayı</span> çok sevdim, ama çadır <span class="ak">kurmayı</span> beceremedim. Meşale <span class="ak">yapmayı</span> çok eğlenceliydi, fakat Kemal amca ateşle <span class="ak">oynamamamızı</span> söyledi.</p>
+  <p>Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu <span class="ak">kaybettiğimizi</span> fark ettik ve yağmur yağmaya başladı. Biraz <span class="ak">korktum</span> itiraf etmeliyim.</p>
+  <p>Ama Kemal amca yolu çabuk <span class="ak">bulacağını</span> ve bizi kamp yerine geri <span class="ak">götüreceğini</span> söyledi. Yosunun her zaman ağacın kuzey tarafında <span class="ak">yetiştiğini</span> açıkladı, böylece her zaman kuzeyi <span class="ak">bulabileceğimizi</span> söyledi.</p>
+  <p>Gerçekten de kısa süre sonra yolu <span class="ak">bulduğunu</span> gördük. Bizi tekrar kampa <span class="ak">götürmeyi</span> başardı.</p>
+  <p>Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik. Bu günü asla <span class="ak">unutamayacağımı</span> biliyorum.</p>
 </div>
 
 <script>
-// ─── Data ────────────────────────────────────────────────────────────────────
-const BLANKS = [
-  { id: 1,  hint: 'проводить время',    answer: 'vakit geçirmeyi'   },
-  { id: 2,  hint: 'отвезти',            answer: 'götürmek'          },
-  { id: 3,  hint: 'жить',               answer: 'yaşamayı'          },
-  { id: 4,  hint: 'хочет',              answer: 'istediğini'        },
-  { id: 5,  hint: 'зажигать',           answer: 'yakmayı'           },
-  { id: 6,  hint: 'ставить',            answer: 'kurmayı'           },
-  { id: 7,  hint: 'ловить',             answer: 'tutmayı'           },
-  { id: 8,  hint: 'необходимо',         answer: 'gerektiğini'       },
-  { id: 9,  hint: 'ловить',             answer: 'tutmayı'           },
-  { id: 10, hint: 'ставить',            answer: 'kurmayı'           },
-  { id: 11, hint: 'делать',             answer: 'yapmak'            },
-  { id: 12, hint: 'не играть',          answer: 'oynamamamızı'      },
-  { id: 13, hint: 'мы потеряли',        answer: 'kaybettiğimizi'    },
-  { id: 14, hint: 'я испугался',        answer: 'korktuğumu'        },
-  { id: 15, hint: 'что он найдёт',      answer: 'bulacağını'        },
-  { id: 16, hint: 'отведёт',            answer: 'götüreceğini'      },
-  { id: 17, hint: 'появляется',         answer: 'çıktığını'         },
-  { id: 18, hint: 'мы сумеем найти',    answer: 'bulabileceğimizi'  },
-  { id: 19, hint: 'он нашёл',           answer: 'bulduğunu'         },
-  { id: 20, hint: 'отвести',            answer: 'götürmeyi'         },
-  { id: 21, hint: 'не смогу забыть',    answer: 'unutmayacağımı'    },
-];
-
-const TOTAL = BLANKS.length;
-
-// ─── Build text ──────────────────────────────────────────────────────────────
-function inp(id) {
-  const b = BLANKS[id - 1];
-  const w = Math.max(110, b.answer.length * 11 + 20);
-  return `<input class="blank" id="b${id}" data-id="${id}" placeholder="${b.hint}" style="width:${w}px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />`;
+const N = 21;
+function norm(s) {
+  return s.trim().toLowerCase()
+    .replace(/i̇/g,'i').replace(/ı/g,'i').replace(/ğ/g,'g')
+    .replace(/ş/g,'s').replace(/ç/g,'c').replace(/ö/g,'o').replace(/ü/g,'u');
 }
-
-function buildText() {
-  document.getElementById('textBlock').innerHTML = `
-<p>İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler. Onlarla ${inp(1)} gerçekten çok seviyorum.</p>
-<p>Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana ${inp(2)} istedi. Bize doğada ${inp(3)} öğretmek ${inp(4)} söyledi, biz de hemen kabul ettik.</p>
-<p>Ormana gidince bize ateş ${inp(5)}, çadır ${inp(6)} ve balık ${inp(7)} gösterdi. Hangi meyveleri yemememiz ${inp(8)} de anlattı.</p>
-<p>Ben balık ${inp(9)} çok sevdim, ama çadır ${inp(10)} beceremedim. Meşale ${inp(11)} çok eğlenceliydi, fakat Kemal amca ateşle ${inp(12)} söyledi.</p>
-<p>Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu ${inp(13)} fark ettik ve yağmur yağmaya başladı. Biraz ${inp(14)} itiraf etmeliyim. Ama Kemal amca yolu çabuk ${inp(15)} ve bizi kamp yerine geri ${inp(16)} söyledi. Yosunun her zaman ağacın kuzey tarafında ${inp(17)} açıkladı, böylece her zaman kuzeyi ${inp(18)} söyledi.</p>
-<p>Gerçekten de kısa süre sonra yolu ${inp(19)} gördük. Bizi tekrar kampa ${inp(20)} başardı.</p>
-<p>Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik. Bu günü asla ${inp(21)} biliyorum.</p>
-  `;
-}
-
-// ─── Check ───────────────────────────────────────────────────────────────────
-function norm(s) { return s.trim().toLowerCase(); }
-
 function checkAnswers() {
-  let correct = 0;
-  BLANKS.forEach(b => {
-    const el = document.getElementById('b' + b.id);
-    el.classList.remove('correct', 'incorrect');
-    if (norm(el.value) === norm(b.answer)) {
-      el.classList.add('correct');
-      correct++;
-    } else {
-      el.classList.add('incorrect');
-    }
-  });
-  showResult(correct);
-}
+  let correct = 0, filled = 0;
+  for (let i = 1; i <= N; i++) {
+    const el = document.getElementById('b'+i);
+    if (!el) continue;
+    const v = el.value.trim();
+    if (!v) continue;
+    filled++;
+    el.disabled = true;
+    if (norm(v) === norm(el.dataset.ans)) { el.classList.add('correct'); correct++; }
+    else { el.classList.add('wrong'); el.title = 'Правильно: ' + el.dataset.ans; }
+  }
+  if (filled === 0) { alert('Заполните хотя бы несколько пропусков!'); return; }
 
-// ─── Show answers ─────────────────────────────────────────────────────────────
-function showAnswers() {
-  BLANKS.forEach(b => {
-    const el = document.getElementById('b' + b.id);
-    el.value = b.answer;
-    el.classList.remove('correct', 'incorrect');
-    el.classList.add('correct');
-  });
-  buildFullText();
-  document.getElementById('fullText').style.display = 'block';
-  document.getElementById('resultBox').style.display = 'none';
-}
+  const msg = document.getElementById('result-msg');
+  document.getElementById('answer-key').classList.add('show');
+  document.getElementById('check-btn').style.display = 'none';
+  msg.classList.add('show');
 
-// ─── Full text ────────────────────────────────────────────────────────────────
-function a(id) { return `<mark>${BLANKS[id-1].answer}</mark>`; }
-
-function buildFullText() {
-  document.getElementById('fullText').innerHTML = `
-<h3>📖 Полный текст с правильными ответами</h3>
-<p>İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler. Onlarla ${a(1)} gerçekten çok seviyorum.</p>
-<p>Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana ${a(2)} istedi. Bize doğada ${a(3)} öğretmek ${a(4)} söyledi, biz de hemen kabul ettik.</p>
-<p>Ormana gidince bize ateş ${a(5)}, çadır ${a(6)} ve balık ${a(7)} gösterdi. Hangi meyveleri yemememiz ${a(8)} de anlattı.</p>
-<p>Ben balık ${a(9)} çok sevdim, ama çadır ${a(10)} beceremedim. Meşale ${a(11)} çok eğlenceliydi, fakat Kemal amca ateşle ${a(12)} söyledi.</p>
-<p>Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu ${a(13)} fark ettik ve yağmur yağmaya başladı. Biraz ${a(14)} itiraf etmeliyim. Ama Kemal amca yolu çabuk ${a(15)} ve bizi kamp yerine geri ${a(16)} söyledi. Yosunun her zaman ağacın kuzey tarafında ${a(17)} açıkladı, böylece her zaman kuzeyi ${a(18)} söyledi.</p>
-<p>Gerçekten de kısa süre sonra yolu ${a(19)} gördük. Bizi tekrar kampa ${a(20)} başardı.</p>
-<p>Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik. Bu günü asla ${a(21)} biliyorum.</p>
-  `;
-}
-
-// ─── Result ───────────────────────────────────────────────────────────────────
-function showResult(correct) {
-  const pct = Math.round(correct / TOTAL * 100);
-  const box  = document.getElementById('resultBox');
-  const text = document.getElementById('resultText');
-  const det  = document.getElementById('scoreDetail');
-
-  box.style.display = 'block';
-  box.className = 'result-box';
-  det.textContent = correct + ' из ' + TOTAL + ' (' + pct + '%)';
-
-  if (correct === TOTAL) {
-    box.classList.add('great');
-    text.textContent = '🎉 Невероятно! Все ответы верны — ты просто звезда!';
-    playVictory();
-    launchConfetti();
-  } else if (pct >= 70) {
-    box.classList.add('good');
-    text.textContent = '👏 Отлично постаралась! Почти всё правильно!';
+  const pct = correct / filled;
+  if (correct === N) {
+    msg.textContent = 'Великолепно! Все 21 ответ верны — вы блестяще справились! 🎉';
+    msg.className = 'result-msg show perfect';
+    playWin(); confetti();
+  } else if (pct >= 0.75) {
+    msg.textContent = `${correct} из ${filled} верно — отличный результат! Посмотрите правильные ответы ниже 💜`;
+    msg.className = 'result-msg show good';
   } else {
-    box.classList.add('retry');
-    text.textContent = '💪 Задание объективно сложное, но практика — ключ к успеху!';
+    msg.textContent = `${correct} из ${filled}. Задание объективно сложное, но практика — ключ к успеху! Изучите ответы и попробуйте снова 🌟`;
+    msg.className = 'result-msg show hard';
   }
-
-  buildFullText();
-  document.getElementById('fullText').style.display = 'block';
-  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  msg.scrollIntoView({behavior:'smooth',block:'center'});
 }
-
-// ─── Reset ────────────────────────────────────────────────────────────────────
 function resetAll() {
-  buildText();
-  document.getElementById('resultBox').style.display = 'none';
-  document.getElementById('fullText').style.display = 'none';
+  for (let i = 1; i <= N; i++) {
+    const el = document.getElementById('b'+i);
+    if (el) { el.value=''; el.disabled=false; el.classList.remove('correct','wrong'); el.title=''; }
+  }
+  document.getElementById('result-msg').classList.remove('show');
+  document.getElementById('answer-key').classList.remove('show');
+  document.getElementById('check-btn').style.display='';
 }
-
-// ─── Audio (Web Audio API) ───────────────────────────────────────────────────
-let _ctx = null;
-function getCtx() {
-  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
-  return _ctx;
-}
-
-function playVictory() {
+document.querySelectorAll('.blank').forEach(el => {
+  el.addEventListener('input', () => {
+    el.style.width = Math.max(el.size*8, el.value.length*10+24)+'px';
+  });
+});
+function playWin() {
   try {
-    const ctx = getCtx();
-    // C5 E5 G5 C6  G5 C6 E6
-    const notes = [523, 659, 784, 1047, 784, 1047, 1319];
-    const durs  = [.14, .14, .14, .22,  .11, .11,  .38 ];
-    let t = ctx.currentTime + 0.05;
-    notes.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const g   = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.type = 'triangle';
-      osc.frequency.value = f;
-      g.gain.setValueAtTime(0.22, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + durs[i] + 0.05);
-      osc.start(t); osc.stop(t + durs[i] + 0.1);
-      t += durs[i] + 0.025;
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [[523,0],[659,.15],[784,.3],[1047,.45],[1319,.6]].forEach(([f,t])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
+      const s=ctx.currentTime+t;g.gain.setValueAtTime(.35,s);g.gain.exponentialRampToValueAtTime(.001,s+.45);o.start(s);o.stop(s+.5);
     });
-  } catch(e) {}
+  } catch(e){}
 }
-
-// ─── Confetti ─────────────────────────────────────────────────────────────────
-function launchConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const COLORS = ['#7c3aed','#a78bfa','#c4b5fd','#f0abfc','#e879f9',
-                  '#fbbf24','#34d399','#60a5fa','#f472b6','#fb923c'];
-  const ptcs = [];
-  for (let i = 0; i < 200; i++) {
-    ptcs.push({
-      x: Math.random() * canvas.width,
-      y: -20 - Math.random() * 80,
-      w: 7 + Math.random() * 7,
-      h: 10 + Math.random() * 7,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      vx: (Math.random() - 0.5) * 3.5,
-      vy: 2.5 + Math.random() * 4,
-      rot: Math.random() * Math.PI * 2,
-      vrot: (Math.random() - 0.5) * 0.18,
-    });
-  }
-
-  let raf;
-  const end = Date.now() + 4500;
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ptcs.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.vy += 0.035;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.y < canvas.height ? 1 : Math.max(0, 1 - (p.y - canvas.height) / 60);
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
-    });
-    if (Date.now() < end) {
-      raf = requestAnimationFrame(draw);
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-  draw();
+function confetti() {
+  const cv=document.getElementById('cc'),cx=cv.getContext('2d');
+  cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#8b5cf6','#a78bfa','#c4b5fd','#7c3aed','#f0abfc','#ddd6fe','#e879f9'];
+  const ps=Array.from({length:130},()=>({x:Math.random()*cv.width,y:-10-Math.random()*60,w:7+Math.random()*7,h:4+Math.random()*5,r:Math.random()*Math.PI*2,dr:(Math.random()-.5)*.18,vx:(Math.random()-.5)*3,vy:2+Math.random()*3.5,c:cols[0|Math.random()*cols.length],a:1}));
+  let fr;(function draw(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;ps.forEach(p=>{if(p.a<=0)return;alive=true;p.x+=p.vx;p.y+=p.vy;p.r+=p.dr;p.vy+=.04;if(p.y>cv.height*.65)p.a-=.014;cx.globalAlpha=Math.max(0,p.a);cx.fillStyle=p.c;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});cx.globalAlpha=1;if(alive)fr=requestAnimationFrame(draw);else cx.clearRect(0,0,cv.width,cv.height);})();
+  setTimeout(()=>{cancelAnimationFrame(fr);cx.clearRect(0,0,cv.width,cv.height);},6000);
 }
-
-// ─── Init ──────────────────────────────────────────────────────────────────────
-buildText();
 </script>
 </body>
 </html>
