@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Упражнение 11 — Вставь слово (поход)</title>
+  <style>
+    :root {
+      --bg: #f8f7ff;
+      --card: #ffffff;
+      --text: #1e1b4b;
+      --muted: #6b7280;
+      --accent: #7c3aed;
+      --accent-dark: #5b21b6;
+      --accent-light: #c4b5fd;
+      --accent-bg: #ede9fe;
+      --hint-color: #a78bfa;
+      --ok: #16a34a;
+      --ok-bg: #dcfce7;
+      --bad: #dc2626;
+      --bad-bg: #fee2e2;
+      --shadow: 0 2px 14px rgba(124,58,237,.1);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 16px 12px 40px;
+      color: var(--text);
+    }
+
+    .container { max-width: 800px; margin: 0 auto; }
+
+    /* Header */
+    .header { text-align: center; margin: 8px 0 20px; }
+    .header h1 { font-size: 1.55rem; line-height: 1.2; color: var(--accent); margin-bottom: 6px; }
+    .header p  { color: var(--muted); font-size: .95rem; }
+
+    /* Word bank */
+    .word-bank {
+      background: var(--card);
+      border: 2px solid var(--accent-light);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .word-bank h3 {
+      color: var(--accent);
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .wb-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+    }
+    .wb-item {
+      font-size: .9rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .wb-item strong { color: var(--accent-dark); }
+
+    /* Text card */
+    .text-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+      line-height: 2.4;
+      color: var(--text);
+    }
+
+    .text-card p { margin-bottom: 8px; }
+
+    /* Blank inputs */
+    .blank {
+      display: inline-block;
+      border: none;
+      border-bottom: 2.5px solid var(--accent-light);
+      background: var(--accent-bg);
+      border-radius: 6px 6px 2px 2px;
+      padding: 2px 8px;
+      font-size: .97rem;
+      font-family: inherit;
+      color: var(--text);
+      min-width: 110px;
+      max-width: 220px;
+      vertical-align: middle;
+      transition: border-color .2s, background .2s;
+      outline: none;
+      margin: 0 1px;
+    }
+    .blank:focus {
+      border-color: var(--accent);
+      background: #f0ebff;
+    }
+    .blank::placeholder {
+      color: var(--hint-color);
+      font-style: italic;
+      font-size: .88rem;
+    }
+    .blank.correct {
+      background: var(--ok-bg);
+      border-color: var(--ok);
+      color: var(--ok);
+      font-weight: 600;
+    }
+    .blank.incorrect {
+      background: var(--bad-bg);
+      border-color: var(--bad);
+      color: var(--bad);
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0 16px;
+    }
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { transform: scale(.97); }
+    .btn.show-btn { background: #9333ea; }
+    .btn.show-btn:hover { background: #7e22ce; }
+    .btn.reset-btn { background: #6b7280; }
+    .btn.reset-btn:hover { background: #4b5563; }
+
+    /* Result */
+    .result-box {
+      display: none;
+      text-align: center;
+      padding: 22px 20px;
+      border-radius: var(--radius);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 14px 0;
+    }
+    .result-box.great { background: var(--ok-bg); color: var(--ok); border: 2px solid rgba(22,163,74,.3); }
+    .result-box.good  { background: #fefce8; color: #a16207; border: 2px solid rgba(234,179,8,.4); }
+    .result-box.retry { background: var(--bad-bg); color: var(--bad); border: 2px solid rgba(220,38,38,.3); }
+    .score-detail { font-size: .92rem; font-weight: 400; color: var(--muted); margin-top: 8px; }
+
+    /* Full text */
+    .full-text {
+      display: none;
+      background: var(--card);
+      border: 2px solid var(--accent-light);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-top: 16px;
+      box-shadow: var(--shadow);
+    }
+    .full-text h3 {
+      color: var(--accent);
+      margin-bottom: 14px;
+      font-size: .95rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .full-text p {
+      line-height: 1.9;
+      margin-bottom: 10px;
+      font-size: .97rem;
+    }
+    .full-text mark {
+      background: var(--accent-bg);
+      color: var(--accent-dark);
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 1px 4px;
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container">
+
+  <div class="header">
+    <h1>🏕️ Упражнение 11 — Вставь форму</h1>
+    <p>Впиши правильную турецкую форму в каждый пропуск. Подсказка — по-русски.</p>
+  </div>
+
+  <!-- Word bank -->
+  <div class="word-bank">
+    <h3>📚 Слова для справки</h3>
+    <div class="wb-grid">
+      <div class="wb-item"><strong>vakit geçirmek</strong> – проводить время</div>
+      <div class="wb-item"><strong>götürmek</strong> – отводить, отвозить</div>
+      <div class="wb-item"><strong>ateş yakmak</strong> – зажигать костёр</div>
+      <div class="wb-item"><strong>çadır kurmak</strong> – ставить палатку</div>
+      <div class="wb-item"><strong>balık tutmak</strong> – ловить рыбу</div>
+      <div class="wb-item"><strong>meşale yapmak</strong> – делать факел</div>
+      <div class="wb-item"><strong>itiraf etmek</strong> – признаваться</div>
+      <div class="wb-item"><strong>yosun</strong> – мох</div>
+      <div class="wb-item"><strong>kuzey</strong> – север</div>
+    </div>
+  </div>
+
+  <!-- Exercise text -->
+  <div class="text-card" id="textBlock"></div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="checkAnswers()">✔️ Проверить</button>
+    <button class="btn show-btn" onclick="showAnswers()">👁 Показать ответы</button>
+    <button class="btn reset-btn" onclick="resetAll()">🔄 Заново</button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div id="resultText"></div>
+    <div class="score-detail" id="scoreDetail"></div>
+  </div>
+
+  <div class="full-text" id="fullText"></div>
+
+</div>
+
+<script>
+// ─── Data ────────────────────────────────────────────────────────────────────
+const BLANKS = [
+  { id: 1,  hint: 'проводить время',    answer: 'vakit geçirmeyi'   },
+  { id: 2,  hint: 'отвезти',            answer: 'götürmek'          },
+  { id: 3,  hint: 'жить',               answer: 'yaşamayı'          },
+  { id: 4,  hint: 'хочет',              answer: 'istediğini'        },
+  { id: 5,  hint: 'зажигать',           answer: 'yakmayı'           },
+  { id: 6,  hint: 'ставить',            answer: 'kurmayı'           },
+  { id: 7,  hint: 'ловить',             answer: 'tutmayı'           },
+  { id: 8,  hint: 'необходимо',         answer: 'gerektiğini'       },
+  { id: 9,  hint: 'ловить',             answer: 'tutmayı'           },
+  { id: 10, hint: 'ставить',            answer: 'kurmayı'           },
+  { id: 11, hint: 'делать',             answer: 'yapmak'            },
+  { id: 12, hint: 'не играть',          answer: 'oynamamamızı'      },
+  { id: 13, hint: 'мы потеряли',        answer: 'kaybettiğimizi'    },
+  { id: 14, hint: 'я испугался',        answer: 'korktuğumu'        },
+  { id: 15, hint: 'что он найдёт',      answer: 'bulacağını'        },
+  { id: 16, hint: 'отведёт',            answer: 'götüreceğini'      },
+  { id: 17, hint: 'появляется',         answer: 'çıktığını'         },
+  { id: 18, hint: 'мы сумеем найти',    answer: 'bulabileceğimizi'  },
+  { id: 19, hint: 'он нашёл',           answer: 'bulduğunu'         },
+  { id: 20, hint: 'отвести',            answer: 'götürmeyi'         },
+  { id: 21, hint: 'не смогу забыть',    answer: 'unutmayacağımı'    },
+];
+
+const TOTAL = BLANKS.length;
+
+// ─── Build text ──────────────────────────────────────────────────────────────
+function inp(id) {
+  const b = BLANKS[id - 1];
+  const w = Math.max(110, b.answer.length * 11 + 20);
+  return `<input class="blank" id="b${id}" data-id="${id}" placeholder="${b.hint}" style="width:${w}px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />`;
+}
+
+function buildText() {
+  document.getElementById('textBlock').innerHTML = `
+<p>İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler. Onlarla ${inp(1)} gerçekten çok seviyorum.</p>
+<p>Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana ${inp(2)} istedi. Bize doğada ${inp(3)} öğretmek ${inp(4)} söyledi, biz de hemen kabul ettik.</p>
+<p>Ormana gidince bize ateş ${inp(5)}, çadır ${inp(6)} ve balık ${inp(7)} gösterdi. Hangi meyveleri yemememiz ${inp(8)} de anlattı.</p>
+<p>Ben balık ${inp(9)} çok sevdim, ama çadır ${inp(10)} beceremedim. Meşale ${inp(11)} çok eğlenceliydi, fakat Kemal amca ateşle ${inp(12)} söyledi.</p>
+<p>Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu ${inp(13)} fark ettik ve yağmur yağmaya başladı. Biraz ${inp(14)} itiraf etmeliyim. Ama Kemal amca yolu çabuk ${inp(15)} ve bizi kamp yerine geri ${inp(16)} söyledi. Yosunun her zaman ağacın kuzey tarafında ${inp(17)} açıkladı, böylece her zaman kuzeyi ${inp(18)} söyledi.</p>
+<p>Gerçekten de kısa süre sonra yolu ${inp(19)} gördük. Bizi tekrar kampa ${inp(20)} başardı.</p>
+<p>Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik. Bu günü asla ${inp(21)} biliyorum.</p>
+  `;
+}
+
+// ─── Check ───────────────────────────────────────────────────────────────────
+function norm(s) { return s.trim().toLowerCase(); }
+
+function checkAnswers() {
+  let correct = 0;
+  BLANKS.forEach(b => {
+    const el = document.getElementById('b' + b.id);
+    el.classList.remove('correct', 'incorrect');
+    if (norm(el.value) === norm(b.answer)) {
+      el.classList.add('correct');
+      correct++;
+    } else {
+      el.classList.add('incorrect');
+    }
+  });
+  showResult(correct);
+}
+
+// ─── Show answers ─────────────────────────────────────────────────────────────
+function showAnswers() {
+  BLANKS.forEach(b => {
+    const el = document.getElementById('b' + b.id);
+    el.value = b.answer;
+    el.classList.remove('correct', 'incorrect');
+    el.classList.add('correct');
+  });
+  buildFullText();
+  document.getElementById('fullText').style.display = 'block';
+  document.getElementById('resultBox').style.display = 'none';
+}
+
+// ─── Full text ────────────────────────────────────────────────────────────────
+function a(id) { return `<mark>${BLANKS[id-1].answer}</mark>`; }
+
+function buildFullText() {
+  document.getElementById('fullText').innerHTML = `
+<h3>📖 Полный текст с правильными ответами</h3>
+<p>İki tane en iyi arkadaşım var: Mert ve Can. Onlar ikiz kardeşler. Onlarla ${a(1)} gerçekten çok seviyorum.</p>
+<p>Geçen hafta Mert ve Can'ın babası Kemal amca bizi ormana ${a(2)} istedi. Bize doğada ${a(3)} öğretmek ${a(4)} söyledi, biz de hemen kabul ettik.</p>
+<p>Ormana gidince bize ateş ${a(5)}, çadır ${a(6)} ve balık ${a(7)} gösterdi. Hangi meyveleri yemememiz ${a(8)} de anlattı.</p>
+<p>Ben balık ${a(9)} çok sevdim, ama çadır ${a(10)} beceremedim. Meşale ${a(11)} çok eğlenceliydi, fakat Kemal amca ateşle ${a(12)} söyledi.</p>
+<p>Başta her şey çok güzeldi. Ama bir süre sonra yolumuzu ${a(13)} fark ettik ve yağmur yağmaya başladı. Biraz ${a(14)} itiraf etmeliyim. Ama Kemal amca yolu çabuk ${a(15)} ve bizi kamp yerine geri ${a(16)} söyledi. Yosunun her zaman ağacın kuzey tarafında ${a(17)} açıkladı, böylece her zaman kuzeyi ${a(18)} söyledi.</p>
+<p>Gerçekten de kısa süre sonra yolu ${a(19)} gördük. Bizi tekrar kampa ${a(20)} başardı.</p>
+<p>Sonra hep birlikte yemek yedik, sıcak çay içtik ve şarkı söyledik. Bu günü asla ${a(21)} biliyorum.</p>
+  `;
+}
+
+// ─── Result ───────────────────────────────────────────────────────────────────
+function showResult(correct) {
+  const pct = Math.round(correct / TOTAL * 100);
+  const box  = document.getElementById('resultBox');
+  const text = document.getElementById('resultText');
+  const det  = document.getElementById('scoreDetail');
+
+  box.style.display = 'block';
+  box.className = 'result-box';
+  det.textContent = correct + ' из ' + TOTAL + ' (' + pct + '%)';
+
+  if (correct === TOTAL) {
+    box.classList.add('great');
+    text.textContent = '🎉 Невероятно! Все ответы верны — ты просто звезда!';
+    playVictory();
+    launchConfetti();
+  } else if (pct >= 70) {
+    box.classList.add('good');
+    text.textContent = '👏 Отлично постаралась! Почти всё правильно!';
+  } else {
+    box.classList.add('retry');
+    text.textContent = '💪 Задание объективно сложное, но практика — ключ к успеху!';
+  }
+
+  buildFullText();
+  document.getElementById('fullText').style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+function resetAll() {
+  buildText();
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('fullText').style.display = 'none';
+}
+
+// ─── Audio (Web Audio API) ───────────────────────────────────────────────────
+let _ctx = null;
+function getCtx() {
+  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  return _ctx;
+}
+
+function playVictory() {
+  try {
+    const ctx = getCtx();
+    // C5 E5 G5 C6  G5 C6 E6
+    const notes = [523, 659, 784, 1047, 784, 1047, 1319];
+    const durs  = [.14, .14, .14, .22,  .11, .11,  .38 ];
+    let t = ctx.currentTime + 0.05;
+    notes.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const g   = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.value = f;
+      g.gain.setValueAtTime(0.22, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + durs[i] + 0.05);
+      osc.start(t); osc.stop(t + durs[i] + 0.1);
+      t += durs[i] + 0.025;
+    });
+  } catch(e) {}
+}
+
+// ─── Confetti ─────────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const COLORS = ['#7c3aed','#a78bfa','#c4b5fd','#f0abfc','#e879f9',
+                  '#fbbf24','#34d399','#60a5fa','#f472b6','#fb923c'];
+  const ptcs = [];
+  for (let i = 0; i < 200; i++) {
+    ptcs.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 80,
+      w: 7 + Math.random() * 7,
+      h: 10 + Math.random() * 7,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      vx: (Math.random() - 0.5) * 3.5,
+      vy: 2.5 + Math.random() * 4,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.18,
+    });
+  }
+
+  let raf;
+  const end = Date.now() + 4500;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ptcs.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.vy += 0.035;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.y < canvas.height ? 1 : Math.max(0, 1 - (p.y - canvas.height) / 60);
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (Date.now() < end) {
+      raf = requestAnimationFrame(draw);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  draw();
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────────
+buildText();
+</script>
+</body>
+</html>
