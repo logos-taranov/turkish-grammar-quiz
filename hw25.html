@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Упражнение 12 — Объедините предложения (-dığı / -eceği)</title>
+<style>
+:root {
+  --accent: #8b5cf6;
+  --accent-light: #ede9fe;
+  --accent-dark: #6d28d9;
+  --correct: #10b981;
+  --wrong: #ef4444;
+  --bg: #faf7ff;
+  --card: #ffffff;
+  --text: #1e1b4b;
+  --text-muted: #6b7280;
+  --border: #e0d9f5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding: 20px 16px 60px;
+}
+.header { text-align: center; max-width: 720px; margin: 0 auto 24px; padding-top: 20px; }
+.header h1 { font-size: 1.5rem; color: var(--accent-dark); margin-bottom: 8px; }
+.header p  { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+/* Example box */
+.example {
+  background: var(--accent-light); border: 1.5px solid #c4b5fd;
+  border-radius: 12px; padding: 14px 18px;
+  max-width: 720px; margin: 0 auto 24px; font-size: 0.93rem; line-height: 1.7;
+}
+.example strong { color: var(--accent-dark); }
+.example .arr { color: var(--accent); margin: 0 4px; }
+
+/* Question cards */
+.q-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 18px 20px;
+  max-width: 720px; margin: 0 auto 14px;
+  transition: border-color 0.2s;
+}
+.q-card.correct-card { border-color: var(--correct); }
+.q-card.wrong-card   { border-color: var(--wrong); }
+
+.q-num {
+  display: inline-block; background: var(--accent-light); color: var(--accent-dark);
+  border-radius: 50%; width: 26px; height: 26px; line-height: 26px;
+  text-align: center; font-size: 0.82rem; font-weight: 700; margin-right: 8px; flex-shrink: 0;
+}
+.q-header { display: flex; align-items: flex-start; gap: 0; margin-bottom: 10px; }
+.q-sentences { flex: 1; }
+.q-sentence { font-size: 0.95rem; line-height: 1.6; color: var(--text); }
+.q-sentence + .q-sentence { margin-top: 2px; }
+
+.q-input {
+  width: 100%; border: 2px solid var(--border); border-radius: 10px;
+  padding: 9px 13px; font-family: inherit; font-size: 0.95rem; color: var(--text);
+  background: var(--bg); outline: none; transition: border-color 0.2s;
+  resize: none; min-height: 44px;
+}
+.q-input:focus { border-color: var(--accent); background: white; }
+.q-input.correct { border-color: var(--correct); background: #ecfdf5; color: #065f46; }
+.q-input.wrong   { border-color: var(--wrong);   background: #fef2f2; color: #7f1d1d; }
+
+.feedback {
+  margin-top: 8px; font-size: 0.88rem; line-height: 1.5; display: none;
+}
+.feedback.show { display: block; }
+.feedback.ok  { color: var(--correct); }
+.feedback.err { color: var(--wrong); }
+.answer-show  { color: #065f46; background: #d1fae5; border-radius: 6px; padding: 5px 10px; display: block; margin-top: 4px; font-size: 0.92rem; }
+
+/* Buttons */
+.check-wrap { max-width: 720px; margin: 24px auto 0; text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.check-btn {
+  background: var(--accent); color: white; border: none; border-radius: 12px;
+  padding: 13px 40px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+  transition: background 0.2s, transform 0.1s;
+}
+.check-btn:hover  { background: var(--accent-dark); transform: translateY(-1px); }
+.check-btn:active { transform: translateY(1px); }
+.reset-btn {
+  background: var(--accent-light); color: var(--accent-dark);
+  border: 2px solid var(--border); border-radius: 12px;
+  padding: 13px 24px; font-size: 1rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.reset-btn:hover { background: #ddd6fe; }
+
+/* Result */
+.result-msg {
+  max-width: 720px; margin: 20px auto 0; text-align: center;
+  font-size: 1.05rem; font-weight: 600; padding: 20px;
+  border-radius: 14px; display: none; line-height: 1.6;
+}
+.result-msg.show    { display: block; }
+.result-msg.perfect { background: #d1fae5; color: #065f46; }
+.result-msg.good    { background: var(--accent-light); color: var(--accent-dark); }
+.result-msg.hard    { background: #fef3c7; color: #92400e; }
+
+canvas#cc { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
+</style>
+</head>
+<body>
+<canvas id="cc"></canvas>
+
+<div class="header">
+  <h1>Упражнение 12</h1>
+  <p>Объедините два предложения в одно, используя <strong>-dığı</strong> или <strong>-eceği</strong>.<br>
+  Регистр и знаки препинания не проверяются.</p>
+</div>
+
+<div class="example">
+  <strong>Пример:</strong><br>
+  Evi şehrin merkezinde bulunuyor. + Bunu duymuştum.
+  <span class="arr">→</span>
+  Evinin şehrin merkezinde bulunduğunu duymuştum.
+</div>
+
+<!-- Questions -->
+<div class="q-card" id="qc1">
+  <div class="q-header">
+    <span class="q-num">1</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Yağmurdan sonra hava çok temiz.</div>
+      <div class="q-sentence">Bunu biliyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q1" placeholder="Введите объединённое предложение…" data-ans="Yağmurdan sonra havanın çok temiz olduğunu biliyorum">
+  <div class="feedback" id="fb1"></div>
+</div>
+
+<div class="q-card" id="qc2">
+  <div class="q-header">
+    <span class="q-num">2</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Daha dikkatli olmam lazım.</div>
+      <div class="q-sentence">Bunu biliyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q2" placeholder="Введите объединённое предложение…" data-ans="Daha dikkatli olmam gerektiğini biliyorum">
+  <div class="feedback" id="fb2"></div>
+</div>
+
+<div class="q-card" id="qc3">
+  <div class="q-header">
+    <span class="q-num">3</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Bir daha asla seni üzmeyeceğim.</div>
+      <div class="q-sentence">Bunu biliyorsun.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q3" placeholder="Введите объединённое предложение…" data-ans="Seni bir daha asla üzmeyeceğimi biliyorsun">
+  <div class="feedback" id="fb3"></div>
+</div>
+
+<div class="q-card" id="qc4">
+  <div class="q-header">
+    <span class="q-num">4</span>
+    <div class="q-sentences">
+      <div class="q-sentence">O çok başarılı bir öğrenci.</div>
+      <div class="q-sentence">Ben böyle düşünüyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q4" placeholder="Введите объединённое предложение…" data-ans="Çok başarılı bir öğrenci olduğunu düşünüyorum">
+  <div class="feedback" id="fb4"></div>
+</div>
+
+<div class="q-card" id="qc5">
+  <div class="q-header">
+    <span class="q-num">5</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Örümceklerden korkuyor.</div>
+      <div class="q-sentence">Bunu itiraf etti.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q5" placeholder="Введите объединённое предложение…" data-ans="Örümceklerden korktuğunu itiraf etti">
+  <div class="feedback" id="fb5"></div>
+</div>
+
+<div class="q-card" id="qc6">
+  <div class="q-header">
+    <span class="q-num">6</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Bir daha yalan söylemeyecekmiş.</div>
+      <div class="q-sentence">Bana öyle söyledi.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q6" placeholder="Введите объединённое предложение…" data-ans="Bana bir daha yalan söylemeyeceğini söyledi">
+  <div class="feedback" id="fb6"></div>
+</div>
+
+<div class="q-card" id="qc7">
+  <div class="q-header">
+    <span class="q-num">7</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Maç berabere bitmiş.</div>
+      <div class="q-sentence">Bunu duydum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q7" placeholder="Введите объединённое предложение…" data-ans="Maçın berabere bittiğini duydum">
+  <div class="feedback" id="fb7"></div>
+</div>
+
+<div class="q-card" id="qc8">
+  <div class="q-header">
+    <span class="q-num">8</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Onlar beş kişiymiş.</div>
+      <div class="q-sentence">Bunu tespit ettik.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q8" placeholder="Введите объединённое предложение…" data-ans="Beş kişi olduklarını tespit ettik">
+  <div class="feedback" id="fb8"></div>
+</div>
+
+<div class="q-card" id="qc9">
+  <div class="q-header">
+    <span class="q-num">9</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Daha çok pratik yapman lazım.</div>
+      <div class="q-sentence">Ben böyle düşünüyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q9" placeholder="Введите объединённое предложение…" data-ans="Daha çok pratik yapman gerektiğini düşünüyorum">
+  <div class="feedback" id="fb9"></div>
+</div>
+
+<div class="q-card" id="qc10">
+  <div class="q-header">
+    <span class="q-num">10</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Arabası ne renk?</div>
+      <div class="q-sentence">Ben unuttum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q10" placeholder="Введите объединённое предложение…" data-ans="Arabasının ne renk olduğunu unuttum">
+  <div class="feedback" id="fb10"></div>
+</div>
+
+<div class="q-card" id="qc11">
+  <div class="q-header">
+    <span class="q-num">11</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Daha iyi bir çözüm var.</div>
+      <div class="q-sentence">Böyle tahmin ediyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q11" placeholder="Введите объединённое предложение…" data-ans="Daha iyi bir çözüm olduğunu tahmin ediyorum">
+  <div class="feedback" id="fb11"></div>
+</div>
+
+<div class="q-card" id="qc12">
+  <div class="q-header">
+    <span class="q-num">12</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Seni yarına kadar beklemeyecekler.</div>
+      <div class="q-sentence">Sanmıyorum.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q12" placeholder="Введите объединённое предложение…" data-ans="Seni yarına kadar bekleyeceklerini sanmıyorum">
+  <div class="feedback" id="fb12"></div>
+</div>
+
+<div class="q-card" id="qc13">
+  <div class="q-header">
+    <span class="q-num">13</span>
+    <div class="q-sentences">
+      <div class="q-sentence">O bu sene Oskar'ı alacakmış.</div>
+      <div class="q-sentence">Bunu öğrendim.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q13" placeholder="Введите объединённое предложение…" data-ans="Onun bu sene Oskarı alacağını öğrendim">
+  <div class="feedback" id="fb13"></div>
+</div>
+
+<div class="q-card" id="qc14">
+  <div class="q-header">
+    <span class="q-num">14</span>
+    <div class="q-sentences">
+      <div class="q-sentence">Adam ne kadar kazanıyor?</div>
+      <div class="q-sentence">Umursamam.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q14" placeholder="Введите объединённое предложение…" data-ans="Adamın ne kadar kazandığını umursamıyorum">
+  <div class="feedback" id="fb14"></div>
+</div>
+
+<div class="q-card" id="qc15">
+  <div class="q-header">
+    <span class="q-num">15</span>
+    <div class="q-sentences">
+      <div class="q-sentence">İşinde çok başarılı.</div>
+      <div class="q-sentence">Hepimiz bunu gördük.</div>
+    </div>
+  </div>
+  <input class="q-input" id="q15" placeholder="Введите объединённое предложение…" data-ans="İşinde çok başarılı olduğunu hepimiz gördük">
+  <div class="feedback" id="fb15"></div>
+</div>
+
+<div class="check-wrap">
+  <button class="check-btn" id="check-btn" onclick="checkAll()">Проверить ✓</button>
+  <button class="reset-btn" onclick="resetAll()">Сначала ↺</button>
+</div>
+<div class="result-msg" id="result-msg"></div>
+
+<script>
+const N = 15;
+
+function norm(s) {
+  return s.toLowerCase()
+    .replace(/[.,!?;:'"«»()\-–]/g, '')   // strip punctuation
+    .replace(/i̇/g, 'i')
+    .replace(/ı/g, 'i')
+    .replace(/ğ/g, 'g')
+    .replace(/ş/g, 's')
+    .replace(/ç/g, 'c')
+    .replace(/ö/g, 'o')
+    .replace(/ü/g, 'u')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function checkAll() {
+  let correct = 0, filled = 0;
+
+  for (let i = 1; i <= N; i++) {
+    const inp = document.getElementById('q' + i);
+    const fb  = document.getElementById('fb' + i);
+    const card = document.getElementById('qc' + i);
+    const val = inp.value.trim();
+    if (!val) continue;
+    filled++;
+    inp.disabled = true;
+
+    if (norm(val) === norm(inp.dataset.ans)) {
+      inp.classList.add('correct');
+      card.classList.add('correct-card');
+      fb.className = 'feedback show ok';
+      fb.textContent = '✓ Верно!';
+      correct++;
+    } else {
+      inp.classList.add('wrong');
+      card.classList.add('wrong-card');
+      fb.className = 'feedback show err';
+      fb.innerHTML = '✗ Не совсем. <span class="answer-show">✓ ' + inp.dataset.ans + '.</span>';
+    }
+  }
+
+  if (filled === 0) { alert('Введите хотя бы одно предложение!'); return; }
+
+  document.getElementById('check-btn').style.display = 'none';
+  const msg = document.getElementById('result-msg');
+  msg.classList.add('show');
+  const pct = correct / filled;
+
+  if (correct === N) {
+    msg.textContent = 'Великолепно! Все 15 предложений верны — отличная работа! 🎉';
+    msg.className = 'result-msg show perfect';
+    playWin(); confetti();
+  } else if (pct >= 0.7) {
+    msg.textContent = `${correct} из ${filled} верно — очень хорошо! Посмотрите ошибки выше 💜`;
+    msg.className = 'result-msg show good';
+  } else {
+    msg.textContent = `${correct} из ${filled}. Это сложная грамматика — практика решает всё! Разберите ошибки и попробуйте снова 🌟`;
+    msg.className = 'result-msg show hard';
+  }
+  msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetAll() {
+  for (let i = 1; i <= N; i++) {
+    const inp  = document.getElementById('q' + i);
+    const fb   = document.getElementById('fb' + i);
+    const card = document.getElementById('qc' + i);
+    inp.value = ''; inp.disabled = false;
+    inp.classList.remove('correct', 'wrong');
+    card.classList.remove('correct-card', 'wrong-card');
+    fb.className = 'feedback'; fb.textContent = '';
+  }
+  document.getElementById('result-msg').classList.remove('show');
+  document.getElementById('check-btn').style.display = '';
+}
+
+function playWin() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523,0],[659,.15],[784,.3],[1047,.45],[1319,.6]].forEach(([f,t]) => {
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.frequency.value=f; o.type='sine';
+      const s=ctx.currentTime+t; g.gain.setValueAtTime(.35,s); g.gain.exponentialRampToValueAtTime(.001,s+.45); o.start(s); o.stop(s+.5);
+    });
+  } catch(e){}
+}
+
+function confetti() {
+  const cv=document.getElementById('cc'), cx=cv.getContext('2d');
+  cv.width=innerWidth; cv.height=innerHeight;
+  const cols=['#8b5cf6','#a78bfa','#c4b5fd','#7c3aed','#f0abfc','#ddd6fe','#e879f9'];
+  const ps=Array.from({length:130},()=>({x:Math.random()*cv.width,y:-10-Math.random()*60,w:7+Math.random()*7,h:4+Math.random()*5,r:Math.random()*Math.PI*2,dr:(Math.random()-.5)*.18,vx:(Math.random()-.5)*3,vy:2+Math.random()*3.5,c:cols[0|Math.random()*cols.length],a:1}));
+  let fr;(function draw(){cx.clearRect(0,0,cv.width,cv.height);let alive=false;ps.forEach(p=>{if(p.a<=0)return;alive=true;p.x+=p.vx;p.y+=p.vy;p.r+=p.dr;p.vy+=.04;if(p.y>cv.height*.65)p.a-=.014;cx.globalAlpha=Math.max(0,p.a);cx.fillStyle=p.c;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});cx.globalAlpha=1;if(alive)fr=requestAnimationFrame(draw);else cx.clearRect(0,0,cv.width,cv.height);})();
+  setTimeout(()=>{cancelAnimationFrame(fr);cx.clearRect(0,0,cv.width,cv.height);},6000);
+}
+</script>
+</body>
+</html>
