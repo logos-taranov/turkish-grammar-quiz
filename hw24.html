@@ -198,7 +198,7 @@ canvas#cc { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer
     <input class="blank" id="b16" placeholder="отведёт" data-ans="götüreceğini" size="13">
     söyledi.
     Yosunun her zaman ağacın kuzey tarafında
-    <input class="blank" id="b17" placeholder="появляется" data-ans="yetiştiğini" size="12">
+    <input class="blank" id="b17" placeholder="появляется" data-ans="yetiştiğini|çıktığını" size="12">
     açıkladı, böylece her zaman kuzeyi
     <input class="blank" id="b18" placeholder="мы сумеем найти" data-ans="bulabileceğimizi" size="17">
     söyledi.
@@ -257,8 +257,9 @@ function checkAnswers() {
     if (!v) continue;
     filled++;
     el.disabled = true;
-    if (norm(v) === norm(el.dataset.ans)) { el.classList.add('correct'); correct++; }
-    else { el.classList.add('wrong'); el.title = 'Правильно: ' + el.dataset.ans; }
+    const alts = el.dataset.ans.split('|');
+    if (alts.some(a => norm(v) === norm(a))) { el.classList.add('correct'); correct++; }
+    else { el.classList.add('wrong'); el.title = 'Правильно: ' + el.dataset.ans.split('|')[0]; }
   }
   if (filled === 0) { alert('Заполните хотя бы несколько пропусков!'); return; }
 
